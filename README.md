@@ -2,7 +2,7 @@
 
 ## 🚗 Introduzione
 
-Questo progetto estende JavaClientTorcs per implementare behavioral cloning usando K-NN per TORCS (The Open Racing Car Simulator). L'approccio imita il comportamento umano basandosi su dati raccolti durante sessioni di guida manuale e automatica.
+Questo progetto estende un client Java fornito dall'Università degli Studi di Salerno per implementare behavioral cloning usando K-NN per TORCS (The Open Racing Car Simulator). L'approccio imita il comportamento umano basandosi su dati raccolti durante sessioni di guida manuale e automatica.
 
 ## 🏗️ Architettura
 
@@ -27,12 +27,42 @@ Questo progetto estende JavaClientTorcs per implementare behavioral cloning usan
 - Maven per build del progetto
 
 ### 2. Build del Progetto
+
+#### **Metodo 1: NetBeans 26 (Raccomandato)**
+**Ambiente di sviluppo:** NetBeans 26 + JDK 24
+
+**Procedura semplificata:**
+1. **Apri il progetto in NetBeans 26**
+   - File → Open Project
+   - Seleziona la cartella `JavaClientTorcs`
+   - NetBeans riconoscerà automaticamente il progetto Maven
+
+2. **Build con un click**
+   - **Pulsante verde "Run Project"** (▶️) nella toolbar
+   - **Oppure:** Right-click sul progetto → Clean and Build
+
+3. **Verifica build**
+   - Il JAR verrà generato in: `JavaClientTorcs/target/JavaClientTorcs-1.0-SNAPSHOT.jar`
+   - **Nessuna configurazione aggiuntiva richiesta**
+
+#### **Metodo 2: Maven da terminale**
 ```bash
 cd JavaClientTorcs
 mvn clean package
 ```
 
-**Note sui warning di build:**
+#### **Metodo 3: NetBeans da terminale**
+```bash
+cd JavaClientTorcs
+mvn -Dnetbeans.deploy=true clean package
+```
+
+### **Note sulla compatibilità**
+- **Testato con:** NetBeans 26 + JDK 24 ✅
+- **Compatibile con:** NetBeans 25+ e JDK 21+
+- **Sistema operativo:** Windows 10/11 (testato)
+
+### **Note sui warning di build**
 Durante la build con NetBeans o Maven, potresti vedere warning come:
 - `WARNING: A restricted method in java.lang.System has been called`
 - `WARNING: A terminally deprecated method in sun.misc.Unsafe has been called`
@@ -43,7 +73,7 @@ Durante la build con NetBeans o Maven, potresti vedere warning come:
 
 #### Menu Interattivo (Raccomandato)
 ```bash
-behavioral_cloning_menu.bat
+torcs_menu.bat
 ```
 
 #### Utilità Singole
@@ -53,6 +83,7 @@ behavioral_cloning_menu.bat
 - `test_human_model.bat` - Test con dati umani
 - `test_auto_model.bat` - Test con dati automatici
 - `combine_datasets.bat` - Combina dataset
+- `torcs_menu.bat` - Menu interattivo unificato (raccomandato)
 
 ## 📊 Raccolta Dati
 
@@ -91,15 +122,20 @@ Il SimpleDriver guida automaticamente e raccoglie dati. Utile per:
 
 ## 🧪 Test del Modello
 
-### Test con Dati Umani
-```bash
-test_human_model.bat
-```
+### ⚠️ **Importante:** Devi prima raccogliere i dati!
+Prima di testare il modello, assicurati di avere i file dataset:
 
-### Test con Dati Automatici
-```bash
-test_auto_model.bat
-```
+### **Sequenza Corretta:**
+1. **Prima raccogli i dati:**
+   - Per dati umani: `run_manual_driving.bat`
+   - Per dati automatici: `run_auto_collection.bat`
+
+2. **Poi testa il modello:**
+   - Test con Dati Umani: `test_human_model.bat`
+   - Test con Dati Automatici: `test_auto_model.bat`
+
+### **Cosa succede se mancano i dati:**
+I file batch controlleranno automaticamente se esistono i dataset e ti guideranno nel processo corretto.
 
 ### Test con Dataset Combinati
 ```bash
@@ -125,7 +161,7 @@ Durante il test, il modello:
 ```
 Progetto/
 ├── README.md                          # Questa guida completa
-├── behavioral_cloning_menu.bat        # Menu principale interattivo
+├── torcs_menu.bat                       # Menu principale interattivo
 ├── run_manual_driving.bat            # Guida manuale
 ├── run_auto_collection.bat            # Raccolta automatica
 ├── run_simpledriver.bat              # SimpleDriver base
@@ -227,7 +263,7 @@ System.setProperty("debug", "true");
 ## 🎯 Esempi di Utilizzo
 
 ### Scenario 1: Nuova Pista
-1. `behavioral_cloning_menu.bat`
+1. `torcs_menu.bat`
 2. Seleziona "Guida Manuale"
 3. Guida per 10-20 giri
 4. Salva con 'C'

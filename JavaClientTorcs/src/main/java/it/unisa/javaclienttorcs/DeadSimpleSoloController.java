@@ -22,12 +22,12 @@ public class DeadSimpleSoloController extends Controller {
         @Override
 	public void reset() {
 		System.out.println("[INFO] DeadSimpleSoloController: reset per nuova gara");
-		// TODO: Aggiungere reset stato interno se necessario
+
 	}
 
         @Override
 	public void shutdown() {
 		System.out.println("[INFO] DeadSimpleSoloController: chiusura controller");
-		// TODO: Aggiungere cleanup risorse se implementate
+
 	}
 }

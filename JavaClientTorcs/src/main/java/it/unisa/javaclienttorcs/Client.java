@@ -121,7 +121,6 @@ public class Client {
 				inMsg = mySocket.receive(UDP_TIMEOUT);
 
 				if (inMsg != null) {
-
 					/*
 					 * Controllo fine gara: server shutdown
 					 */
@@ -156,10 +155,10 @@ public class Client {
 
 					currStep++;
 					mySocket.send(action.toString());
-				} else
-					System.err.println("[ERRORE] Client: timeout ricezione dati dal server TORCS");
-						System.err.println("[ERRORE] Possibili cause: server crashato, connessione interrotta, errore di rete");
-						System.err.println("[ERRORE] Tentativo di riconnessione...");
+				} else if (verbose) {
+					// Silent timeout handling - only show in verbose mode
+					System.out.println("[INFO] Client: timeout ricezione dati dal server TORCS (normale per UDP)");
+				}
 			}
 
 		} while (++curEpisode < maxEpisodes && !shutdownOccurred);
@@ -200,56 +199,72 @@ public class Client {
 		 * Es: port:3001 host:localhost verbose:on
 		 */
 		for (int i = 1; i < args.length; i++) {
-			// Divisione ogni argomento in entità e valore usando ':' come separatore
-			StringTokenizer st = new StringTokenizer(args[i], ":");
-			String entity = st.nextToken();    // Nome del parametro
-			String value = st.nextToken();     // Valore del parametro
+			// Gestione flag speciali come --collect
+			if (args[i].equals("--collect")) {
+				// Il flag --collect viene gestito separatamente nel main
+				continue;
+			}
 			
-			// Fase 3: Assegnazione valori in base al parametro
-			if (entity.equals("port")) {
-				port = Integer.parseInt(value);  // Porta di connessione al server
-			}
-			if (entity.equals("host")) {
-				host = value;                    // Hostname o IP del server TORCS
-			}
-			if (entity.equals("id")) {
-				clientId = value;                // Identificatore univoco del client
-			}
-			if (entity.equals("verbose")) {
-				// Gestione booleana per modalità verbose
-				if (value.equals("on"))
-					verbose = true;              // Attiva output dettagliato
-				else if (value.equals("false"))
-					verbose = false;             // Mantiene modalità silenziosa
-				else {
-					System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
-					System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
-					System.exit(0);
+			// Gestione parametri nel formato chiave:valore
+			if (args[i].contains(":")) {
+				// Divisione ogni argomento in entità e valore usando ':' come separatore
+				StringTokenizer st = new StringTokenizer(args[i], ":");
+				if (st.countTokens() >= 2) {
+					String entity = st.nextToken();    // Nome del parametro
+					String value = st.nextToken();     // Valore del parametro
+					
+					// Fase 3: Assegnazione valori in base al parametro
+					if (entity.equals("port")) {
+						port = Integer.parseInt(value);  // Porta di connessione al server
+					}
+					if (entity.equals("host")) {
+						host = value;                    // Hostname o IP del server TORCS
+					}
+					if (entity.equals("id")) {
+						clientId = value;                // Identificatore univoco del client
+					}
+					if (entity.equals("verbose")) {
+						// Gestione booleana per modalità verbose
+						if (value.equals("on"))
+							verbose = true;              // Attiva output dettagliato
+						else if (value.equals("off"))
+							verbose = false;             // Mantiene modalità silenziosa
+						else {
+							System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
+							System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
+							System.exit(0);
+						}
+					}
+					if (entity.equals("stage")) {
+						// Conversione stringa numerica in enum Stage tramite metodo fromInt
+						stage = Stage.fromInt(Integer.parseInt(value));  // 0=WARMUP, 1=QUALIFYING, 2=RACE
+					}
+					if (entity.equals("trackName")) {
+						trackName = value;               // Nome specifico della pista
+					}
+					if (entity.equals("maxEpisodes")) {
+						maxEpisodes = Integer.parseInt(value);  // Numero massimo di gare
+						if (maxEpisodes <= 0) {
+							System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
+							System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
+							System.exit(0);
+						}
+					}
+					if (entity.equals("maxSteps")) {
+						maxSteps = Integer.parseInt(value);     // Limite passi per episodio
+						if (maxSteps < 0) {
+							System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
+							System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
+							System.exit(0);
+						}
+					}
+				} else {
+					System.err.println("[WARN] Parametri: formato non valido - " + args[i]);
+					System.err.println("[WARN] Parametri: formato atteso parametro:valore");
 				}
-			}
-			// Nota: gestione duplicata di 'id' rimossa per evitare ridondanza
-			if (entity.equals("stage")) {
-				// Conversione stringa numerica in enum Stage tramite metodo fromInt
-				stage = Stage.fromInt(Integer.parseInt(value));  // 0=WARMUP, 1=QUALIFYING, 2=RACE
-			}
-			if (entity.equals("trackName")) {
-				trackName = value;               // Nome specifico della pista
-			}
-			if (entity.equals("maxEpisodes")) {
-				maxEpisodes = Integer.parseInt(value);  // Numero massimo di gare
-				if (maxEpisodes <= 0) {
-					System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
-					System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
-					System.exit(0);
-				}
-			}
-			if (entity.equals("maxSteps")) {
-				maxSteps = Integer.parseInt(value);     // Limite passi per episodio
-				if (maxSteps < 0) {
-					System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
-					System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
-					System.exit(0);
-				}
+			} else {
+				System.err.println("[WARN] Parametri: parametro non riconosciuto - " + args[i]);
+				System.err.println("[WARN] Parametri: parametro ignorato");
 			}
 		}
 	}

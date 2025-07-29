@@ -26,7 +26,7 @@ public class SocketHandler {
 			System.err.println("[ERRORE] SocketHandler: impossibile risolvere l'hostname del server TORCS - " + host);
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Assicurarsi che TORCS sia in esecuzione e accessibile");
-			// TODO: Implementare retry automatico o fallback su localhost
+
 			throw new RuntimeException("Impossibile connettersi al server TORCS", e);
 		}
 		
@@ -43,7 +43,7 @@ public class SocketHandler {
 			System.err.println("[ERRORE] SocketHandler: impossibile creare socket UDP");
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Possibili cause: porta occupata, permessi insufficienti, firewall bloccante");
-			// TODO: Implementare tentativi su porte alternative
+
 			throw new RuntimeException("Impossibile inizializzare la comunicazione UDP", e);
 		}
 		
@@ -70,8 +70,7 @@ public class SocketHandler {
 			System.err.println("[ERRORE] SocketHandler.send: errore durante l'invio del messaggio");
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Messaggio che causava l'errore: " + msg);
-			// TODO: Implementare retry automatico con backoff esponenziale
-			// TODO: Aggiungere log strutturato per analisi errori
+
 			if (verbose) {
 				e.printStackTrace(); // Stacktrace solo in modalità verbose
 			}
@@ -108,8 +107,7 @@ public class SocketHandler {
 			System.err.println("[ERRORE] SocketHandler.receive: errore durante la ricezione");
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Possibili cause: connessione interrotta, socket chiuso, errore di rete");
-			// TODO: Implementare meccanismo di riconnessione automatica
-			// TODO: Aggiungere contatore errori per monitoraggio salute connessione
+
 			if (verbose) {
 				e.printStackTrace(); // Stacktrace solo in modalità verbose
 			}
@@ -137,7 +135,7 @@ public class SocketHandler {
 			System.err.println("[ERRORE] SocketHandler.receive: impossibile modificare il timeout del socket");
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Il socket potrebbe essere stato chiuso o in stato non valido");
-			// TODO: Verificare stato socket e forzare ricreazione se necessario
+
 			if (verbose) {
 				e.printStackTrace();
 			}
@@ -154,7 +152,7 @@ public class SocketHandler {
 		} else {
 			System.out.println("[WARN] SocketHandler: socket già chiuso o non inizializzato");
 		}
-		// TODO: Aggiungere cleanup risorse aggiuntive (buffer, thread, ecc.)
+
 	}
 
 }

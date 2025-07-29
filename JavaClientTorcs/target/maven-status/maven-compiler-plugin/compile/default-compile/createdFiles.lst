@@ -1,5 +1,6 @@
 it\unisa\javaclienttorcs\Client.class
 it\unisa\javaclienttorcs\DeadSimpleSoloController.class
+it\unisa\javaclienttorcs\HumanController$KeyListenerFrame.class
 it\unisa\javaclienttorcs\Controller.class
 it\unisa\javaclienttorcs\MessageParser.class
 it\unisa\javaclienttorcs\DataPoint.class

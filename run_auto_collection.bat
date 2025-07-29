@@ -1,13 +1,15 @@
 @echo off
-echo =================================
-echo   RACCOLTA DATI AUTOMATICA
-echo =================================
-echo Raccolta dati con SimpleDriver...
-echo I dati verranno salvati in: dataset.csv
-echo =================================
-cd JavaClientTorcs
-java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client SimpleDriver --collect
+echo ================================
+echo   AUTOMATIC DATA COLLECTION
+echo ================================
+echo Collecting data with SimpleDriver...
+echo Data will be saved to: dataset.csv
+echo ================================
+echo Press Ctrl+C to interrupt collection...
 echo.
-echo Raccolta completata!
-echo File salvato: dataset.csv
-pause
+cd JavaClientTorcs
+java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.SimpleDriver host:localhost port:3001 --collect
+cd ..
+echo.
+echo Collection completed!
+echo File saved: dataset.csv

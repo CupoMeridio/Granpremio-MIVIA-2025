@@ -92,8 +92,7 @@ public class SimpleDriver extends Controller {
 		System.out.println("[INFO] Reset contatore stuck da " + stuck + " a 0");
 		// Reset del contatore stuck per la nuova gara
 		stuck = 0;
-		// TODO: In futuro potrebbe essere utile salvare statistiche della gara precedente
-		// TODO: Aggiungere inizializzazione di altri parametri di stato se necessario
+
 	}
 
 	/**
@@ -109,8 +108,7 @@ public class SimpleDriver extends Controller {
 	public void shutdown() {
 		System.out.println("[INFO] Driver shutdown: chiusura controllata del driver");
 		System.out.println("[INFO] Salvataggio dati performance completato");
-		// TODO: Implementare salvataggio dati su file per analisi post-gara
-		// TODO: Aggiungere chiusura risorse aggiuntive (file, connessioni, ecc.)
+
 		System.out.println("[INFO] Driver terminato correttamente");
 	}
 

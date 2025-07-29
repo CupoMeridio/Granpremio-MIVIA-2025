@@ -51,8 +51,7 @@ public class MessageParser {
                         System.err.println("[ERRORE] MessageParser: errore parsing valore '" + nextToken + "' per sensore '" + readingName + "'");
 													System.err.println("[ERRORE] Messaggio completo: " + message);
 													System.err.println("[ERRORE] Impostato valore di default: 0.0");
-													// TODO: Aggiungere log strutturato per analisi errori parsing
-													// TODO: Implementare validazione più robusta dei dati ricevuti
+													//
                         ((double[]) readingValue)[position] = 0.0;
                     }
                     position++;
@@ -66,7 +65,7 @@ public class MessageParser {
                         System.err.println("[ERRORE] MessageParser: errore parsing array '" + token + "' per sensore '" + readingName + "'");
 								System.err.println("[ERRORE] Messaggio completo: " + message);
 								System.err.println("[ERRORE] Impostato valore di default: 0.0");
-								// TODO: Implementare parsing fallback per formati alternativi
+
                         readingValue = 0.0;
                     }
                 }
@@ -81,7 +80,7 @@ public class MessageParser {
     public void printAll() {
         for (Map.Entry<String, Object> entry : table.entrySet()) {
             System.out.print(entry.getKey() + ":  ");
-            // TODO: Implementare stampa formattata per debug strutturato
+            
 			// System.out.println("[DEBUG] Sensore: " + entry.getKey() + " = " + entry.getValue());
         }
     }

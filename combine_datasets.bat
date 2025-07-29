@@ -1,35 +1,35 @@
 @echo off
-echo =================================
-echo   COMBINA DATASET
-echo =================================
-echo Combinazione di dataset automatico e manuale...
+echo ================================
+echo   COMBINE DATASETS
+echo ================================
+echo Combining automatic and manual datasets...
 echo Input: dataset.csv + human_dataset.csv
 echo Output: combined_dataset.csv
-echo =================================
+echo ================================
 cd JavaClientTorcs
 
-:: Verifica se i file esistono
+:: Check if files exist
 if not exist "dataset.csv" (
-    echo ERRORE: dataset.csv non trovato!
-    echo Esegui prima run_auto_collection.bat
+    echo ERROR: dataset.csv not found!
+    echo Run run_auto_collection.bat first
     pause
     exit /b
 )
 
 if not exist "human_dataset.csv" (
-    echo ERRORE: human_dataset.csv non trovato!
-    echo Esegui prima run_manual_driving.bat
+    echo ERROR: human_dataset.csv not found!
+    echo Run run_manual_driving.bat first
     pause
     exit /b
 )
 
-:: Combinazione dei file
-echo Combinazione in corso...
+:: Combine files
+echo Combining datasets...
 copy /b dataset.csv + human_dataset.csv combined_dataset.csv >nul
 
 echo.
-echo Dataset combinati con successo!
-echo File creato: combined_dataset.csv
-echo Righe totali:
+echo Datasets combined successfully!
+echo File created: combined_dataset.csv
+echo Total rows:
 find /c /v "" combined_dataset.csv
-pause
+cd ..
