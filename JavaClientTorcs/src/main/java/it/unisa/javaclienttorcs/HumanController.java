@@ -22,6 +22,10 @@ public class HumanController extends Controller {
     // Stato per raccolta dati
     private DataCollector collector;
     private boolean collectingData = false;
+    private boolean autoGearMode = true;
+    private boolean absMode = true;
+    private boolean steeringAssist = true;
+    private boolean autoClutch = true;
     
     // Gestione tasti premuti in real-time
     private ConcurrentHashMap<Integer, Boolean> keysPressed = new ConcurrentHashMap<>();
@@ -35,13 +39,15 @@ public class HumanController extends Controller {
         // Messaggio di avvio
         System.out.println("=== CONTROLLER UMANO ATTIVO ===");
         System.out.println("Controlli real-time attivati!");
-        System.out.println("  W/S: Accelerazione/Frenata");
-        System.out.println("  A/D: Sterzo Sinistra/Destra");
-        System.out.println("  Q/E: Cambio marcia giù/sù");
-        System.out.println("  C: Toggle raccolta dati ON/OFF");
-        System.out.println("  R: Reset macchina");
-        System.out.println("  P: Statistiche raccolta");
-        System.out.println("  X: Esci");
+        System.out.println("  Accelerazione/Frenata: W/S ↑↓ 8/2 I/K");
+        System.out.println("  Sterzo Sinistra/Destra: A/D ←→ 4/6 J/L");
+        System.out.println("  Cambio marcia manuale: Q/E (solo se manuale)");
+        System.out.println("  Toggle cambio automatico: G");
+        System.out.println("  Raccolta dati: C (ON/OFF)");
+        System.out.println("  Reset: R");
+        System.out.println("  Statistiche: P");
+        System.out.println("  Esci: X");
+        System.out.println("  Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE") + " (default: AUTOMATICO)");
         System.out.println("================================");
     }
     
@@ -51,20 +57,37 @@ public class HumanController extends Controller {
     private class KeyListenerFrame extends JFrame implements KeyListener {
         public KeyListenerFrame() {
             setTitle("TORCS Controller - Premi un tasto per guidare");
-            setSize(400, 200);
+            setSize(600, 600);
             setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             setAlwaysOnTop(true);
             setLocationRelativeTo(null);
             
             // Aggiungi label con istruzioni
-            JLabel label = new JLabel("<html><center>" +
-                "<h3>CONTROLLER ATTIVO</h3>" +
-                "<b>W/S/↑↓/8/2/I/K:</b> Accelerazione/Frenata<br>" +
-                "<b>A/D/←→/4/6/J/L:</b> Sterzo Sinistra/Destra<br>" +
-                "<b>Q/E:</b> Cambio marcia | " +
-                "<b>C:</b> Raccolta dati ON/OFF<br>" +
-                "<b>R:</b> Reset | <b>X:</b> Esci" +
-                "</center></html>");
+            JLabel label = new JLabel("<html><div style='padding: 20px; font-size: 12px;'>" +
+                "<h2 style='text-align: center; margin-bottom: 15px;'>🎮 TORCS CONTROLLER</h2>" +
+                "<div style='margin-bottom: 10px;'><b>🚗 MOVIMENTO:</b></div>" +
+                "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
+                "• <b>W/S</b> | <b>↑↓</b> | <b>8/2</b> | <b>I/K</b> → Accelerazione/Frenata</div>" +
+                "<div style='margin-left: 15px; margin-bottom: 15px;'>" +
+                "• <b>A/D</b> | <b>←→</b> | <b>4/6</b> | <b>J/L</b> → Sterzo Sinistra/Destra</div>" +
+                "<div style='margin-bottom: 10px;'><b>⚙️ CONTROLLI AVANZATI:</b></div>" +
+                "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
+                "• <b>Q/E</b> → Cambio marcia manuale (solo modalità manuale)</div>" +
+                "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
+                "• <b>G</b> → Toggle cambio automatico</div>" +
+                "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
+                "• <b>V</b> → Toggle ABS</div>" +
+                "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
+                "• <b>B</b> → Toggle assistenza sterzo</div>" +
+                "<div style='margin-left: 15px; margin-bottom: 15px;'>" +
+                "• <b>N</b> → Toggle frizione automatica</div>" +
+                "<div style='margin-bottom: 10px;'><b>💾 DATI:</b></div>" +
+                "<div style='margin-left: 15px; margin-bottom: 15px;'>" +
+                "• <b>C</b> → Raccolta dati ON/OFF</div>" +
+                "<div style='margin-bottom: 10px;'><b>🔄 GENERALI:</b></div>" +
+                "<div style='margin-left: 15px;'>" +
+                "• <b>R</b> → Reset controlli | <b>X</b> → Esci</div>" +
+                "</div></html>");
             label.setHorizontalAlignment(SwingConstants.CENTER);
             add(label);
             
@@ -105,18 +128,166 @@ public class HumanController extends Controller {
         // Aggiorna i controlli in base ai tasti premuti
         updateControls();
         
+        // Applica assistenza sterzo se attiva
+        double finalSteering = steering;
+        if (steeringAssist) {
+            finalSteering = getAssistedSteering(sensors, steering);
+        }
+        
         // Applica i controlli correnti
         action.accelerate = Math.max(0, Math.min(1, accelerate));
         action.brake = Math.max(0, Math.min(1, brake));
-        action.steering = Math.max(-1, Math.min(1, steering));
-        action.gear = gear;
+        action.steering = Math.max(-1, Math.min(1, finalSteering));
+        
+        // Gestione cambio marcia (automatico o manuale)
+        if (autoGearMode) {
+            action.gear = getGear(sensors);
+            gear = action.gear; // Aggiorna lo stato interno
+        } else {
+            action.gear = gear;
+        }
+        
+        // Applica ABS se attivo
+        if (absMode) {
+            action.brake = filterABS(sensors, action.brake);
+        }
+        
+        // Gestione frizione automatica se attiva
+        if (autoClutch) {
+            action.clutch = getAutoClutch(sensors);
+        } else {
+            action.clutch = 0; // Nessuna frizione
+        }
         
         // Raccogli dati se in modalità raccolta
         if (collectingData) {
-            collector.recordData(sensors, targetSpeed, steering);
+            collector.recordData(sensors, targetSpeed, finalSteering);
         }
         
         return action;
+    }
+    
+    /**
+     * Determina la marcia ottimale in base ai giri motore (RPM) per modalità automatica.
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale della macchina
+     * @return Marcia raccomandata (-1 per retromarcia, 0 per folle, 1-6 per marce avanti)
+     */
+    private int getGear(SensorModel sensors) {
+        int currentGear = sensors.getGear();
+        double rpm = sensors.getRPM();
+        
+        // Gestione marcia 0 (folle) - imposta sempre 1ª marcia
+        if (currentGear < 1)
+            return 1;
+        
+        // Logica upshift: se RPM supera soglia
+        if (currentGear < 6 && rpm >= 7000)
+            return currentGear + 1;
+        // Logica downshift: se RPM sotto soglia
+        else if (currentGear > 1 && rpm <= 3000)
+            return currentGear - 1;
+        else
+            // Nessun cambio marcia necessario
+            return currentGear;
+    }
+
+    /**
+     * Applica il sistema ABS per prevenire il bloccaggio delle ruote durante la frenata.
+     * 
+     * @param sensors Modello sensoriale con dati attuali
+     * @param brake Valore di frenata [0-1]
+     * @return Valore di frenata con ABS applicato
+     */
+    private float filterABS(SensorModel sensors, double brake) {
+        final float absSlip = 2.0f;
+        final float absRange = 3.0f;
+        final float absMinSpeed = 3.0f;
+        final float[] wheelRadius = {0.3179f, 0.3179f, 0.3276f, 0.3276f};
+        
+        float speed = (float)(sensors.getSpeed() / 3.6);
+        
+        // Se la velocità è troppo bassa, ABS non è necessario
+        if (speed < absMinSpeed)
+            return (float)brake;
+
+        // Calcolo slip medio su tutte e 4 le ruote
+        float slip = 0.0f;
+        for (int i = 0; i < 4; i++) {
+            slip += sensors.getWheelSpinVelocity()[i] * wheelRadius[i];
+        }
+        slip = speed - slip / 4.0f;
+        
+        // Riduce la frenata se lo slittamento è eccessivo
+        if (slip > absSlip) {
+            brake = brake - (slip - absSlip) / absRange;
+        }
+        
+        return Math.max(0.0f, Math.min(1.0f, (float)brake));
+    }
+
+    /**
+     * Fornisce assistenza allo sterzo per una guida più fluida e precisa.
+     * Corregge automaticamente l'angolo di sterzo in base alla posizione sulla pista.
+     * 
+     * @param sensors Modello sensoriale con dati attuali
+     * @param manualSteering Sterzo manuale dell'utente [-1, 1]
+     * @return Sterzo corretto con assistenza
+     */
+    private double getAssistedSteering(SensorModel sensors, double manualSteering) {
+        final float steerLock = 0.785398f; // 45° in radianti
+        final float steerSensitivityOffset = 80.0f;
+        
+        // Calcola correzione basata sulla posizione e angolo dell'auto
+        float trackPos = (float)sensors.getTrackPosition();
+        float angle = (float)sensors.getAngleToTrackAxis();
+        
+        // Correzione automatica per mantenere la macchina centrata
+        float correction = angle - trackPos * 0.5f;
+        
+        // Adatta la correzione alla velocità
+        float speed = (float)sensors.getSpeed();
+        if (speed > steerSensitivityOffset) {
+            correction = correction / (steerLock * (speed - steerSensitivityOffset));
+        }
+        
+        // Combina sterzo manuale con correzione assistita
+        double assistedSteering = manualSteering + correction * 0.3;
+        
+        return Math.max(-1.0, Math.min(1.0, assistedSteering));
+    }
+
+    /**
+     * Gestisce automaticamente la frizione per partenze ottimali.
+     * 
+     * @param sensors Modello sensoriale con dati attuali
+     * @return Valore frizione [0-1]
+     */
+    private float getAutoClutch(SensorModel sensors) {
+        final float clutchMax = 0.5f;
+        final float clutchDelta = 0.05f;
+        final float clutchRange = 0.82f;
+        final float clutchDeltaTime = 0.02f;
+        final float clutchDeltaRaced = 10.0f;
+        
+        float clutch = 0.0f;
+        
+        // Controllo partenza gara
+        if (sensors.getCurrentLapTime() < clutchDeltaTime && 
+            getStage() == Stage.RACE && 
+            sensors.getDistanceRaced() < clutchDeltaRaced) {
+            clutch = clutchMax;
+        }
+        
+        // Gestione frizione in base a RPM
+        double rpm = sensors.getRPM();
+        if (rpm < 2000) {
+            clutch = Math.min(clutchMax, clutch + clutchDelta);
+        } else if (rpm > 4000) {
+            clutch = Math.max(0.0f, clutch - clutchDelta);
+        }
+        
+        return Math.max(0.0f, Math.min(1.0f, clutch));
     }
     
     private void updateControls() {
@@ -149,14 +320,40 @@ public class HumanController extends Controller {
             steering *= 0.95;
         }
         
-        // Cambio marcia con Q/E
-        if (isKeyPressed(KeyEvent.VK_Q) && canTriggerAction(KeyEvent.VK_Q)) {
-            gear = Math.max(-1, gear - 1);
-            System.out.println("Marcia: " + gear);
+        // Toggle cambio marcia automatico con G
+        if (isKeyPressed(KeyEvent.VK_G) && canTriggerAction(KeyEvent.VK_G)) {
+            autoGearMode = !autoGearMode;
+            System.out.println("Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE"));
         }
-        if (isKeyPressed(KeyEvent.VK_E) && canTriggerAction(KeyEvent.VK_E)) {
-            gear = Math.min(6, gear + 1);
-            System.out.println("Marcia: " + gear);
+        
+        // Toggle ABS con V
+        if (isKeyPressed(KeyEvent.VK_V) && canTriggerAction(KeyEvent.VK_V)) {
+            absMode = !absMode;
+            System.out.println("ABS: " + (absMode ? "ATTIVO" : "DISATTIVO"));
+        }
+        
+        // Toggle assistenza sterzo con B
+        if (isKeyPressed(KeyEvent.VK_B) && canTriggerAction(KeyEvent.VK_B)) {
+            steeringAssist = !steeringAssist;
+            System.out.println("Assistenza sterzo: " + (steeringAssist ? "ATTIVA" : "DISATTIVA"));
+        }
+        
+        // Toggle frizione automatica con N
+        if (isKeyPressed(KeyEvent.VK_N) && canTriggerAction(KeyEvent.VK_N)) {
+            autoClutch = !autoClutch;
+            System.out.println("Frizione automatica: " + (autoClutch ? "ATTIVA" : "DISATTIVA"));
+        }
+        
+        // Cambio marcia manuale con Q/E (solo se modalità manuale)
+        if (!autoGearMode) {
+            if (isKeyPressed(KeyEvent.VK_Q) && canTriggerAction(KeyEvent.VK_Q)) {
+                gear = Math.max(-1, gear - 1);
+                System.out.println("Marcia: " + gear);
+            }
+            if (isKeyPressed(KeyEvent.VK_E) && canTriggerAction(KeyEvent.VK_E)) {
+                gear = Math.min(6, gear + 1);
+                System.out.println("Marcia: " + gear);
+            }
         }
         
         // Toggle raccolta dati con C
@@ -230,6 +427,12 @@ public class HumanController extends Controller {
         steering = 0.0;
         targetSpeed = 0.0;
         gear = 1;
+        autoGearMode = true; // Default: cambio automatico
+        absMode = true;
+        steeringAssist = false;
+        autoClutch = true;
+        keysPressed.clear();
+        System.out.println("Controlli avanzati resettati - ABS e frizione automatica ATTIVI, assistenza sterzo DISATTIVA");
     }
     
     @Override

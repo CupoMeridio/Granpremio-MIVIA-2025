@@ -5,9 +5,9 @@ setlocal enabledelayedexpansion
 title TORCS - Main Menu
 color 0A
 cls
-echo =========================================
+echo ==========================
 echo   TORCS - COMPLETE MENU
-echo =========================================
+echo ==========================
 echo.
 echo DATA COLLECTION:
 echo 1. Manual Driving (Data Collection)
@@ -27,13 +27,16 @@ echo.
 echo DOCUMENTATION:
 echo 8. Open Complete Guide
 echo.
-echo EXIT:
-echo 9. Exit program
+echo TORCS GAME:
+echo 9. Launch TORCS Game
 echo.
-echo =========================================
-echo NOTE: Press Ctrl+C to interrupt any operation
-echo =========================================
-set /p choice="Select option (1-9): "
+echo EXIT:
+echo 0. Exit program
+echo.
+echo =================================================
+echo   NOTE: Press Ctrl+C to interrupt any operation
+echo =================================================
+set /p choice="Select option (0-9): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto auto
@@ -43,8 +46,8 @@ if "%choice%"=="5" goto combine
 if "%choice%"=="6" goto stats
 if "%choice%"=="7" goto simpledriver
 if "%choice%"=="8" goto guide
-if "%choice%"=="9" goto exit
-
+if "%choice%"=="9" goto torcs_game
+if "%choice%"=="0" goto exit
 echo Invalid choice! Press any key to continue...
 pause >nul
 goto menu
@@ -108,7 +111,7 @@ if exist "combined_dataset.csv" (
 )
 echo.
 echo Press any key to return to menu...
-timeout /t 3 >nul
+pause >nul
 goto menu
 
 :simpledriver
@@ -119,7 +122,14 @@ pause >nul
 goto menu
 
 :guide
-start notepad README.md
+start notepad "%~dp0README.md"
+goto menu
+
+:torcs_game
+echo.
+echo Launching TORCS - The Open Racing Car Simulator...
+echo.
+start "" "C:\Users\cupom\Desktop\TORCS - The Open Racing Car Simulator.lnk"
 goto menu
 
 :exit
