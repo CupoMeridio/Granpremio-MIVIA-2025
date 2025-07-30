@@ -6,7 +6,7 @@ echo Combining automatic and manual datasets...
 echo Input: dataset.csv + human_dataset.csv
 echo Output: combined_dataset.csv
 echo ================================
-cd JavaClientTorcs
+cd /d "%~dp0.."
 
 :: Check if files exist
 if not exist "dataset.csv" (
@@ -32,4 +32,4 @@ echo Datasets combined successfully!
 echo File created: combined_dataset.csv
 echo Total rows:
 find /c /v "" combined_dataset.csv
-cd ..
+cd /d "%~dp0"

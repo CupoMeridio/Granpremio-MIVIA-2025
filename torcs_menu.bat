@@ -28,7 +28,7 @@ echo DOCUMENTATION:
 echo 8. Open Complete Guide
 echo.
 echo TORCS GAME:
-echo 9. Launch TORCS Game
+echo 9. Start TORCS Game
 echo.
 echo EXIT:
 echo 0. Exit program
@@ -46,49 +46,50 @@ if "%choice%"=="5" goto combine
 if "%choice%"=="6" goto stats
 if "%choice%"=="7" goto simpledriver
 if "%choice%"=="8" goto guide
-if "%choice%"=="9" goto torcs_game
+if "%choice%"=="9" goto torcs
+
 if "%choice%"=="0" goto exit
 echo Invalid choice! Press any key to continue...
 pause >nul
 goto menu
 
 :manual
-call "%~dp0run_manual_driving.bat"
+call "%~dp0JavaClientTorcs\scripts\run_manual_driving.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :auto
-call "%~dp0run_auto_collection.bat"
+call "%~dp0JavaClientTorcs\scripts\run_auto_collection.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :test_human
-call "%~dp0test_human_model.bat"
+call "%~dp0JavaClientTorcs\scripts\test_human_model.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :test_auto
-call "%~dp0test_auto_model.bat"
+call "%~dp0JavaClientTorcs\scripts\test_auto_model.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :combine
-call "%~dp0combine_datasets.bat"
+call "%~dp0JavaClientTorcs\scripts\combine_datasets.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :stats
-cd JavaClientTorcs
+cd /d "%~dp0JavaClientTorcs"
 echo.
 echo === DATASET STATISTICS ===
 if exist "dataset.csv" (
@@ -110,27 +111,37 @@ if exist "combined_dataset.csv" (
     echo combined_dataset.csv: Not found
 )
 echo.
+cd /d "%~dp0"
 echo Press any key to return to menu...
 pause >nul
 goto menu
 
 :simpledriver
-call "%~dp0run_simpledriver.bat"
+call "%~dp0JavaClientTorcs\scripts\run_simpledriver.bat"
 echo.
 echo Press any key to continue...
 pause >nul
 goto menu
 
 :guide
-start notepad "%~dp0README.md"
+start notepad "%~dp0JavaClientTorcs\docs\README.md"
 goto menu
 
-:torcs_game
+:torcs
 echo.
-echo Launching TORCS - The Open Racing Car Simulator...
+echo Starting TORCS...
+echo Please wait...
+cd /d "C:\Program Files (x86)\torcs"
+start "" wtorcs.exe
 echo.
-start "" "C:\Users\cupom\Desktop\TORCS - The Open Racing Car Simulator.lnk"
+echo TORCS has been launched!
+echo You can now configure the race and connect the AI drivers.
+echo.
+echo Press any key to return to menu...
+pause >nul
 goto menu
+
+
 
 :exit
 echo Goodbye!

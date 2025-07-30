@@ -6,6 +6,14 @@ echo Testing behavioral cloning with automatically collected data
 echo Dataset: dataset.csv
 echo ================================
 
+rem Cleanup function to kill any remaining Java processes
+for /f "tokens=*" %%a in ('tasklist ^| findstr /i "java.exe" ^| findstr /i "BehavioralCloningDriver"') do (
+    echo Cleaning up Java processes...
+    taskkill /f /im java.exe /fi "imagename eq java.exe" 2>nul
+    timeout /t 1 /nobreak >nul
+)
+
+cd /d "%~dp0.."
 if not exist "dataset.csv" (
     echo.
     echo ⚠️  WARNING: dataset.csv not found!
@@ -20,8 +28,7 @@ if not exist "dataset.csv" (
 
 echo Press Ctrl+C to interrupt test...
 echo.
-cd JavaClientTorcs
 java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.BehavioralCloningDriver host:localhost port:3001
-cd ..
+cd /d "%~dp0"
 echo.
 echo Test completed!

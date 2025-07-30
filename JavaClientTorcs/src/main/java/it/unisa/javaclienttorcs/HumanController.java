@@ -1,7 +1,9 @@
 package it.unisa.javaclienttorcs;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +26,7 @@ public class HumanController extends Controller {
     private boolean collectingData = false;
     private boolean autoGearMode = true;
     private boolean absMode = true;
-    private boolean steeringAssist = true;
+    private boolean steeringAssist = false;
     private boolean autoClutch = true;
     
     // Gestione tasti premuti in real-time
@@ -49,6 +51,7 @@ public class HumanController extends Controller {
         System.out.println("  Esci: X");
         System.out.println("  Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE") + " (default: AUTOMATICO)");
         System.out.println("================================");
+        System.out.println("NOTA: La raccolta dati è OFF di default. Premi C per attivarla.");
     }
     
     /**
@@ -266,7 +269,6 @@ public class HumanController extends Controller {
     private float getAutoClutch(SensorModel sensors) {
         final float clutchMax = 0.5f;
         final float clutchDelta = 0.05f;
-        final float clutchRange = 0.82f;
         final float clutchDeltaTime = 0.02f;
         final float clutchDeltaRaced = 10.0f;
         
@@ -361,8 +363,14 @@ public class HumanController extends Controller {
             collectingData = !collectingData;
             System.out.println("Raccolta dati: " + (collectingData ? "ON" : "OFF"));
             if (collectingData) {
-                System.out.println("Inizio raccolta dati...");
+                try {
+                    collector.startCollection("human_dataset.csv");
+                    System.out.println("Inizio raccolta dati...");
+                } catch (IOException e) {
+                    System.err.println("Errore nell'avviare la raccolta dati: " + e.getMessage());
+                }
             } else {
+                collector.stopCollection();
                 System.out.println("Fine raccolta dati. Salvati in: " + collector.getFilename());
                 collector.printDatasetStats();
             }
@@ -414,7 +422,13 @@ public class HumanController extends Controller {
     public void setCollectingMode(boolean enabled) {
         this.collectingData = enabled;
         if (enabled) {
-            System.out.println("Modalità raccolta dati attivata per HumanController");
+            try {
+                collector.startCollection("human_dataset.csv");
+                System.out.println("Modalità raccolta dati attivata per HumanController");
+                System.out.println("Inizio raccolta dati...");
+            } catch (IOException e) {
+                System.err.println("Errore nell'avviare la raccolta dati: " + e.getMessage());
+            }
         }
     }
     
