@@ -94,12 +94,12 @@ while true; do
             ;;
         8)
             if command -v xdg-open > /dev/null; then
-                xdg-open "$SCRIPT_DIR/JavaClientTorcs/docs/README.md"
+                xdg-open "$SCRIPT_DIR/README.md"
             elif command -v open > /dev/null; then
-                open "$SCRIPT_DIR/JavaClientTorcs/docs/README.md"
+                open "$SCRIPT_DIR/README.md"
             else
                 echo "Opening README.md with default text editor..."
-                "$SCRIPT_DIR/JavaClientTorcs/docs/README.md" &
+                "$SCRIPT_DIR/README.md" &
             fi
             ;;
         9)

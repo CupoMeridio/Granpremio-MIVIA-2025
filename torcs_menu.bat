@@ -124,7 +124,7 @@ pause >nul
 goto menu
 
 :guide
-start notepad "%~dp0JavaClientTorcs\docs\README.md"
+start notepad "%~dp0README.md"
 goto menu
 
 :torcs
