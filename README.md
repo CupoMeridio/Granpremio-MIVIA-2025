@@ -86,17 +86,17 @@ Progetto/
 │   ├── dist/
 │   │   ├── JavaClientTorcs.jar
 │   │   └── lib/            # Librerie copiate
-│   ├── scripts/
-│   │   ├── run_manual_driving.bat    # Guida manuale Windows
-│   │   ├── run_manual_driving.sh     # Guida manuale Linux/Mac
-│   │   ├── run_auto_collection.bat   # Raccolta automatica Windows
-│   │   ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
-│   │   ├── test_human_model.bat      # Test dati umani Windows
-│   │   ├── test_human_model.sh       # Test dati umani Linux/Mac
-│   │   ├── test_auto_model.bat       # Test dati automatici Windows
-│   │   ├── test_auto_model.sh        # Test dati automatici Linux/Mac
-│   │   ├── combine_datasets.bat      # Combina dataset Windows
-│   │   └── combine_datasets.sh       # Combina dataset Linux/Mac
+│   └── scripts/
+│       ├── run_manual_driving.bat    # Guida manuale Windows
+│       ├── run_manual_driving.sh     # Guida manuale Linux/Mac
+│       ├── run_auto_collection.bat   # Raccolta automatica Windows
+│       ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
+│       ├── test_human_model.bat      # Test dati umani Windows
+│       ├── test_human_model.sh       # Test dati umani Linux/Mac
+│       ├── test_auto_model.bat       # Test dati automatici Windows
+│       ├── test_auto_model.sh        # Test dati automatici Linux/Mac
+│       ├── combine_datasets.bat      # Combina dataset Windows
+│       └── combine_datasets.sh       # Combina dataset Linux/Mac
 └── README.md                # Questa documentazione
 ```
 
