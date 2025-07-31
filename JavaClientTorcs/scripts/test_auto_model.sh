@@ -34,6 +34,6 @@ fi
 
 echo "Press Ctrl+C to interrupt test..."
 
-java -cp target/JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.BehavioralCloningDriver host:localhost port:3001
+java -cp "dist/JavaClientTorcs.jar:lib/*" it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.BehavioralCloningDriver dataset.csv
 echo
 echo "Test completed!"

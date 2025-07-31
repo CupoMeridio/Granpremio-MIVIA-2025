@@ -15,8 +15,8 @@ for /f "tokens=*" %%a in ('tasklist ^| findstr /i "java.exe" ^| findstr /i "Simp
     timeout /t 1 /nobreak >nul
 )
 
-cd /d "%~dp0.."
-java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.SimpleDriver host:localhost port:3001 --collect
+cd /d "%~dp0\.."
+java -cp dist\JavaClientTorcs.jar;lib\* it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.SimpleDriver --collect-data
 cd /d "%~dp0"
 echo.
 echo Collection completed!

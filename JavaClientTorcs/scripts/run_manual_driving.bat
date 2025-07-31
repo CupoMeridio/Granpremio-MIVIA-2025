@@ -23,6 +23,6 @@ for /f "tokens=*" %%a in ('tasklist ^| findstr /i "java.exe" ^| findstr /i "Huma
 )
 
 cd /d "%~dp0\.."
-java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.HumanController host:localhost port:3001 --collect
+java -cp dist\JavaClientTorcs.jar;lib\* it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.HumanController host:localhost port:3001 --collect
 echo.
 echo Driving session completed!

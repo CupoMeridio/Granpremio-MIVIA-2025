@@ -28,7 +28,7 @@ if not exist "human_dataset.csv" (
 
 echo Press Ctrl+C to interrupt test...
 echo.
-java -cp target\JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.BehavioralCloningDriver host:localhost port:3001
+java -cp dist\JavaClientTorcs.jar;lib\* it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.BehavioralCloningDriver human_dataset.csv
 cd /d "%~dp0"
 echo.
 echo Test completed!

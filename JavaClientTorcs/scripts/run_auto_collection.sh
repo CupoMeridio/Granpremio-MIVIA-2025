@@ -20,7 +20,7 @@ cleanup() {
 trap cleanup EXIT SIGINT SIGTERM
 
 cd "$(dirname "$0")/.."
-java -cp target/JavaClientTorcs-1.0-SNAPSHOT.jar it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.SimpleDriver host:localhost port:3001 --collect
+java -cp "dist/JavaClientTorcs.jar:lib/*" it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.SimpleDriver --collect-data
 echo
 echo "Collection completed!"
 echo "File saved: dataset.csv"

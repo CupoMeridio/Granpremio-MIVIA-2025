@@ -14,7 +14,7 @@ Questo progetto implementa un driver autonomo per TORCS che:
 
 ### Prerequisiti
 - Java 21+ installato e nel PATH
-- Maven per build del progetto (o NetBeans 26+ per build IDE)
+- Apache Ant per build del progetto (o NetBeans 26+ per build IDE)
 - TORCS avviato con modulo JavaClientTorcs
 
 ### Build
@@ -26,28 +26,30 @@ Questo progetto implementa un driver autonomo per TORCS che:
 1. **Apri il progetto in NetBeans 26**
    - File → Open Project
    - Seleziona la cartella `JavaClientTorcs`
-   - NetBeans riconoscerà automaticamente il progetto Maven
+   - NetBeans riconoscerà automaticamente il progetto Ant
 
 2. **Build con un click**
    - **Pulsante verde "Run Project"** (▶️) nella toolbar
    - **Oppure:** Right-click sul progetto → Clean and Build
 
 3. **Verifica build**
-   - Il JAR verrà generato in: `JavaClientTorcs/target/JavaClientTorcs-1.0-SNAPSHOT.jar`
+   - Il JAR verrà generato in: `JavaClientTorcs/dist/JavaClientTorcs.jar`
    - **Nessuna configurazione aggiuntiva richiesta**
 
-#### Metodo 2: Maven da terminale
+#### Metodo 2: Ant da terminale
 
 #### Windows
 ```cmd
 cd JavaClientTorcs
-mvn clean package
+ant clean
+ant jar
 ```
 
 #### Linux/Mac
 ```bash
 cd JavaClientTorcs
-mvn clean package
+ant clean
+ant jar
 ```
 
 ## 📁 Struttura del Progetto
@@ -57,31 +59,33 @@ Progetto/
 ├── torcs_menu.bat          # Menu Windows
 ├── torcs_menu.sh           # Menu Linux/Mac
 ├── JavaClientTorcs/
-│   ├── pom.xml             # Configurazione Maven
+│   ├── build.xml           # Configurazione Ant
+│   ├── manifest.mf         # Manifest JAR
+│   ├── nbproject/          # Configurazione NetBeans Ant
+│   │   ├── build-impl.xml
+│   │   ├── project.properties
+│   │   └── project.xml
 │   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── it/unisa/javaclienttorcs/
-│   │   │   │       ├── Action.java                 # Azioni di controllo
-│   │   │   │       ├── BehavioralCloningDriver.java # Driver K-NN principale
-│   │   │   │       ├── Client.java                 # Client principale
-│   │   │   │       ├── Controller.java             # Interfaccia controller
-│   │   │   │       ├── DataCollector.java          # Raccolta dati
-│   │   │   │       ├── DeadSimpleSoloController.java # Controller base
-│   │   │   │       ├── HumanController.java        # Controller manuale
-│   │   │   │       ├── MessageBasedSensorModel.java # Modello sensori
-│   │   │   │       ├── MessageParser.java          # Parser messaggi
-│   │   │   │       ├── SensorModel.java            # Interfaccia sensori
-│   │   │   │       ├── SimpleDriver.java           # Driver automatico
-│   │   │   │       └── SocketHandler.java        # Gestione socket
-│   │   │   └── resources/
-│   │   │       └── META-INF/
-│   │   └── test/
-│   │       └── java/
-│   ├── target/
-│   │   ├── JavaClientTorcs-1.0-SNAPSHOT.jar
-│   │   ├── classes/
-│   │   └── test-classes/
+│   │   └── it/unisa/javaclienttorcs/
+│   │       ├── Action.java                 # Azioni di controllo
+│   │       ├── BehavioralCloningDriver.java # Driver K-NN principale
+│   │       ├── Client.java                 # Client principale
+│   │       ├── Controller.java             # Interfaccia controller
+│   │       ├── DataCollector.java          # Raccolta dati
+│   │       ├── DeadSimpleSoloController.java # Controller base
+│   │       ├── HumanController.java        # Controller manuale
+│   │       ├── MessageBasedSensorModel.java # Modello sensori
+│   │       ├── MessageParser.java          # Parser messaggi
+│   │       ├── SensorModel.java            # Interfaccia sensori
+│   │       ├── SimpleDriver.java           # Driver automatico
+│   │       └── SocketHandler.java        # Gestione socket
+│   ├── lib/
+│   │   ├── Jamepad.jar
+│   │   └── sdl2gdx-1.0.5.jar
+│   ├── build/              # Output build temporaneo
+│   ├── dist/
+│   │   ├── JavaClientTorcs.jar
+│   │   └── lib/            # Librerie copiate
 │   ├── scripts/
 │   │   ├── run_manual_driving.bat    # Guida manuale Windows
 │   │   ├── run_manual_driving.sh     # Guida manuale Linux/Mac
@@ -154,7 +158,7 @@ I dataset vengono creati automaticamente nella directory principale:
 
 - **Linguaggio**: Java
 - **IDE**: NetBeans 26 (progetto nativo)
-- **Build Tool**: Maven
+- **Build Tool**: Apache Ant
 - **Algoritmo**: K-Nearest Neighbors (K-NN)
 - **Comunicazione**: Socket UDP con TORCS
 - **Formato Dati**: CSV
@@ -162,7 +166,7 @@ I dataset vengono creati automaticamente nella directory principale:
 ### Compatibilità NetBeans
 - **Testato con**: NetBeans 26 + JDK 21/24 ✅
 - **Compatibile con**: NetBeans 25+ e JDK 21+
-- **Progetto nativo**: Apri direttamente la cartella `JavaClientTorcs` come progetto Maven
+- **Progetto nativo**: Apri direttamente la cartella `JavaClientTorcs` come progetto Ant
 
 ## 🚗 TORCS Setup
 
@@ -172,7 +176,7 @@ I dataset vengono creati automaticamente nella directory principale:
 
 ## ⚡ Esecuzione Veloce
 
-1. **Build**: `mvn clean package` (da JavaClientTorcs/)
+1. **Build**: `ant clean && ant jar` (da JavaClientTorcs/)
 2. **Menu**: Usa il menu appropriato per il tuo sistema
 3. **Raccogli dati**: Guida manualmente o automaticamente
 4. **Testa**: Usa il modello con i tuoi dati
