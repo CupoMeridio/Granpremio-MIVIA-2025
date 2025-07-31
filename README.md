@@ -97,8 +97,7 @@ Progetto/
 │   │   ├── test_auto_model.sh        # Test dati automatici Linux/Mac
 │   │   ├── combine_datasets.bat      # Combina dataset Windows
 │   │   └── combine_datasets.sh       # Combina dataset Linux/Mac
-│   └── docs/
-│       └── README.md                # Questa documentazione
+├── README.md                # Questa documentazione
 ```
 
 ## 🎮 Come Usare
