@@ -51,7 +51,6 @@ public class HumanController extends Controller {
         System.out.println("  Esci: X");
         System.out.println("  Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE") + " (default: AUTOMATICO)");
         System.out.println("================================");
-        System.out.println("NOTA: La raccolta dati è OFF di default. Premi C per attivarla.");
     }
     
     /**
@@ -179,15 +178,39 @@ public class HumanController extends Controller {
     private int getGear(SensorModel sensors) {
         int currentGear = sensors.getGear();
         double rpm = sensors.getRPM();
+        double speed = sensors.getSpeed(); // km/h
+        
+        // Arcade-style reverse: switch to reverse when pressing backward at low speed
+        boolean isBackwardPressed = isKeyPressed(KeyEvent.VK_S) || isKeyPressed(KeyEvent.VK_DOWN) || 
+                                   isKeyPressed(KeyEvent.VK_NUMPAD2) || isKeyPressed(KeyEvent.VK_K);
+        boolean isForwardPressed = isKeyPressed(KeyEvent.VK_W) || isKeyPressed(KeyEvent.VK_UP) || 
+                                  isKeyPressed(KeyEvent.VK_NUMPAD8) || isKeyPressed(KeyEvent.VK_I);
+        
+        // Allow immediate reverse when stopped or very low speed
+        if (speed < 5.0) {
+            if (isBackwardPressed && currentGear >= 0) {
+                return -1; // Switch to reverse
+            }
+        }
+        
+        // Allow immediate forward acceleration from reverse regardless of speed
+        if (isForwardPressed && currentGear == -1) {
+            return 1; // Switch back to first gear from reverse immediately
+        }
+        
+        // If currently in reverse, don't perform automatic gear shifting
+        if (currentGear == -1) {
+            return -1; // Stay in reverse
+        }
         
         // Gestione marcia 0 (folle) - imposta sempre 1ª marcia
         if (currentGear < 1)
             return 1;
         
-        // Logica upshift: se RPM supera soglia
-        if (currentGear < 6 && rpm >= 7000)
+        // Logica upshift: se RPM supera soglia (solo marce avanti)
+        if (currentGear > 0 && currentGear < 6 && rpm >= 7000)
             return currentGear + 1;
-        // Logica downshift: se RPM sotto soglia
+        // Logica downshift: se RPM sotto soglia (solo marce avanti)
         else if (currentGear > 1 && rpm <= 3000)
             return currentGear - 1;
         else
@@ -294,20 +317,41 @@ public class HumanController extends Controller {
     
     private void updateControls() {
         // Accelerazione/Frenata con W/S/Frecce/NumPad/IKJL
-        if (isKeyPressed(KeyEvent.VK_W) || isKeyPressed(KeyEvent.VK_UP) || 
-            isKeyPressed(KeyEvent.VK_NUMPAD8) || isKeyPressed(KeyEvent.VK_I)) {
-            accelerate = Math.min(1.0, accelerate + 0.02);
-            brake = 0.0;
-            targetSpeed = Math.min(200, targetSpeed + 2);
-        } else if (isKeyPressed(KeyEvent.VK_S) || isKeyPressed(KeyEvent.VK_DOWN) || 
-                   isKeyPressed(KeyEvent.VK_NUMPAD2) || isKeyPressed(KeyEvent.VK_K)) {
-            brake = Math.min(1.0, brake + 0.02);
-            accelerate = Math.max(0.0, accelerate - 0.02);
-            targetSpeed = Math.max(0, targetSpeed - 2);
+        boolean isForwardPressed = isKeyPressed(KeyEvent.VK_W) || isKeyPressed(KeyEvent.VK_UP) || 
+                                  isKeyPressed(KeyEvent.VK_NUMPAD8) || isKeyPressed(KeyEvent.VK_I);
+        boolean isBackwardPressed = isKeyPressed(KeyEvent.VK_S) || isKeyPressed(KeyEvent.VK_DOWN) || 
+                                   isKeyPressed(KeyEvent.VK_NUMPAD2) || isKeyPressed(KeyEvent.VK_K);
+        
+        if (gear == -1) {
+            // In reverse: backward key accelerates reverse, forward key brakes
+            if (isBackwardPressed) {
+                accelerate = Math.min(1.0, accelerate + 0.005); // Very gradual acceleration for reverse
+                brake = 0.0;
+                targetSpeed = Math.max(-30, targetSpeed - 0.5); // Much slower reverse target
+            } else if (isForwardPressed) {
+                brake = Math.min(1.0, brake + 0.02);
+                accelerate = Math.max(0.0, accelerate - 0.02);
+                targetSpeed = Math.min(0, targetSpeed + 2);
+            } else {
+                // Rilascio graduale
+                accelerate *= 0.92; // More aggressive decay for reverse
+                brake *= 0.98;
+            }
         } else {
-            // Rilascio graduale
-            accelerate *= 0.98;
-            brake *= 0.98;
+            // Normal forward movement
+            if (isForwardPressed) {
+                accelerate = Math.min(1.0, accelerate + 0.02);
+                brake = 0.0;
+                targetSpeed = Math.min(200, targetSpeed + 2);
+            } else if (isBackwardPressed) {
+                brake = Math.min(1.0, brake + 0.02);
+                accelerate = Math.max(0.0, accelerate - 0.02);
+                targetSpeed = Math.max(0, targetSpeed - 2);
+            } else {
+                // Rilascio graduale
+                accelerate *= 0.98;
+                brake *= 0.98;
+            }
         }
         
         // Sterzo con A/D/Frecce/NumPad/IKJL
@@ -424,8 +468,7 @@ public class HumanController extends Controller {
         if (enabled) {
             try {
                 collector.startCollection("human_dataset.csv");
-                System.out.println("Modalità raccolta dati attivata per HumanController");
-                System.out.println("Inizio raccolta dati...");
+                System.out.println("[INFO] Raccolta dati attivata automaticamente via parametro --collect");
             } catch (IOException e) {
                 System.err.println("Errore nell'avviare la raccolta dati: " + e.getMessage());
             }
