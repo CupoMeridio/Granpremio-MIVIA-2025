@@ -60,10 +60,19 @@ public class EnhancedDataCollectionManager {
     }
     
     /**
-     * Ferma la raccolta dati
+     * Ferma la raccolta dati e genera automaticamente human_dataset.csv
      */
     public void stopCollection() {
         enhancedCollector.stopCollection();
+        
+        // Genera automaticamente human_dataset.csv
+        try {
+            System.out.println("[INFO] Generazione automatica di human_dataset.csv...");
+            DatasetConverter.convertToHumanDataset(enhancedFilePath, humanFilePath);
+            System.out.println("[SUCCESS] human_dataset.csv generato automaticamente!");
+        } catch (IOException e) {
+            System.err.println("[ERROR] Errore durante generazione automatica di human_dataset.csv: " + e.getMessage());
+        }
     }
 
     /**
