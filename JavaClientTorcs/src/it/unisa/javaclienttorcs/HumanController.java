@@ -3,7 +3,6 @@ package it.unisa.javaclienttorcs;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,11 +26,10 @@ public class HumanController extends Controller {
     // Parametri per sterzo gamepad
     private static final float STEERING_DEADZONE = 0.25f;
     private static final float STEERING_SENSITIVITY = 1.2f;
-    private float lastSteeringOutput = 0.0f;
-    private static final float STEERING_FILTER_BETA = 0.6f;
+    private final float lastSteeringOutput = 0.0f;
     
     // Stato per raccolta dati
-    private final DataCollector collector;
+    private final EnhancedDataCollectionManager dataManager;
     private boolean collectingData = false;
     private boolean autoGearMode = true;
     private boolean absMode = true;
@@ -44,7 +42,7 @@ public class HumanController extends Controller {
     private final AtomicBoolean running = new AtomicBoolean(true);
     
     public HumanController() {
-        this.collector = new DataCollector("human_dataset.csv");
+        this.dataManager = new EnhancedDataCollectionManager();
         initializeKeyListener();
         
         // Messaggio di avvio
@@ -58,9 +56,8 @@ public class HumanController extends Controller {
         System.out.println("    Toggle ABS: V");
         System.out.println("    Toggle assistenza sterzo: B");
         System.out.println("    Toggle frizione automatica: N");
-        System.out.println("    Raccolta dati: C (ON/OFF)");
+        System.out.println("    Raccolta dati enhanced: C (ON/OFF)");
         System.out.println("    Reset: R");
-        System.out.println("    Statistiche: P");
         System.out.println("    Esci: X");
         System.out.println("  GAMEPAD:");
         System.out.println("    Sterzo: Left Stick X");
@@ -71,7 +68,7 @@ public class HumanController extends Controller {
         System.out.println("    Toggle ABS: B");
         System.out.println("    Toggle assistenza sterzo: Y");
         System.out.println("    Toggle frizione automatica: A");
-        System.out.println("    Raccolta dati: START");
+        System.out.println("    Raccolta dati enhanced: START");
         System.out.println("  Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE") + " (default: AUTOMATICO)");
         System.out.println("================================");
     }
@@ -113,7 +110,7 @@ public class HumanController extends Controller {
                 "• <b>N</b> | <b>A</b> → Toggle frizione automatica</div>" +
                 "<div style='margin-bottom: 10px;'><b>💾 DATI:</b></div>" +
                 "<div style='margin-left: 15px; margin-bottom: 15px;'>" +
-                "• <b>C</b> | <b>START</b> → Raccolta dati ON/OFF</div>" +
+                "• <b>C</b> | <b>START</b> → Raccolta dati enhanced ON/OFF</div>" +
                 "<div style='margin-bottom: 10px;'><b>🔄 GENERALI:</b></div>" +
                 "<div style='margin-left: 15px;'>" +
                 "• <b>R</b> → Reset controlli | <b>X</b> → Esci</div>" +
@@ -191,7 +188,7 @@ public class HumanController extends Controller {
         
         // Raccogli dati se in modalità raccolta
         if (collectingData) {
-            collector.recordData(sensors, targetSpeed, finalSteering);
+            dataManager.recordData(sensors, targetSpeed, action);
         }
         
         return action;
@@ -236,10 +233,10 @@ public class HumanController extends Controller {
             return 1;
         
         // Logica upshift: se RPM supera soglia (solo marce avanti)
-        if (currentGear > 0 && currentGear < 6 && rpm >= 7000)
+        if (currentGear > 0 && currentGear < 6 && rpm >= 19000)
             return currentGear + 1;
         // Logica downshift: se RPM sotto soglia (solo marce avanti)
-        else if (currentGear > 1 && rpm <= 3000)
+        else if (currentGear > 1 && rpm <= 9000)
             return currentGear - 1;
         else
             // Nessun cambio marcia necessario
@@ -361,22 +358,7 @@ public class HumanController extends Controller {
         // Applica curva di sensibilità
         float rawSteering = applySteeringCurve(stickX, STEERING_SENSITIVITY);
         
-        // Applica filtro passa-basso per rendere il movimento più smooth
-        float filteredSteering = lowPassFilter(rawSteering, STEERING_FILTER_BETA, (float)lastSteeringOutput);
-        lastSteeringOutput = filteredSteering;
-        
-        return filteredSteering;
-    }
-    
-    /**
-     * Filtro passa-basso per rendere il movimento più smooth.
-     * @param currentInput Input attuale
-     * @param beta Coefficiente di filtro (0-1)
-     * @param previousOutput Output precedente
-     * @return Valore filtrato
-     */
-    private float lowPassFilter(float currentInput, float beta, float previousOutput) {
-        return previousOutput + beta * (currentInput - previousOutput);
+        return rawSteering;
     }
     
     /**
@@ -386,8 +368,9 @@ public class HumanController extends Controller {
      * @return Valore con curva applicata
      */
     private float applySteeringCurve(float input, float sensitivity) {
-        // Curva polinomiale per migliorare la precisione a piccoli angoli
-        return (float)(Math.signum(input) * Math.pow(Math.abs(input), sensitivity));
+        float sign = Math.signum(input);
+        float absInput = Math.abs(input);
+        return sign * (float) Math.pow(absInput, 1.0 / sensitivity);
     }
     
     private void updateControls() {
@@ -562,16 +545,11 @@ public class HumanController extends Controller {
             collectingData = !collectingData;
             System.out.println("Raccolta dati: " + (collectingData ? "ON" : "OFF"));
             if (collectingData) {
-                try {
-                    collector.startCollection("human_dataset.csv");
-                    System.out.println("Inizio raccolta dati...");
-                } catch (IOException e) {
-                    System.err.println("Errore nell'avviare la raccolta dati: " + e.getMessage());
-                }
+                dataManager.startEnhancedCollection();
+                System.out.println("Inizio raccolta dati enhanced...");
             } else {
-                collector.stopCollection();
-                System.out.println("Fine raccolta dati. Salvati in: " + collector.getFilename());
-                collector.printDatasetStats();
+                dataManager.stopAndConvert();
+                System.out.println("Fine raccolta dati. File creati: enhanced_dataset.csv e human_dataset.csv");
             }
         }
         
@@ -592,10 +570,7 @@ public class HumanController extends Controller {
             System.exit(0);
         }
         
-        // Statistiche con P
-        if (isKeyPressed(KeyEvent.VK_P) && canTriggerAction(KeyEvent.VK_P)) {
-            collector.printDatasetStats();
-        }
+
     }
     
 
@@ -606,7 +581,7 @@ public class HumanController extends Controller {
     
     // Gestione toggle dei tasti
     private static final long KEY_COOLDOWN = 200; // millisecondi
-    private ConcurrentHashMap<Integer, Long> lastPressedTimes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Long> lastPressedTimes = new ConcurrentHashMap<>();
     
     private boolean canTriggerAction(int keyCode) {
         long currentTime = System.currentTimeMillis();
@@ -621,12 +596,8 @@ public class HumanController extends Controller {
     public void setCollectingMode(boolean enabled) {
         this.collectingData = enabled;
         if (enabled) {
-            try {
-                collector.startCollection("human_dataset.csv");
-                System.out.println("[INFO] Raccolta dati attivata automaticamente via parametro --collect");
-            } catch (IOException e) {
-                System.err.println("Errore nell'avviare la raccolta dati: " + e.getMessage());
-            }
+            dataManager.startEnhancedCollection();
+            System.out.println("[INFO] Raccolta dati enhanced attivata automaticamente via parametro --collect");
         }
     }
     
@@ -654,12 +625,9 @@ public class HumanController extends Controller {
         if (keyFrame != null) {
             keyFrame.dispose();
         }
-        if (collector != null) {
-            collector.close();
-        }
     }
     
     public void printDatasetStats() {
-        collector.printDatasetStats();
+        System.out.println("[INFO] Statistiche raccolta dati: consulta i file CSV generati");
     }
 }

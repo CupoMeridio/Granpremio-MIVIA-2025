@@ -1,5 +1,7 @@
 package it.unisa.javaclienttorcs;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -9,10 +11,10 @@ import java.util.*;
  */
 public class BehavioralCloningDriver extends Controller {
     private List<DataPoint> dataset;
-    private DataCollector collector;
+    private EnhancedDataCollectionManager dataManager;
     private int k = 5; // numero di vicini per K-NN
     private boolean collectingMode = false;
-    private String datasetFile = "dataset.csv";
+    private String datasetFile;
     
     public BehavioralCloningDriver() {
         this("dataset.csv");
@@ -20,12 +22,12 @@ public class BehavioralCloningDriver extends Controller {
     
     public BehavioralCloningDriver(String datasetFilename) {
         this.datasetFile = datasetFilename;
-        this.collector = new DataCollector();
+        this.dataManager = new EnhancedDataCollectionManager();
         this.dataset = new ArrayList<>();
         
         // Carica dataset esistente se disponibile
         try {
-            dataset = collector.loadDataset(datasetFile);
+            dataset = loadDatasetFromHumanCSV();
             System.out.println("[INFO] BehavioralCloningDriver inizializzato con " + dataset.size() + " esempi");
         } catch (IOException e) {
             System.out.println("[WARN] Nessun dataset trovato, partenza da zero");
@@ -34,21 +36,18 @@ public class BehavioralCloningDriver extends Controller {
     
     /**
      * Modalità raccolta dati: usa SimpleDriver per generare dati di training
+     * @param enabled
      */
     public void setCollectingMode(boolean enabled) {
         this.collectingMode = enabled;
         if (enabled) {
-            try {
-                collector.startCollection(datasetFile);
-                System.out.println("[INFO] Modalità raccolta dati ATTIVA");
-            } catch (IOException e) {
-                System.err.println("[ERRORE] Impossibile avviare raccolta dati: " + e.getMessage());
-            }
+            dataManager.startEnhancedCollection();
+            System.out.println("[INFO] Modalità raccolta dati ATTIVA");
         } else {
-            collector.stopCollection();
+            dataManager.stopCollection();
             // Ricarica dataset aggiornato
             try {
-                dataset = collector.loadDataset(datasetFile);
+                dataset = loadDatasetFromHumanCSV();
             } catch (IOException e) {
                 System.err.println("[ERRORE] Impossibile ricaricare dataset: " + e.getMessage());
             }
@@ -57,6 +56,8 @@ public class BehavioralCloningDriver extends Controller {
     
     /**
      * Implementazione del controllo basato su behavioral cloning
+     * @param sensors
+     * @return 
      */
     @Override
     public Action control(SensorModel sensors) {
@@ -68,7 +69,7 @@ public class BehavioralCloningDriver extends Controller {
             Action manualAction = simpleDriver.control(sensors);
             
             // Registra la coppia osservazione-azione
-            collector.recordData(sensors, manualAction.accelerate, manualAction.steering);
+            dataManager.recordData(sensors, manualAction.accelerate, manualAction);
             
             return manualAction;
         }
@@ -128,6 +129,49 @@ public class BehavioralCloningDriver extends Controller {
     }
     
     /**
+     * Carica dataset dal file specificato (usa datasetFile)
+     */
+    private List<DataPoint> loadDatasetFromHumanCSV() throws IOException {
+        List<DataPoint> loaded = new ArrayList<>();
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(datasetFile))) {
+            String line;
+            boolean firstLine = true;
+            
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    // Salta la prima riga (header) se contiene "track0"
+                    if (firstLine && line.contains("track0")) {
+                        firstLine = false;
+                        continue;
+                    }
+                    
+                    String[] parts = line.split(",");
+                    if (parts.length >= 24) { // 19 track + 3 sensori + 2 azioni
+                        double[] track = new double[19];
+                        for (int i = 0; i < 19; i++) {
+                            track[i] = Double.parseDouble(parts[i]);
+                        }
+                        
+                        double speedX = Double.parseDouble(parts[19]);
+                        double angleToTrackAxis = Double.parseDouble(parts[20]);
+                        double trackPosition = Double.parseDouble(parts[21]);
+                        double targetSpeed = Double.parseDouble(parts[22]);
+                        double steer = Double.parseDouble(parts[23]);
+                        
+                        loaded.add(new DataPoint(track, speedX, angleToTrackAxis, 
+                                               trackPosition, targetSpeed, steer));
+                    }
+                    firstLine = false;
+                }
+            }
+        }
+        
+        System.out.println("[INFO] Dataset caricato: " + loaded.size() + " punti");
+        return loaded;
+    }
+
+    /**
      * Trova i k vicini più simili usando distanza euclidea
      */
     private List<DataPoint> findKNearestNeighbors(DataPoint query, int k) {
@@ -160,9 +204,7 @@ public class BehavioralCloningDriver extends Controller {
      */
     private DataPoint createDataPoint(SensorModel sensors, double targetSpeed, double steer) {
         double[] track = new double[19];
-        for (int i = 0; i < 19; i++) {
-            track[i] = sensors.getTrackEdgeSensors()[i];
-        }
+        System.arraycopy(sensors.getTrackEdgeSensors(), 0, track, 0, 19);
         
         return new DataPoint(
             track,
@@ -184,9 +226,9 @@ public class BehavioralCloningDriver extends Controller {
         if (gear == 0) return 1; // partenza
         
         // Cambio marcia basato su RPM
-        if (rpm > 7000 && gear < 6) {
+        if (rpm > 19000 && gear < 6) {
             return gear + 1;
-        } else if (rpm < 3000 && gear > 1) {
+        } else if (rpm < 14000 && gear > 1) {
             return gear - 1;
         }
         
@@ -200,8 +242,8 @@ public class BehavioralCloningDriver extends Controller {
     
     @Override
     public void shutdown() {
-        if (collector.isCollecting()) {
-            collector.stopCollection();
+        if (dataManager.isCollecting()) {
+            dataManager.stopCollection();
         }
         System.out.println("[INFO] BehavioralCloningDriver shutdown completato");
     }
@@ -223,6 +265,7 @@ public class BehavioralCloningDriver extends Controller {
     
     /**
      * Imposta il valore di k per K-NN
+     * @param k
      */
     public void setK(int k) {
         this.k = k;

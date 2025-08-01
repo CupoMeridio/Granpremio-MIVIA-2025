@@ -48,9 +48,13 @@ public class Client {
 
 		// Fase 3: Caricamento dinamico del controller/driver specificato
 		Controller driver = load(args[0]);
+		if (driver == null) {
+			System.err.println("[ERRORE] Impossibile caricare il controller: " + args[0]);
+			System.exit(1);
+		}
 		
 		// Gestione speciale per controller con raccolta dati
-		if (driver instanceof BehavioralCloningDriver) {
+		if (driver instanceof BehavioralCloningDriver behavioralCloningDriver) {
 			// Controlla se è richiesta la modalità raccolta dati
 			boolean collectData = false;
 			for (String arg : args) {
@@ -61,13 +65,13 @@ public class Client {
 			}
 			
 			if (collectData) {
-				((BehavioralCloningDriver) driver).setCollectingMode(true);
+				behavioralCloningDriver.setCollectingMode(true);
 				System.out.println("[INFO] Modalità raccolta dati attivata per BehavioralCloningDriver");
 			}
 		}
 		
 		// Gestione speciale per HumanController
-		if (driver instanceof HumanController) {
+		if (driver instanceof HumanController humanController) {
 			// Controlla se è richiesta la modalità raccolta dati
 			boolean collectData = false;
 			for (String arg : args) {
@@ -78,7 +82,7 @@ public class Client {
 			}
 			
 			if (collectData) {
-				((HumanController) driver).setCollectingMode(true);
+				humanController.setCollectingMode(true);
 				System.out.println("[INFO] Modalità raccolta dati attivata per HumanController");
 			}
 		}
@@ -224,16 +228,16 @@ public class Client {
 						clientId = value;                // Identificatore univoco del client
 					}
 					if (entity.equals("verbose")) {
-						// Gestione booleana per modalità verbose
-						if (value.equals("on"))
-							verbose = true;              // Attiva output dettagliato
-						else if (value.equals("off"))
-							verbose = false;             // Mantiene modalità silenziosa
-						else {
-							System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
-							System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
-							System.exit(0);
-						}
+                                            // Gestione booleana per modalità verbose
+                                            switch (value) {
+                                                case "on" -> verbose = true;              // Attiva output dettagliato
+                                                case "off" -> verbose = false;             // Mantiene modalità silenziosa
+                                                default -> {
+                                                    System.err.println("[WARN] Parametri: opzione non valida - " + entity + ":" + value);
+                                                    System.err.println("[WARN] Parametri: verrà utilizzato il valore di default");
+                                                    System.exit(0);
+                                                }
+                                            }
 					}
 					if (entity.equals("stage")) {
 						// Conversione stringa numerica in enum Stage tramite metodo fromInt
@@ -270,7 +274,7 @@ public class Client {
 	}
 
         private static Controller load(String name) {
-            Controller controller = null;
+            Controller controller;
 
             try {
                 // Usa la reflection moderna per creare l'istanza
