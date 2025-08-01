@@ -7,16 +7,14 @@ echo Dataset: human_dataset.csv
 echo ================================
 
 rem Cleanup function to kill any remaining Java processes
-for /f "tokens=*" %%a in ('tasklist ^| findstr /i "java.exe" ^| findstr /i "BehavioralCloningDriver"') do (
-    echo Cleaning up Java processes...
-    taskkill /f /im java.exe /fi "imagename eq java.exe" 2>nul
-    timeout /t 1 /nobreak >nul
-)
+echo Cleaning up Java processes...
+taskkill /f /im java.exe 2>nul
+timeout /t 1 /nobreak >nul
 
 cd /d "%~dp0.."
 if not exist "human_dataset.csv" (
     echo.
-    echo ⚠️  WARNING: human_dataset.csv not found!
+    echo WARNING: human_dataset.csv not found!
     echo.
     echo To test the model with human data you must first:
     echo 1. Run 'run_manual_driving.bat' to collect manual data

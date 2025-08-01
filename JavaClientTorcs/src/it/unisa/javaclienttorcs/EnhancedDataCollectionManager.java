@@ -9,12 +9,16 @@ public class EnhancedDataCollectionManager {
     
     private final EnhancedDataCollector enhancedCollector;
     private final String enhancedFilePath;
-    private final String humanFilePath;
+    private final String outputDatasetFile;
     
     public EnhancedDataCollectionManager() {
+        this("dataset.csv");
+    }
+    
+    public EnhancedDataCollectionManager(String outputFilename) {
         this.enhancedCollector = new EnhancedDataCollector();
         this.enhancedFilePath = "enhanced_dataset.csv";
-        this.humanFilePath = "human_dataset.csv";
+        this.outputDatasetFile = outputFilename;
     }
     
     /**
@@ -38,12 +42,12 @@ public class EnhancedDataCollectionManager {
         enhancedCollector.stopCollection();
         
         try {
-            System.out.println("[INFO] Conversione in formato human_dataset.csv...");
-            DatasetConverter.convertToHumanDataset(enhancedFilePath, humanFilePath);
+            System.out.println("[INFO] Conversione in formato " + outputDatasetFile + "...");
+            DatasetConverter.convertToHumanDataset(enhancedFilePath, outputDatasetFile);
             System.out.println("[SUCCESS] Processo completato!");
             System.out.println("[INFO] File creati:");
             System.out.println("  - " + enhancedFilePath + " (tutti i sensori e azioni)");
-            System.out.println("  - " + humanFilePath + " (formato standard per behavioral cloning)");
+            System.out.println("  - " + outputDatasetFile + " (formato standard per behavioral cloning)");
         } catch (IOException e) {
             System.err.println("[ERROR] Errore durante conversione: " + e.getMessage());
         }
@@ -65,13 +69,13 @@ public class EnhancedDataCollectionManager {
     public void stopCollection() {
         enhancedCollector.stopCollection();
         
-        // Genera automaticamente human_dataset.csv
+        // Genera automaticamente il file dataset
         try {
-            System.out.println("[INFO] Generazione automatica di human_dataset.csv...");
-            DatasetConverter.convertToHumanDataset(enhancedFilePath, humanFilePath);
-            System.out.println("[SUCCESS] human_dataset.csv generato automaticamente!");
+            System.out.println("[INFO] Generazione automatica di " + outputDatasetFile + "...");
+            DatasetConverter.convertToHumanDataset(enhancedFilePath, outputDatasetFile);
+            System.out.println("[SUCCESS] " + outputDatasetFile + " generato automaticamente!");
         } catch (IOException e) {
-            System.err.println("[ERROR] Errore durante generazione automatica di human_dataset.csv: " + e.getMessage());
+            System.err.println("[ERROR] Errore durante generazione automatica di " + outputDatasetFile + ": " + e.getMessage());
         }
     }
 

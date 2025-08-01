@@ -1,6 +1,7 @@
 package it.unisa.javaclienttorcs;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -25,13 +26,8 @@ public class BehavioralCloningDriver extends Controller {
         this.dataManager = new EnhancedDataCollectionManager();
         this.dataset = new ArrayList<>();
         
-        // Carica dataset esistente se disponibile
-        try {
-            dataset = loadDatasetFromHumanCSV();
-            System.out.println("[INFO] BehavioralCloningDriver inizializzato con " + dataset.size() + " esempi");
-        } catch (IOException e) {
-            System.out.println("[WARN] Nessun dataset trovato, partenza da zero");
-        }
+        // Dataset loading is now deferred until actually needed (in control method)
+        // This prevents premature warnings when file doesn't exist
     }
     
     /**
@@ -72,6 +68,21 @@ public class BehavioralCloningDriver extends Controller {
             dataManager.recordData(sensors, manualAction.accelerate, manualAction);
             
             return manualAction;
+        }
+        
+        // Load dataset on first use if not already loaded
+        if (dataset.isEmpty()) {
+            File datasetFileObj = new File(datasetFile);
+            if (datasetFileObj.exists()) {
+                try {
+                    dataset = loadDatasetFromHumanCSV();
+                } catch (IOException e) {
+                    System.err.println("[ERRORE] Impossibile caricare dataset: " + e.getMessage());
+                }
+            } else {
+                // Only warn when actually trying to use the dataset
+                System.out.println("[WARN] Nessun dataset trovato, partenza da zero");
+            }
         }
         
         if (dataset.isEmpty()) {

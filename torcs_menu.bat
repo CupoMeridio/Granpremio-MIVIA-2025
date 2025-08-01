@@ -89,29 +89,35 @@ pause >nul
 goto menu
 
 :stats
-cd /d "%~dp0JavaClientTorcs"
-echo.
-echo === DATASET STATISTICS ===
-if exist "dataset.csv" (
-    echo dataset.csv: 
-    find /c /v "" dataset.csv
-) else (
-    echo dataset.csv: Not found
-)
-if exist "human_dataset.csv" (
-    echo human_dataset.csv: 
-    find /c /v "" human_dataset.csv
-) else (
-    echo human_dataset.csv: Not found
-)
-if exist "combined_dataset.csv" (
-    echo combined_dataset.csv: 
-    find /c /v "" combined_dataset.csv
-) else (
-    echo combined_dataset.csv: Not found
-)
-echo.
-cd /d "%~dp0"
+	cd /d "%~dp0JavaClientTorcs"
+	echo.
+	echo === DATASET STATISTICS ===
+	if exist "dataset.csv" (
+	    echo dataset.csv: 
+	    find /c /v "" dataset.csv
+	) else (
+	    echo dataset.csv: Not found
+	)
+	if exist "enhanced_dataset.csv" (
+	    echo enhanced_dataset.csv: 
+	    find /c /v "" enhanced_dataset.csv
+	) else (
+	    echo enhanced_dataset.csv: Not found
+	)
+	if exist "human_dataset.csv" (
+	    echo human_dataset.csv: 
+	    find /c /v "" human_dataset.csv
+	) else (
+	    echo human_dataset.csv: Not found
+	)
+	if exist "combined_dataset.csv" (
+	    echo combined_dataset.csv: 
+	    find /c /v "" combined_dataset.csv
+	) else (
+	    echo combined_dataset.csv: Not found
+	)
+	echo.
+	cd /d "%~dp0"
 echo Press any key to return to menu...
 pause >nul
 goto menu

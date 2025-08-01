@@ -54,7 +54,7 @@ public class Client {
 		}
 		
 		// Gestione speciale per controller con raccolta dati
-		if (driver instanceof BehavioralCloningDriver behavioralCloningDriver) {
+		if (driver instanceof BehavioralCloningDriver) {
 			// Controlla se è richiesta la modalità raccolta dati
 			boolean collectData = false;
 			for (String arg : args) {
@@ -64,8 +64,22 @@ public class Client {
 				}
 			}
 			
+			// Controlla se è specificato un file dataset personalizzato
+			String datasetFile = "dataset.csv";
+			for (int i = 1; i < args.length; i++) {
+				if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
+					// Il secondo argomento potrebbe essere il nome del file dataset
+					datasetFile = args[i];
+					break;
+				}
+			}
+			
+			// Ricrea sempre il driver con il file dataset specificato
+			driver = new BehavioralCloningDriver(datasetFile);
+			System.out.println("[INFO] BehavioralCloningDriver inizializzato con dataset: " + datasetFile);
+			
 			if (collectData) {
-				behavioralCloningDriver.setCollectingMode(true);
+				((BehavioralCloningDriver)driver).setCollectingMode(true);
 				System.out.println("[INFO] Modalità raccolta dati attivata per BehavioralCloningDriver");
 			}
 		}
@@ -84,6 +98,35 @@ public class Client {
 			if (collectData) {
 				humanController.setCollectingMode(true);
 				System.out.println("[INFO] Modalità raccolta dati attivata per HumanController");
+			}
+		}
+		
+		// Gestione speciale per SimpleDriver con raccolta dati avanzata
+		if (driver instanceof SimpleDriver) {
+			// Controlla se è richiesta la modalità raccolta dati avanzata
+			boolean collectData = false;
+			for (String arg : args) {
+				if (arg.equals("--collect-data")) {
+					collectData = true;
+					break;
+				}
+			}
+			
+			if (collectData) {
+				// Determina il nome del file dataset da usare
+				String datasetFile = "dataset.csv";
+				for (int i = 1; i < args.length; i++) {
+					if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
+						// Il secondo argomento potrebbe essere il nome del file dataset
+						datasetFile = args[i];
+						break;
+					}
+				}
+				
+				// Crea e usa un wrapper per SimpleDriver con raccolta dati avanzata
+				SimpleDriverWithCollection simpleDriverWithCollection = new SimpleDriverWithCollection(datasetFile);
+				driver = simpleDriverWithCollection;
+				System.out.println("[INFO] Modalità raccolta dati avanzata attivata per SimpleDriver con output: " + datasetFile);
 			}
 		}
 		
@@ -203,9 +246,9 @@ public class Client {
 		 * Es: port:3001 host:localhost verbose:on
 		 */
 		for (int i = 1; i < args.length; i++) {
-			// Gestione flag speciali come --collect
-			if (args[i].equals("--collect")) {
-				// Il flag --collect viene gestito separatamente nel main
+			// Gestione flag speciali come --collect e --collect-data
+			if (args[i].equals("--collect") || args[i].equals("--collect-data")) {
+				// Il flag viene gestito separatamente nel main
 				continue;
 			}
 			
@@ -266,6 +309,9 @@ public class Client {
 					System.err.println("[WARN] Parametri: formato non valido - " + args[i]);
 					System.err.println("[WARN] Parametri: formato atteso parametro:valore");
 				}
+			} else if (i == 1 && !args[i].startsWith("--") && !args[i].contains(":")) {
+				// Il secondo argomento può essere il nome del file dataset (gestito nel main)
+				continue;
 			} else {
 				System.err.println("[WARN] Parametri: parametro non riconosciuto - " + args[i]);
 				System.err.println("[WARN] Parametri: parametro ignorato");
