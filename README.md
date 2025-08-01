@@ -56,48 +56,48 @@ ant jar
 
 ```
 Progetto/
+├── README.md               # Questa documentazione
 ├── torcs_menu.bat          # Menu Windows
 ├── torcs_menu.sh           # Menu Linux/Mac
-├── JavaClientTorcs/
-│   ├── build.xml           # Configurazione Ant
-│   ├── manifest.mf         # Manifest JAR
-│   ├── nbproject/          # Configurazione NetBeans Ant
-│   │   ├── build-impl.xml
-│   │   ├── project.properties
-│   │   └── project.xml
-│   ├── src/
-│   │   └── it/unisa/javaclienttorcs/
-│   │       ├── Action.java                 # Azioni di controllo
-│   │       ├── BehavioralCloningDriver.java # Driver K-NN principale
-│   │       ├── Client.java                 # Client principale
-│   │       ├── Controller.java             # Interfaccia controller
-│   │       ├── DataCollector.java          # Raccolta dati
-│   │       ├── DeadSimpleSoloController.java # Controller base
-│   │       ├── HumanController.java        # Controller manuale
-│   │       ├── MessageBasedSensorModel.java # Modello sensori
-│   │       ├── MessageParser.java          # Parser messaggi
-│   │       ├── SensorModel.java            # Interfaccia sensori
-│   │       ├── SimpleDriver.java           # Driver automatico
-│   │       └── SocketHandler.java        # Gestione socket
-│   ├── lib/
-│   │   ├── Jamepad.jar
-│   │   └── sdl2gdx-1.0.5.jar
-│   ├── build/              # Output build temporaneo
-│   ├── dist/
-│   │   ├── JavaClientTorcs.jar
-│   │   └── lib/            # Librerie copiate
-│   ├── scripts/
-│   │   ├── run_manual_driving.bat    # Guida manuale Windows
-│   │   ├── run_manual_driving.sh     # Guida manuale Linux/Mac
-│   │   ├── run_auto_collection.bat   # Raccolta automatica Windows
-│   │   ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
-│   │   ├── test_human_model.bat      # Test dati umani Windows
-│   │   ├── test_human_model.sh       # Test dati umani Linux/Mac
-│   │   ├── test_auto_model.bat       # Test dati automatici Windows
-│   │   ├── test_auto_model.sh        # Test dati automatici Linux/Mac
-│   │   ├── combine_datasets.bat      # Combina dataset Windows
-│   │   └── combine_datasets.sh       # Combina dataset Linux/Mac
-├── README.md                # Questa documentazione
+└── JavaClientTorcs/
+    ├── build.xml           # Configurazione Ant
+    ├── manifest.mf         # Manifest JAR
+    ├── nbproject/          # Configurazione NetBeans Ant
+    │   ├── build-impl.xml
+    │   ├── project.properties
+    │   └── project.xml
+    ├── src/
+    │   └── it/unisa/javaclienttorcs/
+    │       ├── Action.java                 # Azioni di controllo
+    │       ├── BehavioralCloningDriver.java # Driver K-NN principale
+    │       ├── Client.java                 # Client principale
+    │       ├── Controller.java             # Interfaccia controller
+    │       ├── DataCollector.java          # Raccolta dati
+    │       ├── DeadSimpleSoloController.java # Controller base
+    │       ├── HumanController.java        # Controller manuale
+    │       ├── MessageBasedSensorModel.java # Modello sensori
+    │       ├── MessageParser.java          # Parser messaggi
+    │       ├── SensorModel.java            # Interfaccia sensori
+    │       ├── SimpleDriver.java           # Driver automatico
+    │       └── SocketHandler.java        # Gestione socket
+    ├── lib/
+    │   ├── Jamepad.jar
+    │   └── sdl2gdx-1.0.5.jar
+    ├── build/              # Output build temporaneo
+    ├── dist/
+    │   ├── JavaClientTorcs.jar
+    │   └── lib/            # Librerie copiate
+    └── scripts/
+        ├── run_manual_driving.bat    # Guida manuale Windows
+        ├── run_manual_driving.sh     # Guida manuale Linux/Mac
+        ├── run_auto_collection.bat   # Raccolta automatica Windows
+        ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
+        ├── test_human_model.bat      # Test dati umani Windows
+        ├── test_human_model.sh       # Test dati umani Linux/Mac
+        ├── test_auto_model.bat       # Test dati automatici Windows
+        ├── test_auto_model.sh        # Test dati automatici Linux/Mac
+        ├── combine_datasets.bat      # Combina dataset Windows
+        └── combine_datasets.sh       # Combina dataset Linux/Mac
 ```
 
 ## 🎮 Come Usare
