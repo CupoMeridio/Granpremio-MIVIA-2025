@@ -26,7 +26,7 @@ public class EnhancedDataCollector {
         File file = new File(filename);
         boolean fileExists = file.exists();
         
-        writer = new PrintWriter(new FileWriter(filename, true)); // append mode
+        writer = new PrintWriter(new BufferedWriter(new FileWriter(filename, true))); // buffered per performance
         
         // Scrivi header solo se il file è nuovo
         if (!fileExists) {
@@ -49,9 +49,8 @@ public class EnhancedDataCollector {
         EnhancedDataPoint point = new EnhancedDataPoint(sensors, action, targetSpeed);
         dataset.add(point);
         
-        // Salva su file CSV
+        // Salva su file CSV - rimosso flush() per performance
         writer.println(point.toCSV());
-        writer.flush();
     }
     
     /**
@@ -136,7 +135,12 @@ public class EnhancedDataCollector {
     
     public void stopCollection() {
         if (writer != null) {
-            writer.close();
+            try {
+                writer.flush(); // Forza scrittura buffer
+                writer.close();
+            } catch (Exception e) {
+                System.err.println("[ERROR] Errore durante chiusura file: " + e.getMessage());
+            }
         }
         collecting = false;
         System.out.println("[INFO] Raccolta dati terminata. Punti raccolti: " + dataset.size());

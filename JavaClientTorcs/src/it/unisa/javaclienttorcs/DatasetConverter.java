@@ -62,11 +62,11 @@ public class DatasetConverter {
                 // trackPosition (posizione 21)
                 humanLine.append(parts[21]).append(",");
                 
-                // targetSpeed (posizione 37 - ultima azione prima delle azioni)
-                humanLine.append(parts[37]).append(",");
+                // targetSpeed (posizione 41 - target speed corretta)
+                humanLine.append(parts[41]).append(",");
                 
-                // steer (posizione 38 - prima azione)
-                humanLine.append(parts[38]);
+                // steer (posizione 42 - steering corretto)
+                humanLine.append(parts[42]);
                 
                 writer.println(humanLine.toString());
             }
