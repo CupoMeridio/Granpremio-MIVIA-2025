@@ -139,8 +139,9 @@ torcs_menu.bat
   - Windows: `JavaClientTorcs/scripts/combine_datasets.bat`
   - Linux/Mac: `./JavaClientTorcs/scripts/combine_datasets.sh`
 
-## 🕹️ Controlli di Guida
+## 🕹️ Controlli di Guida & Supporto Controller
 
+### Controlli Tastiera
 Durante la guida manuale, usa:
 - **Freccette/WASD/IJKL/8426** - Controlli direzione
 - **C** - Toggle raccolta dati ON/OFF
@@ -148,12 +149,83 @@ Durante la guida manuale, usa:
 - **R** - Reset posizione
 - **Q** - Esci
 
-## 📊 Dataset
+### Supporto Controller Gamepad
+Il sistema supporta **controller compatibili XInput** (controller Xbox e gamepad compatibili) tramite **libreria Jamepad**.
+
+#### Mappatura Controller
+- **Stick Sinistro** - Sterzo (sinistra/destra)
+- **Grilletto Destro** - Accelerazione
+- **Grilletto Sinistro** - Frenata
+- **Pulsante A** - Toggle raccolta dati ON/OFF
+- **Pulsante B** - Reset posizione
+- **Pulsante Y** - Mostra statistiche
+- **Start/Back** - Esci
+
+#### Requisiti Setup Controller
+- **Libreria Jamepad** (inclusa in `lib/Jamepad.jar`)
+- **SDL2** (incluso tramite `lib/sdl2gdx-1.0.5.jar`)
+- **Controller compatibile XInput** (Xbox 360, Xbox One, o compatibile)
+
+#### Risoluzione Problemi Controller
+1. **Controller non rilevato**: Assicurati che il controller sia connesso prima di avviare l'applicazione
+2. **Nessuna risposta**: Prova a riavviare con il controller già connesso
+3. **Mappatura errata**: Usa i controlli tastiera come fallback
+4. **Linux/Mac**: Potrebbe richiedere installazione SDL2 aggiuntiva
+
+### Priorità di Controllo
+Il sistema prioritizza automaticamente:
+1. **Controller gamepad** (se connesso e rilevato)
+2. **Controlli tastiera** (come fallback)
+
+### Note Raccolta Dati
+- **Tutti gli input di controllo** (tastiera e controller) vengono registrati nei dataset
+- **Input del controller** fornisce sterzo più fluido per dati di training migliori
+- **Metodi di input misti** sono supportati durante la raccolta
+
+## 📊 Dataset & Configurazione Auto
+
+**Configurazione Auto**: Tutti i dataset e le configurazioni del progetto sono specificamente ottimizzati per la **Ferrari F2001** (car1-ow1). L'elenco completo delle auto disponibili in TORCS può essere trovato su: https://www.igcd.net/vehicle.php?id=15647
+
+**Cambiare l'Auto**: Per utilizzare un'auto diversa, modificare il campo `car name` nel file di configurazione scr_server:
+- **Windows**: `C:\Program Files (x86)\torcs\drivers\scr_server\scr_server.xml`
+- **Linux**: `/usr/local/share/games/torcs/drivers/scr_server/scr_server.xml`
+
+Esempio di configurazione:
+```xml
+<attstr name="car name" val="car1-ow1"></attstr>
+```
+
+**Impostazioni Aggiuntive Specifiche dell'Auto**: Potrebbe essere necessario regolare i parametri del cambio marcia in base alle specifiche dell'auto selezionata.
+
+**Configurazione Cambio Marcia**: Modifica i parametri del cambio marcia nei file Java del driver:
+
+**Per SimpleDriver (guida AI)**:
+- **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/SimpleDriver.java`
+- **Linee 30-35**: Modifica le costanti del cambio marcia
+  ```java
+  /* === COSTANTI PER IL CAMBIO MARCIA === */
+  // RPM minimi per salire di marcia [per marcia 1-6]
+  final int[] gearUp = { 19000, 19000, 19000, 19000, 19000, 0 };
+  // RPM massimi per scalare di marcia [per marcia 1-6]
+  final int[] gearDown = { 0, 7000, 7000, 7000, 7000, 7000 };
+  ```
+
+**Per HumanController (guida manuale)**:
+- **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/HumanController.java`
+- **Linee 197-244**: Modifica la logica del cambio marcia nel metodo `getGear()`
+  - **Linea 220**: `if (currentGear > 0 && currentGear < 6 && rpm >= 19000)` - Cambia `19000` per RPM di upshift
+  - **Linea 224**: `else if (currentGear > 1 && rpm <= 7000)` - Cambia `7000` per RPM di downshift
+
+**Regola questi valori in base alle specifiche della tua auto**:
+- Riduci i valori `gearUp` per auto con RPM massimi più bassi
+- Regola i valori `gearDown` per prestazioni ottimali del motore
+- Modifica la logica del cambio se la tua auto ha un numero diverso di marce
 
 I dataset vengono creati automaticamente nella directory principale:
-- `dataset.csv` - Dati raccolti automaticamente
-- `human_dataset.csv` - Dati raccolti manualmente
-- `combined_dataset.csv` - Dataset combinati
+- `dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per k-NN
+- `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per k-NN
+- `enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
+- `combined_dataset.csv` - Dataset combinati (dataset.csv + human_dataset.csv) - Solo sensori essenziali
 
 ## 🔧 Tecnologia
 

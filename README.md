@@ -140,8 +140,9 @@ torcs_menu.bat
   - Windows: `JavaClientTorcs/scripts/combine_datasets.bat`
   - Linux/Mac: `./JavaClientTorcs/scripts/combine_datasets.sh`
 
-## 🕹️ Driving Controls
+## 🕹️ Driving Controls & Controller Support
 
+### Keyboard Controls
 During manual driving, use:
 - **Arrow keys/WASD/IJKL/8426** - Directional controls
 - **C** - Toggle data collection ON/OFF
@@ -149,12 +150,83 @@ During manual driving, use:
 - **R** - Reset position
 - **Q** - Exit
 
-## 📊 Datasets
+### Gamepad Controller Support
+The system supports **XInput compatible controllers** (Xbox controllers and compatible gamepads) via **Jamepad library**.
+
+#### Controller Mapping
+- **Left Stick** - Steering (left/right)
+- **Right Trigger** - Acceleration
+- **Left Trigger** - Braking
+- **A Button** - Toggle data collection ON/OFF
+- **B Button** - Reset position
+- **Y Button** - Show statistics
+- **Start/Back** - Exit
+
+#### Controller Setup Requirements
+- **Jamepad library** (included in `lib/Jamepad.jar`)
+- **SDL2** (included via `lib/sdl2gdx-1.0.5.jar`)
+- **XInput compatible controller** (Xbox 360, Xbox One, or compatible)
+
+#### Troubleshooting Controller Issues
+1. **Controller not detected**: Ensure controller is connected before starting the application
+2. **No response**: Try restarting with controller already connected
+3. **Wrong mappings**: Use keyboard controls as fallback
+4. **Linux/Mac**: May require additional SDL2 installation
+
+### Control Priority
+The system automatically prioritizes:
+1. **Gamepad controller** (if connected and detected)
+2. **Keyboard controls** (as fallback)
+
+### Data Collection Notes
+- **All control inputs** (keyboard and controller) are recorded in datasets
+- **Controller inputs** provide smoother steering for better training data
+- **Mixed input methods** are supported during collection
+
+## 📊 Datasets & Car Configuration
+
+**Car Configuration**: All datasets and project configurations are specifically optimized for the **Ferrari F2001** (car1-ow1). The complete list of available TORCS cars can be found at: https://www.igcd.net/vehicle.php?id=15647
+
+**Changing the Car**: To use a different car, modify the `car name` field in the scr_server configuration file:
+- **Windows**: `C:\Program Files (x86)\torcs\drivers\scr_server\scr_server.xml`
+- **Linux**: `/usr/local/share/games/torcs/drivers/scr_server/scr_server.xml`
+
+Example configuration:
+```xml
+<attstr name="car name" val="car1-ow1"></attstr>
+```
+
+**Additional Car-Specific Settings**: You may need to adjust gear shifting parameters based on the selected car's specifications.
+
+**Gear Shifting Configuration**: Modify gear shifting parameters in the Java driver files:
+
+**For SimpleDriver (AI driving)**:
+- **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/SimpleDriver.java`
+- **Lines 30-35**: Edit the gear shifting constants
+  ```java
+  /* === COSTANTI PER IL CAMBIO MARCIA === */
+  // RPM minimi per salire di marcia [per marcia 1-6]
+  final int[] gearUp = { 19000, 19000, 19000, 19000, 19000, 0 };
+  // RPM massimi per scalare di marcia [per marcia 1-6]
+  final int[] gearDown = { 0, 7000, 7000, 7000, 7000, 7000 };
+  ```
+
+**For HumanController (manual driving)**:
+- **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/HumanController.java`
+- **Lines 197-244**: Modify the gear shifting logic in `getGear()` method
+  - **Line 220**: `if (currentGear > 0 && currentGear < 6 && rpm >= 19000)` - Change `19000` for upshift RPM
+  - **Line 224**: `else if (currentGear > 1 && rpm <= 7000)` - Change `7000` for downshift RPM
+
+**Adjust these values based on your car's specifications**:
+- Lower `gearUp` values for cars with lower redline RPM
+- Adjust `gearDown` values for optimal engine performance
+- Modify gear logic if your car has different number of gears
 
 Datasets are automatically created in the main directory:
-- `dataset.csv` - Automatically collected data
-- `human_dataset.csv` - Manually collected data
-- `combined_dataset.csv` - Combined datasets
+- `dataset.csv` - Automatically collected data (SimpleDriver) - Contains essential sensors for k-NN
+- `human_dataset.csv` - Manually collected data (HumanController) - Contains essential sensors for k-NN
+- `enhanced_dataset.csv` - Comprehensive dataset with almost all available TORCS sensors - Ideal for future implementations and data analysis
+- `combined_dataset.csv` - Combined datasets (dataset.csv + human_dataset.csv) - Essential sensors only
 
 ## 🔧 Technology
 
