@@ -53,36 +53,7 @@ public class Client {
 			System.exit(1);
 		}
 		
-		// Gestione speciale per controller con raccolta dati
-		if (driver instanceof BehavioralCloningDriver) {
-			// Controlla se è richiesta la modalità raccolta dati
-			boolean collectData = false;
-			for (String arg : args) {
-				if (arg.equals("--collect")) {
-					collectData = true;
-					break;
-				}
-			}
-			
-			// Controlla se è specificato un file dataset personalizzato
-			String datasetFile = "dataset.csv";
-			for (int i = 1; i < args.length; i++) {
-				if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
-					// Il secondo argomento potrebbe essere il nome del file dataset
-					datasetFile = args[i];
-					break;
-				}
-			}
-			
-			// Ricrea sempre il driver con il file dataset specificato
-			driver = new BehavioralCloningDriver(datasetFile);
-			System.out.println("[INFO] BehavioralCloningDriver inizializzato con dataset: " + datasetFile);
-			
-			if (collectData) {
-				((BehavioralCloningDriver)driver).setCollectingMode(true);
-				System.out.println("[INFO] Modalità raccolta dati attivata per BehavioralCloningDriver");
-			}
-		}
+
 		
 		// Gestione speciale per HumanController
 		if (driver instanceof HumanController humanController) {

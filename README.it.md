@@ -1,14 +1,14 @@
-# Driver Behavioral Cloning per TORCS
+# Sistema di Raccolta Dati per TORCS
 
 [![Language: English](https://img.shields.io/badge/lang-en-green.svg)](README.md) [![Language: Italian](https://img.shields.io/badge/lang-it-blue.svg)](README.it.md)
 
-Un sistema di behavioral cloning per TORCS (The Open Racing Car Simulator) che utilizza K-NN per imitare il comportamento di guida umano basandosi su dati di guida raccolti.
+Un sistema di raccolta dati per TORCS (The Open Racing Car Simulator) che cattura il comportamento di guida tramite file CSV per analisi e machine learning.
 
 ## 🎯 Cos'è
 
-Questo progetto implementa un driver autonomo per TORCS che:
-- **Impara dal comportamento umano** tramite raccolta dati
-- **Utilizza K-NN** per prendere decisioni di guida in tempo reale
+Questo progetto implementa un sistema di raccolta dati per TORCS che:
+- **Cattura il comportamento di guida umano** tramite dati sensoriali completi
+- **Genera dataset CSV** per applicazioni di machine learning
 - **Supporta raccolta dati** sia manuale che automatica
 - **È cross-platform** (Windows, Linux, macOS)
 
@@ -71,7 +71,7 @@ Progetto/
     ├── src/
     │   └── it/unisa/javaclienttorcs/
     │       ├── Action.java                 # Azioni di controllo
-    │       ├── BehavioralCloningDriver.java # Driver K-NN principale
+    │       ├── DataCollector.java          # Raccolta dati
     │       ├── Client.java                 # Client principale
     │       ├── Controller.java             # Interfaccia controller
     │       ├── DataCollector.java          # Raccolta dati
@@ -222,8 +222,8 @@ Esempio di configurazione:
 - Modifica la logica del cambio se la tua auto ha un numero diverso di marce
 
 I dataset vengono creati automaticamente nella directory principale:
-- `dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per k-NN
-- `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per k-NN
+- `dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per analisi
+- `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per analisi
 - `enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
 - `combined_dataset.csv` - Dataset combinati (dataset.csv + human_dataset.csv) - Solo sensori essenziali
 
@@ -232,7 +232,7 @@ I dataset vengono creati automaticamente nella directory principale:
 - **Linguaggio**: Java
 - **IDE**: NetBeans 26 (progetto nativo)
 - **Build Tool**: Apache Ant
-- **Algoritmo**: K-Nearest Neighbors (K-NN)
+- **Formato Dati**: CSV
 - **Comunicazione**: Socket UDP con TORCS
 - **Formato Dati**: CSV
 

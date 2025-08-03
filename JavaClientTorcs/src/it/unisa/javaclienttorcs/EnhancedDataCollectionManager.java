@@ -48,7 +48,7 @@ public class EnhancedDataCollectionManager {
             System.out.println("[SUCCESS] Processo completato!");
             System.out.println("[INFO] File creati:");
             System.out.println("  - " + enhancedFilePath + " (tutti i sensori e azioni)");
-            System.out.println("  - " + outputDatasetFile + " (formato standard per behavioral cloning)");
+            System.out.println("  - " + outputDatasetFile + " (formato CSV standard per analisi dati)");
         } catch (IOException e) {
             System.err.println("[ERROR] Errore durante conversione: " + e.getMessage());
         }

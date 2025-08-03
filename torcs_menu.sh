@@ -11,16 +11,12 @@ show_menu() {
     echo "1. Manual Driving (Data Collection)"
     echo "2. Automatic Data Collection"
     echo
-    echo "MODEL TESTING:"
-    echo "3. Test Model - Human Data"
-    echo "4. Test Model - Automatic Data"
-    echo
     echo "DATA MANAGEMENT:"
-    echo "5. Combine Datasets"
-    echo "6. View Dataset Statistics"
+    echo "3. Combine Datasets"
+    echo "4. View Dataset Statistics"
     echo
     echo "AUTONOMOUS DRIVING:"
-    echo "7. SimpleDriver (Basic Autonomous)"
+    echo "5. SimpleDriver (Basic Autonomous)"
     echo
     echo "DOCUMENTATION:"
     echo "8. Open Complete Guide"
@@ -54,18 +50,10 @@ while true; do
             read -p "Press Enter to continue..."
             ;;
         3)
-            "$SCRIPTS_DIR/test_human_model.sh"
-            read -p "Press Enter to continue..."
-            ;;
-        4)
-            "$SCRIPTS_DIR/test_auto_model.sh"
-            read -p "Press Enter to continue..."
-            ;;
-        5)
             "$SCRIPTS_DIR/combine_datasets.sh"
             read -p "Press Enter to continue..."
             ;;
-        6)
+        4)
             cd "$SCRIPT_DIR/JavaClientTorcs"
             echo
             echo "=== DATASET STATISTICS ==="
@@ -88,11 +76,11 @@ while true; do
             cd "$SCRIPT_DIR"
             read -p "Press Enter to return to menu..."
             ;;
-        7)
+        5)
             "$SCRIPTS_DIR/run_simpledriver.sh"
             read -p "Press Enter to continue..."
             ;;
-        8)
+        6)
             if command -v xdg-open > /dev/null; then
                 xdg-open "$SCRIPT_DIR/README.md"
             elif command -v open > /dev/null; then
@@ -102,7 +90,7 @@ while true; do
                 "$SCRIPT_DIR/README.md" &
             fi
             ;;
-        9)
+        7)
             echo
             echo "Launching TORCS - The Open Racing Car Simulator..."
             echo "Note: Ensure TORCS is installed and in PATH or provide full path"
