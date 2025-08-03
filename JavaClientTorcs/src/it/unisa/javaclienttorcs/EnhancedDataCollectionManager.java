@@ -1,5 +1,6 @@
 package it.unisa.javaclienttorcs;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -12,7 +13,7 @@ public class EnhancedDataCollectionManager {
     private final String outputDatasetFile;
     
     public EnhancedDataCollectionManager() {
-        this("dataset.csv");
+        this("human_dataset.csv");
     }
     
     public EnhancedDataCollectionManager(String outputFilename) {
@@ -74,8 +75,17 @@ public class EnhancedDataCollectionManager {
             System.out.println("[INFO] Generazione automatica di " + outputDatasetFile + "...");
             DatasetConverter.convertToHumanDataset(enhancedFilePath, outputDatasetFile);
             System.out.println("[SUCCESS] " + outputDatasetFile + " generato automaticamente!");
+            
+            // Verifica che il file sia stato creato
+            File file = new File(outputDatasetFile);
+            if (file.exists()) {
+                System.out.println("[INFO] File creato: " + file.getAbsolutePath() + " (" + file.length() + " bytes)");
+            } else {
+                System.err.println("[ERROR] File non trovato: " + file.getAbsolutePath());
+            }
         } catch (IOException e) {
             System.err.println("[ERROR] Errore durante generazione automatica di " + outputDatasetFile + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

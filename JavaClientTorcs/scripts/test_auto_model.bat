@@ -16,13 +16,12 @@ for /f "tokens=*" %%a in ('tasklist ^| findstr /i "java.exe" ^| findstr /i "Beha
 cd /d "%~dp0.."
 if not exist "dataset.csv" (
     echo.
-    echo ⚠️  WARNING: dataset.csv not found!
+    echo WARNING: dataset.csv not found!
     echo.
     echo To test the model with automatic data you must first:
     echo 1. Run 'run_auto_collection.bat' to collect data
     echo 2. Or run 'torcs_menu.bat' and select option 2
-    echo.
-    pause
+    
     exit /b
 )
 

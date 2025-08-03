@@ -20,7 +20,6 @@ if not exist "human_dataset.csv" (
     echo 1. Run 'run_manual_driving.bat' to collect manual data
     echo 2. Or run 'torcs_menu.bat' and select option 1
     echo.
-    pause
     exit /b
 )
 

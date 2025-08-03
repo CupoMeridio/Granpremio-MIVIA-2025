@@ -236,7 +236,7 @@ public class HumanController extends Controller {
         if (currentGear > 0 && currentGear < 6 && rpm >= 19000)
             return currentGear + 1;
         // Logica downshift: se RPM sotto soglia (solo marce avanti)
-        else if (currentGear > 1 && rpm <= 9000)
+        else if (currentGear > 1 && rpm <= 7000)
             return currentGear - 1;
         else
             // Nessun cambio marcia necessario
@@ -423,30 +423,30 @@ public class HumanController extends Controller {
             if (gear == -1) {
                 // In reverse: backward key accelerates reverse, forward key brakes
                 if (isBackwardPressed) {
-                    accelerate = Math.min(1.0, accelerate + 0.005);
-                    brake = 0.0;
-                    targetSpeed = Math.max(-30, targetSpeed - 0.5);
+                    accelerate = Math.min(1.0, accelerate + 0.003);
+                    brake = Math.max(0.0, brake - 0.01);
+                    targetSpeed = Math.max(-20, targetSpeed - 0.3);
                 } else if (isForwardPressed) {
-                    brake = Math.min(1.0, brake + 0.02);
-                    accelerate = Math.max(0.0, accelerate - 0.02);
-                    targetSpeed = Math.min(0, targetSpeed + 2);
+                    brake = Math.min(1.0, brake + 0.01);
+                    accelerate = Math.max(0.0, accelerate - 0.01);
+                    targetSpeed = Math.min(0, targetSpeed + 1);
                 } else {
-                    accelerate *= 0.92;
-                    brake *= 0.98;
+                    accelerate *= 0.90;
+                    brake *= 0.95;
                 }
             } else {
                 // Normal forward movement
                 if (isForwardPressed) {
-                    accelerate = Math.min(1.0, accelerate + 0.02);
-                    brake = 0.0;
-                    targetSpeed = Math.min(200, targetSpeed + 2);
+                    accelerate = Math.min(1.0, accelerate + 0.01);
+                    brake = Math.max(0.0, brake - 0.02);
+                    targetSpeed = Math.min(150, targetSpeed + 1);
                 } else if (isBackwardPressed) {
-                    brake = Math.min(1.0, brake + 0.02);
-                    accelerate = Math.max(0.0, accelerate - 0.02);
-                    targetSpeed = Math.max(0, targetSpeed - 2);
+                    brake = Math.min(1.0, brake + 0.01);
+                    accelerate = Math.max(0.0, accelerate - 0.01);
+                    targetSpeed = Math.max(0, targetSpeed - 1);
                 } else {
-                    accelerate *= 0.98;
-                    brake *= 0.98;
+                    accelerate *= 0.95;
+                    brake *= 0.95;
                 }
             }
         }
@@ -624,6 +624,13 @@ public class HumanController extends Controller {
         running.set(false);
         if (keyFrame != null) {
             keyFrame.dispose();
+        }
+        
+        // Conversione automatica dei dati raccolti alla chiusura
+        if (collectingData) {
+            System.out.println("[INFO] Conversione automatica dei dati raccolti...");
+            dataManager.stopAndConvert();
+            collectingData = false;
         }
     }
     

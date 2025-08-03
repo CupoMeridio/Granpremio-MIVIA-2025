@@ -19,7 +19,7 @@ public class SimpleDriver extends Controller {
 	// RPM minimi per salire di marcia [per marcia 1-6]
 	final int[] gearUp = { 19000, 19000, 19000, 19000, 19000, 0 };
 	// RPM massimi per scalare di marcia [per marcia 1-6]
-	final int[] gearDown = { 0, 9000, 9000, 9000, 9000, 9000 };
+	final int[] gearDown = { 0, 7000, 7000, 7000, 7000, 7000 };
 
 	/* === COSTANTI PER GESTIONE STUCK === */
 	// Tempo in cicli prima di attivare la procedura di recupero
@@ -219,11 +219,17 @@ public class SimpleDriver extends Controller {
 				}
 			}
 
-			// Fase 4: Calcolo comando accelerazione/frenata
-			// Usa funzione sigmoide per transizione morbida
-			// Quando velocità attuale < target → valore positivo (accelerazione)
-			// Quando velocità attuale > target → valore negativo (frenata)
-			return (float) (2 / (1 + Math.exp(sensors.getSpeed() - targetSpeed)) - 1);
+			// Fase 4: Calcolo comando accelerazione/frenata graduale
+			// Usa funzione sigmoide con smoothing per evitare accelerazione brusca
+			double speedDiff = targetSpeed - sensors.getSpeed();
+			double baseAccel = 2 / (1 + Math.exp(-speedDiff / 10.0)) - 1;
+			
+			// Limita l'accelerazione massima per evitare slittamenti
+			double maxAccelChange = 0.05; // Massimo cambio per ciclo
+			baseAccel = Math.max(-0.8, Math.min(0.8, baseAccel));
+			
+			// Applica smoothing per accelerazione graduale
+			return (float) (baseAccel * 0.7); // Riduci ulteriormente l'intensità
 		} else
 			// Fase 5: Comportamento fuori pista
 			// Accelerazione moderata per rientrare in pista

@@ -87,6 +87,7 @@ public class BehavioralCloningDriver extends Controller {
         
         if (dataset.isEmpty()) {
             // Fallback: usa SimpleDriver se non ci sono dati
+            System.out.println("[FALLBACK] Dataset vuoto o non trovato - uso SimpleDriver");
             SimpleDriver fallback = new SimpleDriver();
             return fallback.control(sensors);
         }
@@ -99,6 +100,7 @@ public class BehavioralCloningDriver extends Controller {
         
         if (neighbors.isEmpty()) {
             // Fallback: SimpleDriver
+            System.out.println("[FALLBACK] Nessun vicino trovato - uso SimpleDriver");
             SimpleDriver fallback = new SimpleDriver();
             return fallback.control(sensors);
         }
@@ -118,18 +120,26 @@ public class BehavioralCloningDriver extends Controller {
         // Applica azioni
         action.steering = (float) avgSteer;
         
-        // Controllo velocità: accelera o frena per raggiungere target speed
+        // Controllo velocità: accelera o frena per raggiungere target speed con smoothing
         double currentSpeed = sensors.getSpeed();
         double speedDiff = avgTargetSpeed - currentSpeed;
         
+        // Limita la differenza di velocità per evitare accelerazione brusca
+        double maxSpeedDiff = 10.0;
+        speedDiff = Math.max(-maxSpeedDiff, Math.min(maxSpeedDiff, speedDiff));
+        
+        // Calcola accelerazione/frenata con limiti graduali
+        double accelIntensity = speedDiff / 20.0; // Riduci l'impatto
+        accelIntensity = Math.max(-0.8, Math.min(0.8, accelIntensity));
+        
         if (speedDiff > 0.1) {
-            action.accelerate = (float) speedDiff; // accelera
+            action.accelerate = (float) Math.max(0.05, accelIntensity); // accelerazione graduale
             action.brake = 0;
         } else if (speedDiff < -0.1) {
             action.accelerate = 0;
-            action.brake = (float) (-speedDiff); // frena
+            action.brake = (float) Math.max(0.05, -accelIntensity); // frenata graduale
         } else {
-            action.accelerate = 0.1f; // mantiene velocità
+            action.accelerate = 0.05f; // mantiene velocità con accelerazione minima
             action.brake = 0;
         }
         
@@ -207,6 +217,11 @@ public class BehavioralCloningDriver extends Controller {
         
         // Restituisci i k più vicini
         int limit = Math.min(k, candidates.size());
+        if (limit == 0) {
+            System.out.println("[K-NN] Trovati 0 vicini su " + dataset.size() + " punti totali");
+        } else {
+            System.out.println("[K-NN] Trovati " + limit + " vicini su " + dataset.size() + " punti totali");
+        }
         return candidates.subList(0, limit);
     }
     
