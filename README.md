@@ -1,42 +1,44 @@
 # TORCS Behavioral Cloning Driver
 
-Un sistema di behavioral cloning per TORCS (The Open Racing Car Simulator) che utilizza K-NN per imitare il comportamento di guida umano basandosi su dati raccolti durante sessioni di guida.
+[![Language: English](https://img.shields.io/badge/lang-en-green.svg)](README.md) [![Language: Italian](https://img.shields.io/badge/lang-it-blue.svg)](README.it.md)
 
-## 🎯 Cos'è
+A behavioral cloning system for TORCS (The Open Racing Car Simulator) that uses K-NN to imitate human driving behavior based on collected driving data.
 
-Questo progetto implementa un driver autonomo per TORCS che:
-- **Impara dal comportamento umano** tramite raccolta dati
-- **Utilizza K-NN** per prendere decisioni di guida in tempo reale
-- **Supporta raccolta dati** sia manuale che automatica
-- **È cross-platform** (Windows, Linux, macOS)
+## 🎯 What It Is
 
-## 🚀 Installazione
+This project implements an autonomous driver for TORCS that:
+- **Learns from human behavior** through data collection
+- **Uses K-NN** to make real-time driving decisions
+- **Supports data collection** both manual and automatic
+- **Is cross-platform** (Windows, Linux, macOS)
 
-### Prerequisiti
-- Java 21+ installato e nel PATH
-- Apache Ant per build del progetto (o NetBeans 26+ per build IDE)
-- TORCS avviato con modulo JavaClientTorcs
+## 🚀 Installation
+
+### Prerequisites
+- **Java 21+** installed and in PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
+- **Apache Ant** for project building ([Download Apache Ant](https://ant.apache.org/bindownload.cgi)) (or **NetBeans 26+** for IDE build - [Download NetBeans](https://netbeans.apache.org/front/main/download/nb26))
+- TORCS started with JavaClientTorcs module
 
 ### Build
 
-#### Metodo 1: NetBeans 26 (Raccomandato)
-**Ambiente di sviluppo:** NetBeans 26 + JDK 21+
+#### Method 1: NetBeans 26 (Recommended)
+**Development Environment:** NetBeans 26 + JDK 21+
 
-**Procedura semplificata:**
-1. **Apri il progetto in NetBeans 26**
+**Simplified Procedure:**
+1. **Open the project in NetBeans 26**
    - File → Open Project
-   - Seleziona la cartella `JavaClientTorcs`
-   - NetBeans riconoscerà automaticamente il progetto Ant
+   - Select the `JavaClientTorcs` folder
+   - NetBeans will automatically recognize the Ant project
 
-2. **Build con un click**
-   - **Pulsante verde "Run Project"** (▶️) nella toolbar
-   - **Oppure:** Right-click sul progetto → Clean and Build
+2. **Build with one click**
+   - **Green "Run Project" button** (▶️) in the toolbar
+   - **Or:** Right-click on project → Clean and Build
 
-3. **Verifica build**
-   - Il JAR verrà generato in: `JavaClientTorcs/dist/JavaClientTorcs.jar`
-   - **Nessuna configurazione aggiuntiva richiesta**
+3. **Verify build**
+   - The JAR will be generated in: `JavaClientTorcs/dist/JavaClientTorcs.jar`
+   - **No additional configuration required**
 
-#### Metodo 2: Ant da terminale
+#### Method 2: Ant from terminal
 
 #### Windows
 ```cmd
@@ -52,57 +54,58 @@ ant clean
 ant jar
 ```
 
-## 📁 Struttura del Progetto
+## 📁 Project Structure
 
 ```
-Progetto/
-├── README.md               # Questa documentazione
-├── torcs_menu.bat          # Menu Windows
-├── torcs_menu.sh           # Menu Linux/Mac
+Project/
+├── README.md               # This documentation
+├── README.it.md            # Italian documentation
+├── torcs_menu.bat          # Windows menu
+├── torcs_menu.sh           # Linux/Mac menu
 └── JavaClientTorcs/
-    ├── build.xml           # Configurazione Ant
-    ├── manifest.mf         # Manifest JAR
-    ├── nbproject/          # Configurazione NetBeans Ant
+    ├── build.xml           # Ant configuration
+    ├── manifest.mf         # JAR manifest
+    ├── nbproject/          # NetBeans Ant configuration
     │   ├── build-impl.xml
     │   ├── project.properties
     │   └── project.xml
     ├── src/
     │   └── it/unisa/javaclienttorcs/
-    │       ├── Action.java                 # Azioni di controllo
-    │       ├── BehavioralCloningDriver.java # Driver K-NN principale
-    │       ├── Client.java                 # Client principale
-    │       ├── Controller.java             # Interfaccia controller
-    │       ├── DataCollector.java          # Raccolta dati
-    │       ├── DeadSimpleSoloController.java # Controller base
-    │       ├── HumanController.java        # Controller manuale
-    │       ├── MessageBasedSensorModel.java # Modello sensori
-    │       ├── MessageParser.java          # Parser messaggi
-    │       ├── SensorModel.java            # Interfaccia sensori
-    │       ├── SimpleDriver.java           # Driver automatico
-    │       └── SocketHandler.java        # Gestione socket
+    │       ├── Action.java                 # Control actions
+    │       ├── BehavioralCloningDriver.java # Main K-NN driver
+    │       ├── Client.java                 # Main client
+    │       ├── Controller.java             # Controller interface
+    │       ├── DataCollector.java          # Data collection
+    │       ├── DeadSimpleSoloController.java # Base controller
+    │       ├── HumanController.java        # Manual controller
+    │       ├── MessageBasedSensorModel.java # Sensor model
+    │       ├── MessageParser.java          # Message parser
+    │       ├── SensorModel.java            # Sensor interface
+    │       ├── SimpleDriver.java           # Automatic driver
+    │       └── SocketHandler.java        # Socket management
     ├── lib/
     │   ├── Jamepad.jar
     │   └── sdl2gdx-1.0.5.jar
-    ├── build/              # Output build temporaneo
+    ├── build/              # Temporary build output
     ├── dist/
     │   ├── JavaClientTorcs.jar
-    │   └── lib/            # Librerie copiate
+    │   └── lib/            # Copied libraries
     └── scripts/
-        ├── run_manual_driving.bat    # Guida manuale Windows
-        ├── run_manual_driving.sh     # Guida manuale Linux/Mac
-        ├── run_auto_collection.bat   # Raccolta automatica Windows
-        ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
-        ├── test_human_model.bat      # Test dati umani Windows
-        ├── test_human_model.sh       # Test dati umani Linux/Mac
-        ├── test_auto_model.bat       # Test dati automatici Windows
-        ├── test_auto_model.sh        # Test dati automatici Linux/Mac
-        ├── combine_datasets.bat      # Combina dataset Windows
-        └── combine_datasets.sh       # Combina dataset Linux/Mac
+        ├── run_manual_driving.bat    # Manual driving Windows
+        ├── run_manual_driving.sh     # Manual driving Linux/Mac
+        ├── run_auto_collection.bat   # Automatic collection Windows
+        ├── run_auto_collection.sh    # Automatic collection Linux/Mac
+        ├── test_human_model.bat      # Test human data Windows
+        ├── test_human_model.sh       # Test human data Linux/Mac
+        ├── test_auto_model.bat       # Test automatic data Windows
+        ├── test_auto_model.sh        # Test automatic data Linux/Mac
+        ├── combine_datasets.bat      # Combine datasets Windows
+        └── combine_datasets.sh       # Combine datasets Linux/Mac
 ```
 
-## 🎮 Come Usare
+## 🎮 How to Use
 
-### Metodo 1: Menu Interattivo (Raccomandato)
+### Method 1: Interactive Menu (Recommended)
 
 #### Windows
 ```cmd
@@ -114,197 +117,167 @@ torcs_menu.bat
 ./torcs_menu.sh
 ```
 
-### Metodo 2: Script Individuali
+### Method 2: Individual Scripts
 
-#### Raccolta Dati Manuali
+#### Manual Data Collection
 - **Windows**: `JavaClientTorcs/scripts/run_manual_driving.bat`
 - **Linux/Mac**: `./JavaClientTorcs/scripts/run_manual_driving.sh`
 
-#### Raccolta Dati Automatica
+#### Automatic Data Collection
 - **Windows**: `JavaClientTorcs/scripts/run_auto_collection.bat`
 - **Linux/Mac**: `./JavaClientTorcs/scripts/run_auto_collection.sh`
 
-#### Test Modello
-- **Test dati umani**: 
+#### Model Testing
+- **Test human data**: 
   - Windows: `JavaClientTorcs/scripts/test_human_model.bat`
   - Linux/Mac: `./JavaClientTorcs/scripts/test_human_model.sh`
-- **Test dati automatici**:
+- **Test automatic data**:
   - Windows: `JavaClientTorcs/scripts/test_auto_model.bat`
   - Linux/Mac: `./JavaClientTorcs/scripts/test_auto_model.sh`
 
-#### Gestione Dataset
-- **Combinare dataset**:
+#### Dataset Management
+- **Combine datasets**:
   - Windows: `JavaClientTorcs/scripts/combine_datasets.bat`
   - Linux/Mac: `./JavaClientTorcs/scripts/combine_datasets.sh`
 
-## 🕹️ Controlli di Guida
+## 🕹️ Driving Controls
 
-Durante la guida manuale, usa:
-- **Freccette/WASD/IJKL/8426** - Controlli direzione
-- **C** - Toggle raccolta dati ON/OFF
-- **P** - Mostra statistiche
-- **R** - Reset posizione
-- **Q** - Esci
+During manual driving, use:
+- **Arrow keys/WASD/IJKL/8426** - Directional controls
+- **C** - Toggle data collection ON/OFF
+- **P** - Show statistics
+- **R** - Reset position
+- **Q** - Exit
 
-## 📊 Dataset
+## 📊 Datasets
 
-I dataset vengono creati automaticamente nella directory principale:
-- `dataset.csv` - Dati raccolti automaticamente
-- `human_dataset.csv` - Dati raccolti manualmente
-- `combined_dataset.csv` - Dataset combinati
+Datasets are automatically created in the main directory:
+- `dataset.csv` - Automatically collected data
+- `human_dataset.csv` - Manually collected data
+- `combined_dataset.csv` - Combined datasets
 
-## 🔧 Tecnologia
+## 🔧 Technology
 
-- **Linguaggio**: Java
-- **IDE**: NetBeans 26 (progetto nativo)
+- **Language**: Java
+- **IDE**: NetBeans 26 (native project)
 - **Build Tool**: Apache Ant
-- **Algoritmo**: K-Nearest Neighbors (K-NN)
-- **Comunicazione**: Socket UDP con TORCS
-- **Formato Dati**: CSV
+- **Algorithm**: K-Nearest Neighbors (K-NN)
+- **Communication**: UDP Socket with TORCS
+- **Data Format**: CSV
 
-### Compatibilità NetBeans
-- **Testato con**: NetBeans 26 + JDK 21/24 ✅
-- **Compatibile con**: NetBeans 25+ e JDK 21+
-- **Progetto nativo**: Apri direttamente la cartella `JavaClientTorcs` come progetto Ant
+### NetBeans Compatibility
+- **Tested with**: NetBeans 26 + JDK 21/24 ✅
+- **Compatible with**: NetBeans 25+ and JDK 21+
+- **Native project**: Open the `JavaClientTorcs` folder directly as Ant project
 
 ## 🚗 TORCS Setup
 
-1. Avvia TORCS
-2. Configura la gara con il client Java
-3. Il driver si connetterà automaticamente alla porta 3001
+1. Start TORCS
+2. Configure race with Java client
+3. The driver will automatically connect to port 3001
 
-## ⚡ Esecuzione Veloce
+## ⚡ Quick Start
 
-1. **Build**: `ant clean && ant jar` (da JavaClientTorcs/)
-2. **Menu**: Usa il menu appropriato per il tuo sistema
-3. **Raccogli dati**: Guida manualmente o automaticamente
-4. **Testa**: Usa il modello con i tuoi dati
+1. **Build**: `ant clean && ant jar` (from JavaClientTorcs/)
+2. **Menu**: Use appropriate menu for your system
+3. **Collect data**: Drive manually or automatically
+4. **Test**: Use model with your data
 
-## 📋 Note Importanti
+## 📋 Important Notes
 
-- Assicurati che TORCS sia in esecuzione prima di avviare i driver
-- I dataset vengono salvati nella directory dove esegui gli script
-- Per migliori risultati, raccogli almeno 1000-5000 esempi per pista
-- Il sistema è cross-platform: funziona su Windows, Linux e macOS
+- Make sure TORCS is running before starting drivers
+- Datasets are saved in the directory where you run scripts
+- For best results, collect at least 1000-5000 examples per track
+- The system is cross-platform: works on Windows, Linux and macOS
 
-## 🪟 Configurazione TORCS per Windows
+## 🪟 TORCS Configuration for Windows
 
-### ⚠️ Versione Richiesta: 1.3.7
-**Nota Importante**: Il progetto MIVIA 2025 richiede **specificamente la versione 1.3.7**, non la 1.3.8 più recente.
+### ⚠️ Required Version: 1.3.7
+**Important Note**: The MIVIA 2025 project specifically requires **version 1.3.7**, not the more recent 1.3.8.
 
-### Installazione Completa TORCS + SCR Patch
+### Complete TORCS + SCR Patch Installation
 
-Per configurare correttamente TORCS su Windows per il progetto MIVIA 2025:
+To properly configure TORCS on Windows for the MIVIA 2025 project:
 
-#### Passo 1: Installazione TORCS 1.3.7
-1. **Scarica l'esatta versione 1.3.7**:
+#### Step 1: Install TORCS 1.3.7
+1. **Download exact version 1.3.7**:
    - [Download torcs_1.3.7_setup.exe](https://sourceforge.net/projects/torcs/files/torcs-win32-bin/1.3.7/torcs_1.3.7_setup.exe/download)
-   - Salva il file nella cartella Downloads
-   - **⚠️ Garanzia Versione**: Questo link fornisce **esattamente la versione 1.3.7** richiesta dal progetto
+   - Save the file in Downloads folder
+   - **⚠️ Version Guarantee**: This link provides **exactly version 1.3.7** required by the project
 
-2. **Installa TORCS**:
-   - Esegui `torcs_1.3.7_setup.exe` come Amministratore
-   - Segui la procedura guidata di installazione
-   - Installa nella directory predefinita: `C:\Program Files\TORCS`
-   - **Verifica versione**: Vai in `Help > About TORCS` per confermare 1.3.7
+2. **Install TORCS**:
+   - Run `torcs_1.3.7_setup.exe` as Administrator
+   - Follow the installation wizard
+   - Install in default directory: `C:\Program Files\TORCS`
+   - **Verify version**: Go to `Help > About TORCS` to confirm 1.3.7
 
-#### Passo 2: Applicazione Patch SCR
-1. **Scarica il pacchetto SCR**:
-   - Visita: [Computational Intelligence in Games](http://sourceforge.net/projects/cig/)
-   - Scarica: `scr-win-patch.zip`
+#### Step 2: Apply SCR Patch
+1. **Download SCR package**:
+   - Visit: [Computational Intelligence in Games](http://sourceforge.net/projects/cig/)
+   - Download: `scr-win-patch.zip`
 
-2. **Applica la patch**:
-   - Vai nella directory di installazione TORCS (es. `C:\Program Files\TORCS`)
-   - Estrai `scr-win-patch.zip` direttamente in questa directory
-   - **IMPORTANTE**: Quando richiesto, seleziona **"Sì a tutti"** per sovrascrivere i file esistenti
-   - Verifica che tutti i file siano stati estratti correttamente
+2. **Apply patch**:
+   - Go to TORCS installation directory (e.g. `C:\Program Files\TORCS`)
+   - Extract `scr-win-patch.zip` directly into this directory
+   - **IMPORTANT**: When prompted, select **"Yes to all"** to overwrite existing files
+   - Verify all files were extracted correctly
 
-#### Passo 3: Verifica Installazione
-1. **Avvia TORCS**:
-   - Esegui `C:\Program Files\TORCS\torcs.exe`
-   - Verifica che appaiano le funzionalità SCR aggiuntive
+#### Step 3: Verify Installation
+1. **Start TORCS**:
+   - Run `C:\Program Files\TORCS\torcs.exe`
+   - Verify SCR additional features appear
 
-2. **Test connessione**:
-   - Avvia TORCS prima di eseguire i driver Java
-   - Il client Java si connetterà automaticamente su porta 3001
+2. **Test connection**:
+   - Start TORCS before running Java drivers
+   - Java client will automatically connect on port 3001
 
-#### Risoluzione Problemi Comuni
-- **TORCS non parte**: Assicurati di avere la versione esatta 1.3.7
-- **Patch non applicata**: Re-scarica `scr-win-patch.zip` ed estrai di nuovo
-- **Permessi**: Esegui sempre come Amministratore su Windows
+## 🐧 TORCS Configuration for Linux
 
-#### ⚠️ Problema: Versione Errata Installata (1.3.8 invece di 1.3.7)
-- **Windows**: Usa il link specifico fornito sopra per scaricare 1.3.7
-- **Linux**: Se il package manager installa 1.3.8, usa:
-  ```bash
-  # Verifica versione disponibile
-  apt-cache show torcs | grep Version
-  # Se solo 1.3.8 disponibile, usa la compilazione da sorgente
-  ```
+### ⚠️ Required Version: 1.3.7
+**Important Note**: The MIVIA 2025 project specifically requires **version 1.3.7**, not the more recent 1.3.8.
 
-#### Problema: TORCS non si avvia
-- **Soluzione**: Controlla le dipendenze OpenGL
-- **Windows**: Aggiorna i driver della scheda video
-- **Linux**: Installa `libgl1-mesa-glx`
+### TORCS 1.3.7 + SCR Patch Installation
 
-#### Problema: SCR Patch non funziona
-- **Soluzione**: Verifica che il patch sia stato applicato nella directory corretta
-- **Windows**: Controlla che i file siano in `C:\Program Files\TORCS`
-- **Linux**: Verifica il percorso di installazione con `which torcs`
+To configure TORCS on Linux, use **one of the following options to get exactly 1.3.7**:
 
-### Prossimi Passi
-Dopo la configurazione:
-1. Testa l'installazione avviando TORCS manualmente
-2. Usa `torcs_menu.bat` per accedere alle funzionalità del progetto
-3. Procedi con la raccolta dati o test del modello
+#### Option 1: Package Manager Installation (Recommended - Version 1.3.7)
 
-## 🐧 Configurazione TORCS per Linux
-
-### ⚠️ Versione Richiesta: 1.3.7
-**Nota Importante**: Il progetto MIVIA 2025 richiede **specificamente la versione 1.3.7**, non la 1.3.8 più recente.
-
-### Installazione TORCS 1.3.7 + SCR Patch
-
-Per configurare TORCS su Linux, usa **una delle seguenti opzioni per ottenere esattamente la 1.3.7**:
-
-#### Opzione 1: Installazione via Package Manager (Raccomandato - Versione 1.3.7)
-
-**Ubuntu/Debian (versione 1.3.7 confermata):**
+**Ubuntu/Debian (confirmed 1.3.7 version):**
 ```bash
-# Installa TORCS 1.3.7 dai repository (versione attuale: 1.3.7+dfsg-5)
+# Install TORCS 1.3.7 from repositories (current version: 1.3.7+dfsg-5)
 sudo apt update
 sudo apt install torcs=1.3.7+dfsg-5
 
-# Verifica la versione installata
+# Verify installed version
 torcs --version
 
-# Installa dipendenze aggiuntive per SCR
+# Install additional dependencies for SCR
 sudo apt install libalut-dev libvorbis-dev libpng-dev
 ```
 
 **Debian:**
 ```bash
-# Debian stable/bookworm include 1.3.7
+# Debian stable/bookworm includes 1.3.7
 sudo apt update
 sudo apt install torcs
 ```
 
 **Fedora:**
 ```bash
-# Fedora include 1.3.7 nei repository
+# Fedora includes 1.3.7 in repositories
 sudo dnf install torcs-1.3.7
 ```
 
-**⚠️ Attenzione**: Alcune distribuzioni potrebbero avere aggiornato alla 1.3.8. In tal caso, usa l'opzione 2 o 3.
+**⚠️ Attention**: Some distributions might have updated to 1.3.8. In this case, use option 2 or 3.
 
-#### Opzione 2: Installazione da Sorgente con SCR Patch
+#### Option 2: Source Installation with SCR Patch
 
-**Ubuntu/Debian completo:**
+**Complete Ubuntu/Debian:**
 ```bash
-# Installa tutte le dipendenze necessarie
+# Install all necessary dependencies
 sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential git
 
-# Scarica e compila TORCS 1.3.7 con SCR patch
+# Download and compile TORCS 1.3.7 with SCR patch
 git clone https://github.com/fmirus/torcs-1.3.7.git
 cd torcs-1.3.7
 
@@ -318,27 +291,19 @@ make install
 make datainstall
 ```
 
-**CentOS/RHEL:**
+#### Option 3: Pre-patched GitHub Repository (Recommended for Linux)
+
+**GitHub repository with TORCS 1.3.7 + SCR already patched:**
 ```bash
-# Installa dipendenze
-sudo yum install gcc gcc-c++ mesa-libGL-devel mesa-libGLU-devel freeglut-devel plib-devel openal-soft-devel libvorbis-devel libpng-devel cmake git
-
-# Segui gli stessi passi di compilazione Ubuntu
-```
-
-#### Opzione 3: Repository GitHub Pre-Patchato (Raccomandato per Linux)
-
-**Repository GitHub con TORCS 1.3.7 + SCR già patchato:**
-```bash
-# Clona il repository con TORCS 1.3.7 pre-patchato
-# Include dipendenze e patch SCR già applicate
+# Clone repository with TORCS 1.3.7 pre-patched
+# Includes dependencies and SCR patch already applied
 git clone https://github.com/fmirus/torcs-1.3.7.git
 cd torcs-1.3.7
 
-# Installa dipendenze
+# Install dependencies
 sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential
 
-# Compila e installa
+# Compile and install
 export CFLAGS="-fPIC"
 export CPPFLAGS=$CFLAGS
 export CXXFLAGS=$CFLAGS
@@ -348,72 +313,8 @@ make install
 make datainstall
 ```
 
-#### Opzione 4: Installazione Flatpak (Universale)
-```bash
-# Installa Flatpak se non presente
-sudo apt install flatpak  # Ubuntu/Debian
-sudo dnf install flatpak  # Fedora
-
-# Installa TORCS da Flathub
-flatpak install flathub net.sourceforge.torcs
-```
-
-### Applicazione Patch SCR su Linux
-
-Dopo l'installazione di TORCS, applica la patch SCR:
-
-1. **Scarica il pacchetto SCR:**
-   ```bash
-   wget http://sourceforge.net/projects/cig/files/scr-linux-patch.tar.gz
-   ```
-
-2. **Trova la directory di installazione di TORCS:**
-   - Package manager: `/usr/games/torcs` o `/opt/torcs`
-   - Sorgente: `~/torcs-1.3.7/BUILD/bin/torcs`
-
-3. **Applica la patch:**
-   ```bash
-   # Estrai la patch nella directory TORCS
-   sudo tar -xzvf scr-linux-patch.tar.gz -C /usr/share/games/torcs/
-   
-   # Dai i permessi necessari
-   sudo chmod +x /usr/games/torcs
-   ```
-
-### Verifica Installazione Linux
-
-1. **Test avvio TORCS:**
-   ```bash
-   # Se installato da package manager
-   torcs
-   
-   # Se installato da sorgente
-   ~/torcs-1.3.7/BUILD/bin/torcs
-   
-   # Se installato da Flatpak
-   flatpak run net.sourceforge.torcs
-   ```
-
-2. **Verifica patch SCR:**
-   - In TORCS, vai su "Race" → "Practice"
-   - Verifica che siano presenti opzioni SCR aggiuntive
-
-### Risoluzione Problemi Linux
-
-#### Problemi comuni:
-- **Librerie mancanti**: `sudo apt install --fix-missing`
-- **Permessi**: `sudo chmod +x /usr/games/torcs`
-- **OpenGL**: Verifica con `glxinfo | grep "direct rendering"`
-- **Audio**: Installa `libopenal-dev` se necessario
-
-#### Dipendenze specifiche per distribuzioni:
-- **Ubuntu 20.04+**: Tutte le dipendenze disponibili nei repository
-- **Ubuntu 18.04**: Potrebbe richiedere repository aggiuntivi
-- **Debian**: Usa `apt-get` con i repository non-free
-- **Fedora**: Usa `dnf` con i repository RPM Fusion
-
-### Prossimi Passi Linux
-Dopo la configurazione:
-1. Testa l'installazione con `torcs_menu.sh`
-2. Verifica la connessione client-server su porta 3001
-3. Procedi con la raccolta dati usando gli script `.sh`
+### Next Steps for Linux
+After configuration:
+1. Test installation with `torcs_menu.sh`
+2. Verify client-server connection on port 3001
+3. Proceed with data collection using `.sh` scripts
