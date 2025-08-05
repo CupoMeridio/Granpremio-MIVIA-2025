@@ -15,10 +15,7 @@ public class KNNDriver extends Controller {
     private double[] featureMin;
     private double[] featureMax;
     
-    // Enum per le metriche di distanza
-    public enum DistanceMetric {
-        EUCLIDEAN
-    }
+
     
     /**
      * Costruttore del KNN Driver con configurazione
@@ -206,7 +203,7 @@ public class KNNDriver extends Controller {
      * Costruisce il KD-tree dai dati di training
      */
     private void buildKDTree() {
-        kdTree = new KDTree(trainingData, config.getDistanceMetric());
+        kdTree = new KDTree(trainingData);
         if (config.isEnableLogging()) {
             System.out.println("[KNN] KD-tree costruito con " + trainingData.size() + " nodi");
         }
@@ -307,7 +304,6 @@ public class KNNDriver extends Controller {
     private int getAutoGear(SensorModel sensors) {
         int currentGear = sensors.getGear();
         double rpm = sensors.getRPM();
-        double speed = sensors.getSpeed(); // km/h
         
         // Gestione marcia 0 (folle) - imposta sempre 1ª marcia
         if (currentGear < 1)
@@ -387,122 +383,5 @@ public class KNNDriver extends Controller {
         return kdTree != null && !trainingData.isEmpty();
     }
     
-    /**
-     * Metodo main per test standalone
-     */
-    public static void main(String[] args) {
-        System.out.println("=== Test Standalone KNN Driver ===");
-        
-        try {
-            KNNDriver driver;
-            
-            if (args.length >= 1) {
-                // Dataset filename provided
-                String datasetFilename = args[0];
-                System.out.println("[DEBUG] Using dataset: " + datasetFilename);
-                driver = new KNNDriver(datasetFilename);
-            } else {
-                // No arguments - use default
-                System.out.println("[DEBUG] No arguments - using default dataset");
-                driver = new KNNDriver();
-            }
-            
-            if (driver.isReady()) {
-                System.out.println("[SUCCESS] KNN Driver inizializzato correttamente!");
-                System.out.println("[INFO] Configurazione: " + driver.getConfig());
-                System.out.println("[INFO] Punti di training: " + driver.getTrainingDataSize());
-                
-                // Test di predizione
-                SensorModel testSensor = createTestSensor();
-                Action action = driver.control(testSensor);
-                
-                System.out.println("[TEST] Predizione di esempio:");
-                System.out.println("  Steering: " + String.format("%.4f", action.steering));
-                System.out.println("  Acceleration: " + String.format("%.4f", action.accelerate));
-                System.out.println("  Brake: " + String.format("%.4f", action.brake));
-            } else {
-                System.err.println("[ERROR] KNN Driver non pronto!");
-            }
-            
-        } catch (Exception e) {
-            System.err.println("[ERROR] Errore durante l'inizializzazione: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Crea un sensore di test per il metodo main
-     */
-    private static SensorModel createTestSensor() {
-        return new SensorModel() {
-            @Override
-            public double getSpeed() { return 80.0; }
-            
-            @Override
-            public double getAngleToTrackAxis() { return 0.1; }
-            
-            @Override
-            public double[] getTrackEdgeSensors() {
-                return new double[]{
-                    100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0,
-                    50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0
-                };
-            }
-            
-            @Override
-            public double[] getFocusSensors() {
-                return new double[]{200.0, 180.0, 150.0, 180.0, 200.0};
-            }
-            
-            @Override
-            public double getTrackPosition() { return 0.2; }
-            
-            @Override
-            public int getGear() { return 3; }
-            
-            @Override
-            public double[] getOpponentSensors() { return new double[36]; }
-            
-            @Override
-            public int getRacePosition() { return 1; }
-            
-            @Override
-            public double getLateralSpeed() { return 0.5; }
-            
-            @Override
-            public double getCurrentLapTime() { return 45.2; }
-            
-            @Override
-            public double getDamage() { return 0.0; }
-            
-            @Override
-            public double getDistanceFromStartLine() { return 1500.0; }
-            
-            @Override
-            public double getDistanceRaced() { return 3000.0; }
-            
-            @Override
-            public double getFuelLevel() { return 50.0; }
-            
-            @Override
-            public double getLastLapTime() { return 44.8; }
-            
-            @Override
-            public double getRPM() { return 6000.0; }
-            
-            @Override
-            public double[] getWheelSpinVelocity() {
-                return new double[]{15.0, 15.0, 15.0, 15.0};
-            }
-            
-            @Override
-            public double getZSpeed() { return 0.1; }
-            
-            @Override
-            public double getZ() { return 0.35; }
-            
-            @Override
-            public String getMessage() { return ""; }
-        };
-    }
+
 }

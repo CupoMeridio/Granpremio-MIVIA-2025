@@ -59,12 +59,11 @@ public class DataPoint {
 
     
     /**
-     * Calcola la distanza tra questo punto e un altro usando la distanza euclidea
+     * Calcola la distanza euclidea tra questo punto e un altro set di features
      * @param otherFeatures Le features dell'altro punto
-     * @param metric La metrica di distanza da utilizzare (solo EUCLIDEAN supportata)
      * @return La distanza euclidea calcolata
      */
-    public double calculateDistance(double[] otherFeatures, KNNDriver.DistanceMetric metric) {
+    public double calculateDistance(double[] otherFeatures) {
         return euclideanDistance(otherFeatures);
     }
     

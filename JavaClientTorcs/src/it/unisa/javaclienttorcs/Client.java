@@ -277,7 +277,7 @@ public class Client {
                                             }
 					}
 					if (entity.equals("stage")) {
-						// Conversione stringa numerica in enum Stage tramite metodo fromInt
+			
 						stage = Stage.fromInt(Integer.parseInt(value));  // 0=WARMUP, 1=QUALIFYING, 2=RACE
 					}
 					if (entity.equals("trackName")) {

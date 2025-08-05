@@ -9,7 +9,6 @@ public class KNNConfig {
     
     // Parametri ottimali fissi (non configurabili)
     private static final int K = 5;
-    private static final KNNDriver.DistanceMetric DISTANCE_METRIC = KNNDriver.DistanceMetric.EUCLIDEAN;
     private static final boolean NORMALIZE_DATA = true;
     private static final boolean USE_WEIGHTED_VOTING = true;
     private static final double MIN_WEIGHT = 1e-10;
@@ -33,10 +32,6 @@ public class KNNConfig {
     // Getters per i parametri fissi
     public int getK() {
         return K;
-    }
-    
-    public KNNDriver.DistanceMetric getDistanceMetric() {
-        return DISTANCE_METRIC;
     }
     
     public boolean isNormalizeData() {
@@ -92,7 +87,7 @@ public class KNNConfig {
     
     @Override
     public String toString() {
-        return String.format("KNNConfig{datasetPath='%s', k=%d, distanceMetric=%s, normalizeData=%s, useWeightedVoting=%s}",
-                datasetPath, K, DISTANCE_METRIC, NORMALIZE_DATA, USE_WEIGHTED_VOTING);
+        return String.format("KNNConfig{datasetPath='%s', k=%d, normalizeData=%s, useWeightedVoting=%s}",
+                datasetPath, K, NORMALIZE_DATA, USE_WEIGHTED_VOTING);
     }
 }

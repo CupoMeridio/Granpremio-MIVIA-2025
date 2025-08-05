@@ -121,28 +121,5 @@ public final class IOConfig {
         return sb.toString();
     }
     
-    /**
-     * Valida la configurazione corrente
-     * 
-     * @return true se la configurazione è valida
-     */
-    public static boolean validateConfig() {
-        // Controlli di sanità
-        if (BATCH_WRITE_SIZE <= 0 || BATCH_WRITE_SIZE > 1000) {
-            System.err.println("[ERROR] IOConfig: BATCH_WRITE_SIZE non valido: " + BATCH_WRITE_SIZE);
-            return false;
-        }
-        
-        if (MAX_IN_MEMORY_RECORDS <= 0 || MAX_IN_MEMORY_RECORDS > 100000) {
-            System.err.println("[ERROR] IOConfig: MAX_IN_MEMORY_RECORDS non valido: " + MAX_IN_MEMORY_RECORDS);
-            return false;
-        }
-        
-        if (UDP_RECEIVE_BUFFER_SIZE <= 0 || UDP_RECEIVE_BUFFER_SIZE > 65536) {
-            System.err.println("[ERROR] IOConfig: UDP_RECEIVE_BUFFER_SIZE non valido: " + UDP_RECEIVE_BUFFER_SIZE);
-            return false;
-        }
-        
-        return true;
-    }
+
 }

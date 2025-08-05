@@ -642,7 +642,5 @@ public class HumanController extends Controller {
         }
     }
     
-    public void printDatasetStats() {
-        System.out.println("[INFO] Statistiche raccolta dati: consulta i file CSV generati");
-    }
+
 }

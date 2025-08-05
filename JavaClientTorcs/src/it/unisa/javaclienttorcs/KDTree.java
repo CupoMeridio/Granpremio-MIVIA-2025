@@ -9,7 +9,6 @@ import java.util.*;
 public class KDTree {
     
     private KDNode root;
-    private KNNDriver.DistanceMetric distanceMetric;
     private int dimensions;
     
     /**
@@ -30,10 +29,8 @@ public class KDTree {
     /**
      * Costruttore del KD-Tree
      * @param dataPoints Lista dei punti dati
-     * @param distanceMetric Metrica di distanza da utilizzare (solo EUCLIDEAN supportata)
      */
-    public KDTree(List<DataPoint> dataPoints, KNNDriver.DistanceMetric distanceMetric) {
-        this.distanceMetric = distanceMetric;
+    public KDTree(List<DataPoint> dataPoints) {
         if (!dataPoints.isEmpty()) {
             this.dimensions = dataPoints.get(0).features.length;
             this.root = buildTree(new ArrayList<>(dataPoints), 0);
@@ -206,37 +203,6 @@ public class KDTree {
         return 1 + countNodes(node.left) + countNodes(node.right);
     }
     
-    /**
-     * Verifica se l'albero è vuoto
-     * @return true se l'albero è vuoto
-     */
-    public boolean isEmpty() {
-        return root == null;
-    }
     
-    /**
-     * Restituisce la profondità massima dell'albero
-     * @return La profondità massima
-     */
-    public int getMaxDepth() {
-        return calculateDepth(root);
-    }
-    
-    /**
-     * Calcola ricorsivamente la profondità dell'albero
-     */
-    private int calculateDepth(KDNode node) {
-        if (node == null) {
-            return 0;
-        }
-        return 1 + Math.max(calculateDepth(node.left), calculateDepth(node.right));
-    }
-    
-    /**
-     * Cambia la metrica di distanza (richiede ricostruzione dell'albero se necessario)
-     * @param newMetric La nuova metrica di distanza
-     */
-    public void setDistanceMetric(KNNDriver.DistanceMetric newMetric) {
-        this.distanceMetric = newMetric;
-    }
+
 }

@@ -28,9 +28,9 @@ public class MessageBasedSensorModel implements SensorModel {
 	}
 
         @Override
-	public double[] getFocusSensors() {// ML
-		return (double[]) message.getReading("focus");// ML
-	}// ML
+	public double[] getFocusSensors() {
+		return (double[]) message.getReading("focus");
+	}
 
         @Override
 	public int getGear() {
