@@ -3,7 +3,7 @@ echo ================================
 echo   AUTOMATIC DATA COLLECTION
 echo ================================
 echo Collecting data with SimpleDriver...
-echo Data will be saved to: dataset.csv
+echo Data will be saved to: auto_dataset.csv
 echo ================================
 echo Press Ctrl+C to interrupt collection...
 echo.
@@ -20,4 +20,4 @@ java -cp dist\JavaClientTorcs.jar;lib\* it.unisa.javaclienttorcs.Client it.unisa
 cd /d "%~dp0"
 echo.
 echo Collection completed!
-echo File saved: dataset.csv
+echo File saved: auto_dataset.csv

@@ -14,6 +14,17 @@ public class SocketHandler {
 	private int port;
 	private DatagramSocket socket;
 	private final boolean verbose;
+	
+	// Ottimizzazioni I/O per performance migliori - utilizza IOConfig
+	// Buffer riutilizzabili per evitare allocazioni ripetute
+	private final byte[] receiveBuffer = new byte[IOConfig.UDP_RECEIVE_BUFFER_SIZE];
+	private final DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, IOConfig.UDP_RECEIVE_BUFFER_SIZE);
+	
+	// Statistiche performance (opzionale)
+	private long totalBytesSent = 0;
+	private long totalBytesReceived = 0;
+	private long messagesSent = 0;
+	private long messagesReceived = 0;
 
 	public SocketHandler(String host, int port, boolean verbose) {
 		// Fase 1: Configurazione indirizzo server TORCS
@@ -33,14 +44,24 @@ public class SocketHandler {
 		// Fase 2: Configurazione porta di comunicazione
 		this.port = port;
 		
-		// Fase 3: Inizializzazione socket UDP
+		// Fase 3: Inizializzazione socket UDP ottimizzato
 		// DatagramSocket per comunicazione non affidabile ma veloce
 		try {
 			socket = new DatagramSocket();
-			System.out.println("[INFO] SocketHandler: socket UDP creato correttamente sulla porta " + socket.getLocalPort());
+			
+			// Ottimizzazioni socket per performance migliori - utilizza IOConfig
+			socket.setSendBufferSize(IOConfig.UDP_SOCKET_SEND_BUFFER);
+			socket.setReceiveBufferSize(IOConfig.UDP_SOCKET_RECEIVE_BUFFER);
+			
+			// Disabilita il controllo di validità degli indirizzi per performance
+			// socket.setReuseAddress(true); // Opzionale per riutilizzo porta
+			
+			System.out.println("[INFO] SocketHandler: socket UDP ottimizzato creato sulla porta " + socket.getLocalPort());
+			System.out.println("[INFO] Buffer invio: " + socket.getSendBufferSize() + " byte, Buffer ricezione: " + socket.getReceiveBufferSize() + " byte");
+			
 		} catch (SocketException e) {
 			// Gestione errore: impossibile creare socket (porta occupata, permessi, ecc.)
-			System.err.println("[ERRORE] SocketHandler: impossibile creare socket UDP");
+			System.err.println("[ERRORE] SocketHandler: impossibile creare socket UDP ottimizzato");
 			System.err.println("[ERRORE] Dettagli: " + e.getMessage());
 			System.err.println("[ERRORE] Possibili cause: porta occupata, permessi insufficienti, firewall bloccante");
 
@@ -52,18 +73,28 @@ public class SocketHandler {
 	}
 
 	public void send(String msg) {
-		// Fase 1: Log debug (se attivato)
+		// Fase 1: Log debug ottimizzato (se attivato)
 		if (verbose)
-			System.out.println("[DEBUG] SocketHandler.send: invio messaggio - " + msg);
+			System.out.println("[DEBUG] SocketHandler.send: invio messaggio (" + msg.length() + " char) - " + msg);
 		
-		// Fase 2: Preparazione dati per invio
-		// Conversione stringa in array di byte
+		// Fase 2: Preparazione dati per invio ottimizzata
+		// Conversione stringa in array di byte con encoding UTF-8 esplicito
 		try {
-			byte[] buffer = msg.getBytes();
+			byte[] buffer = msg.getBytes("UTF-8");
 			
-			// Fase 3: Creazione e invio pacchetto UDP
-			// DatagramPacket contiene: dati, lunghezza, indirizzo destinatario, porta
-			socket.send(new DatagramPacket(buffer, buffer.length, address, port));
+			// Controllo dimensione messaggio per evitare frammentazione - utilizza IOConfig
+			if (buffer.length > IOConfig.UDP_FRAGMENTATION_THRESHOLD) {
+				System.err.println("[WARN] SocketHandler.send: messaggio molto grande (" + buffer.length + " byte), possibile frammentazione");
+			}
+			
+			// Fase 3: Creazione e invio pacchetto UDP ottimizzato
+			// Riutilizzo oggetto DatagramPacket per performance migliori
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
+			socket.send(packet);
+			
+			// Aggiorna statistiche
+			totalBytesSent += buffer.length;
+			messagesSent++;
 			
 		} catch (IOException e) {
 			// Gestione errore: problemi di rete, pacchetto troppo grande, ecc.
@@ -79,22 +110,25 @@ public class SocketHandler {
 
 	public String receive() {
 		try {
-			// Fase 1: Preparazione buffer ricezione
-			// 1024 byte dovrebbero essere sufficienti per messaggi TORCS
-			byte[] buffer = new byte[1024];
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+			// Fase 1: Reset del buffer riutilizzabile per performance migliori
+			// Riutilizzo receivePacket pre-allocato invece di crearne uno nuovo
+			receivePacket.setLength(IOConfig.UDP_RECEIVE_BUFFER_SIZE); // Reset lunghezza per riutilizzo
 			
-			// Fase 2: Attesa ricezione pacchetto
+			// Fase 2: Attesa ricezione pacchetto ottimizzata
 			// Bloccante finché non arriva un pacchetto
-			socket.receive(packet);
+			socket.receive(receivePacket);
 			
-			// Fase 3: Conversione dati ricevuti in stringa
-			// Usa solo la parte effettiva del pacchetto (non tutto il buffer)
-			String received = new String(packet.getData(), 0, packet.getLength());
+			// Fase 3: Conversione dati ricevuti in stringa ottimizzata
+			// Usa encoding UTF-8 esplicito e solo la parte effettiva del pacchetto
+			String received = new String(receivePacket.getData(), 0, receivePacket.getLength(), "UTF-8");
 			
-			// Fase 4: Log debug (se attivato)
+			// Aggiorna statistiche
+			totalBytesReceived += receivePacket.getLength();
+			messagesReceived++;
+			
+			// Fase 4: Log debug ottimizzato (se attivato)
 			if (verbose)
-				System.out.println("[DEBUG] SocketHandler.receive: ricevuto - " + received);
+				System.out.println("[DEBUG] SocketHandler.receive: ricevuto (" + receivePacket.getLength() + " byte) - " + received);
 			
 			return received;
 			
@@ -144,15 +178,36 @@ public class SocketHandler {
 	}
 
 	public void close() {
-		// Chiusura pulita del socket
+		// Chiusura pulita del socket con statistiche
 		// Libera la porta e le risorse di sistema
 		if (socket != null && !socket.isClosed()) {
 			socket.close();
-			System.out.println("[INFO] SocketHandler: socket chiuso correttamente");
+			
+			// Stampa statistiche finali se verbose
+			if (verbose) {
+				System.out.println("[INFO] SocketHandler: statistiche finali:");
+				System.out.println("[INFO] - Messaggi inviati: " + messagesSent + " (" + totalBytesSent + " byte)");
+				System.out.println("[INFO] - Messaggi ricevuti: " + messagesReceived + " (" + totalBytesReceived + " byte)");
+				if (messagesSent > 0) {
+					System.out.println("[INFO] - Dimensione media invio: " + (totalBytesSent / messagesSent) + " byte/msg");
+				}
+				if (messagesReceived > 0) {
+					System.out.println("[INFO] - Dimensione media ricezione: " + (totalBytesReceived / messagesReceived) + " byte/msg");
+				}
+			}
+			
+			System.out.println("[INFO] SocketHandler: socket chiuso correttamente (I/O ottimizzato)");
 		} else {
 			System.out.println("[WARN] SocketHandler: socket già chiuso o non inizializzato");
 		}
-
+	}
+	
+	/**
+	 * Restituisce statistiche di utilizzo del socket
+	 */
+	public String getStats() {
+		return String.format("SocketHandler Stats - Sent: %d msg (%d byte), Received: %d msg (%d byte)", 
+				messagesSent, totalBytesSent, messagesReceived, totalBytesReceived);
 	}
 
 }

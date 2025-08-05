@@ -44,7 +44,7 @@ public class EnhancedDataCollectionManager {
         
         try {
             System.out.println("[INFO] Conversione in formato " + outputDatasetFile + "...");
-            DatasetConverter.convertToHumanDataset(enhancedFilePath, outputDatasetFile);
+            DatasetConverter.convertToStandardDataset(enhancedFilePath, outputDatasetFile);
             System.out.println("[SUCCESS] Processo completato!");
             System.out.println("[INFO] File creati:");
             System.out.println("  - " + enhancedFilePath + " (tutti i sensori e azioni)");
@@ -73,7 +73,7 @@ public class EnhancedDataCollectionManager {
         // Genera automaticamente il file dataset
         try {
             System.out.println("[INFO] Generazione automatica di " + outputDatasetFile + "...");
-            DatasetConverter.convertToHumanDataset(enhancedFilePath, outputDatasetFile);
+            DatasetConverter.convertToStandardDataset(enhancedFilePath, outputDatasetFile);
             System.out.println("[SUCCESS] " + outputDatasetFile + " generato automaticamente!");
             
             // Verifica che il file sia stato creato

@@ -3,14 +3,14 @@ echo ================================
 echo   COMBINE DATASETS
 echo ================================
 echo Combining automatic and manual datasets...
-echo Input: dataset.csv + human_dataset.csv
+echo Input: auto_dataset.csv + human_dataset.csv
 echo Output: combined_dataset.csv
 echo ================================
 cd /d "%~dp0.."
 
 :: Check if files exist
-if not exist "dataset.csv" (
-    echo ERROR: dataset.csv not found!
+if not exist "auto_dataset.csv" (
+    echo ERROR: auto_dataset.csv not found!
     echo Run run_auto_collection.bat first
     pause
     exit /b
@@ -25,7 +25,7 @@ if not exist "human_dataset.csv" (
 
 :: Combine files
 echo Combining datasets...
-copy /b dataset.csv + human_dataset.csv combined_dataset.csv >nul
+copy /b auto_dataset.csv + human_dataset.csv combined_dataset.csv >nul
 
 echo.
 echo Datasets combined successfully!

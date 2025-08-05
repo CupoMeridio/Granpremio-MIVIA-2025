@@ -85,7 +85,7 @@ public class Client {
 			
 			if (collectData) {
 				// Determina il nome del file dataset da usare
-				String datasetFile = "dataset.csv";
+				String datasetFile = "auto_dataset.csv";
 				for (int i = 1; i < args.length; i++) {
 					if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
 						// Il secondo argomento potrebbe essere il nome del file dataset
@@ -97,7 +97,7 @@ public class Client {
 				// Crea e usa un wrapper per SimpleDriver con raccolta dati avanzata
 				SimpleDriverWithCollection simpleDriverWithCollection = new SimpleDriverWithCollection(datasetFile);
 				driver = simpleDriverWithCollection;
-				System.out.println("[INFO] Modalità raccolta dati avanzata attivata per SimpleDriver con output: " + datasetFile);
+				// Messaggio già stampato dal costruttore di SimpleDriverWithCollection
 			}
 		}
 		

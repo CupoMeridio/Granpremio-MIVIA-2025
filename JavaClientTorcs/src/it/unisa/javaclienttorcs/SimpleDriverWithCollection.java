@@ -3,7 +3,8 @@ package it.unisa.javaclienttorcs;
 /**
  * Wrapper per SimpleDriver che aggiunge la raccolta dati avanzata.
  * Questa classe estende la funzionalità di SimpleDriver per generare
- * sia enhanced_dataset.csv che human_dataset.csv durante la guida automatica.
+ * sia enhanced_dataset.csv che human_dataset.csv durante la guida autonoma.
+ * Genera automaticamente auto_dataset.csv durante la guida autonoma.
  */
 public class SimpleDriverWithCollection extends Controller {
     
@@ -11,16 +12,14 @@ public class SimpleDriverWithCollection extends Controller {
     private final EnhancedDataCollectionManager dataManager;
     
     public SimpleDriverWithCollection() {
-        this("dataset.csv");
+        this("auto_dataset.csv");
     }
     
     public SimpleDriverWithCollection(String datasetFilename) {
         this.simpleDriver = new SimpleDriver();
         this.dataManager = new EnhancedDataCollectionManager(datasetFilename);
         
-        // Avvia automaticamente la raccolta dati
-        dataManager.startEnhancedCollection();
-        System.out.println("[INFO] SimpleDriverWithCollection: raccolta dati avviata con output: " + datasetFilename);
+        System.out.println("[INFO] SimpleDriverWithCollection: inizializzato con output: " + datasetFilename);
     }
     
     /**
@@ -32,6 +31,11 @@ public class SimpleDriverWithCollection extends Controller {
      */
     @Override
     public Action control(SensorModel sensors) {
+        // Avvia la raccolta dati al primo controllo (evita duplicazioni)
+        if (!dataManager.isCollecting()) {
+            dataManager.startEnhancedCollection();
+        }
+        
         // Ottieni l'azione da SimpleDriver
         Action action = simpleDriver.control(sensors);
         

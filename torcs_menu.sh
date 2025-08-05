@@ -57,10 +57,10 @@ while true; do
             cd "$SCRIPT_DIR/JavaClientTorcs"
             echo
             echo "=== DATASET STATISTICS ==="
-            if [ -f "dataset.csv" ]; then
-                echo "dataset.csv: $(wc -l < dataset.csv) rows"
+            if [ -f "auto_dataset.csv" ]; then
+                echo "auto_dataset.csv: $(wc -l < auto_dataset.csv) rows"
             else
-                echo "dataset.csv: Not found"
+                echo "auto_dataset.csv: Not found"
             fi
             if [ -f "human_dataset.csv" ]; then
                 echo "human_dataset.csv: $(wc -l < human_dataset.csv) rows"

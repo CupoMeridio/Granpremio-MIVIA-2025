@@ -39,11 +39,10 @@ if "%choice%"=="2" goto auto
 if "%choice%"=="3" goto combine
 if "%choice%"=="4" goto stats
 if "%choice%"=="5" goto simpledriver
-if "%choice%"=="6" goto guide
-if "%choice%"=="7" goto torcs
+if "%choice%"=="8" goto guide
+if "%choice%"=="9" goto torcs
 if "%choice%"=="0" goto exit
 
-if "%choice%"=="0" goto exit
 echo Invalid choice! Press any key to continue...
 pause >nul
 goto menu
@@ -75,12 +74,12 @@ goto menu
 	cd /d "%~dp0JavaClientTorcs"
 	echo.
 	echo === DATASET STATISTICS ===
-	if exist "dataset.csv" (
-	    echo dataset.csv: 
-	    find /c /v "" dataset.csv
-	) else (
-	    echo dataset.csv: Not found
-	)
+	if exist "auto_dataset.csv" (
+    echo auto_dataset.csv:
+    find /c /v "" auto_dataset.csv
+) else (
+    echo auto_dataset.csv: Not found
+)
 	if exist "enhanced_dataset.csv" (
 	    echo enhanced_dataset.csv: 
 	    find /c /v "" enhanced_dataset.csv

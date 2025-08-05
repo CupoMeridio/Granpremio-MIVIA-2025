@@ -222,10 +222,10 @@ Esempio di configurazione:
 - Modifica la logica del cambio se la tua auto ha un numero diverso di marce
 
 I dataset vengono creati automaticamente nella directory principale:
-- `dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per analisi
+- `auto_dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per analisi
 - `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per analisi
 - `enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
-- `combined_dataset.csv` - Dataset combinati (dataset.csv + human_dataset.csv) - Solo sensori essenziali
+- `combined_dataset.csv` - Dataset combinati (auto_dataset.csv + human_dataset.csv) - Solo sensori essenziali
 
 ## 🔧 Tecnologia
 

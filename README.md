@@ -223,10 +223,10 @@ Example configuration:
 - Modify gear logic if your car has different number of gears
 
 Datasets are automatically created in the main directory:
-- `dataset.csv` - Automatically collected data (SimpleDriver) - Contains essential sensors for analysis
+- `auto_dataset.csv` - Automatically collected data (SimpleDriver) - Contains essential sensors for analysis
 - `human_dataset.csv` - Manually collected data (HumanController) - Contains essential sensors for analysis
 - `enhanced_dataset.csv` - Comprehensive dataset with almost all available TORCS sensors - Ideal for future implementations and data analysis
-- `combined_dataset.csv` - Combined datasets (dataset.csv + human_dataset.csv) - Essential sensors only
+- `combined_dataset.csv` - Combined datasets (auto_dataset.csv + human_dataset.csv) - Essential sensors only
 
 ## 🔧 Technology
 
