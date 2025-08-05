@@ -10,7 +10,7 @@ This project implements a data collection system for TORCS that:
 - **Captures human driving behavior** through comprehensive sensor data
 - **Generates CSV datasets** for machine learning applications
 - **Supports data collection** both manual and automatic
-- **Is cross-platform** (Windows, Linux, macOS)
+- **Windows compatible**
 
 ## 🚀 Installation
 
@@ -47,12 +47,7 @@ ant clean
 ant jar
 ```
 
-#### Linux/Mac
-```bash
-cd JavaClientTorcs
-ant clean
-ant jar
-```
+
 
 ## 📁 Project Structure
 
@@ -61,7 +56,7 @@ Project/
 ├── README.md               # This documentation
 ├── README.it.md            # Italian documentation
 ├── torcs_menu.bat          # Windows menu
-├── torcs_menu.sh           # Linux/Mac menu
+
 └── JavaClientTorcs/
     ├── build.xml           # Ant configuration
     ├── manifest.mf         # JAR manifest
@@ -91,13 +86,13 @@ Project/
     │   ├── JavaClientTorcs.jar
     │   └── lib/            # Copied libraries
     └── scripts/
-        ├── run_manual_driving.bat    # Manual driving Windows
-        ├── run_manual_driving.sh     # Manual driving Linux/Mac
-        ├── run_auto_collection.bat   # Automatic collection Windows
-        ├── run_auto_collection.sh    # Automatic collection Linux/Mac
-        ├── test_human_model.bat      # Test human data Windows
-        ├── test_human_model.sh       # Test human data Linux/Mac
-        ├── test_auto_model.bat       # Test automatic data Windows
+        ├── run_manual_driving.bat    # Manual driving
+        ├── run_auto_collection.bat   # Automatic collection
+        ├── run_knn_driving_human.bat # KNN with human data
+        ├── run_knn_driving_auto.bat  # KNN with auto data
+        ├── run_simpledriver.bat      # Simple driver
+        ├── combine_datasets.bat      # Combine datasets
+        └── test_knn.bat              # Test KNN
         ├── test_auto_model.sh        # Test automatic data Linux/Mac
         ├── combine_datasets.bat      # Combine datasets Windows
         └── combine_datasets.sh       # Combine datasets Linux/Mac
@@ -107,38 +102,56 @@ Project/
 
 ### Method 1: Interactive Menu (Recommended)
 
+The project includes a comprehensive menu system with all functionalities:
+
 #### Windows
 ```cmd
 torcs_menu.bat
 ```
 
-#### Linux/Mac
-```bash
-./torcs_menu.sh
-```
+
+
+### Menu Options
+
+**Data Collection:**
+- Option 1: Manual driving (human data collection)
+- Option 2: Automatic collection (SimpleDriver)
+
+**Dataset Management:**
+- Option 3: Combine datasets (auto + human)
+- Option 4: View dataset statistics
+- Option 5: Convert datasets for ML models
+
+**Artificial Intelligence:**
+- Option 6: **Test KNN system**
+- Option 7: **KNN autonomous driving**
+- Option 8: **Compare KNN configurations**
+
+**Classic Autonomous Driving:**
+- Option 9: SimpleDriver (basic automatic driving)
+
+**Utilities:**
+- Option 10: Clean temporary files
+- Option 11: Project information
 
 ### Method 2: Individual Scripts
 
 #### Manual Data Collection
-- **Windows**: `JavaClientTorcs/scripts/run_manual_driving.bat`
-- **Linux/Mac**: `./JavaClientTorcs/scripts/run_manual_driving.sh`
+- `JavaClientTorcs/scripts/run_manual_driving.bat`
 
 #### Automatic Data Collection
-- **Windows**: `JavaClientTorcs/scripts/run_auto_collection.bat`
-- **Linux/Mac**: `./JavaClientTorcs/scripts/run_auto_collection.sh`
+- `JavaClientTorcs/scripts/run_auto_collection.bat`
 
-#### Model Testing
-- **Test human data**: 
-  - Windows: `JavaClientTorcs/scripts/test_human_model.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/test_human_model.sh`
-- **Test automatic data**:
-  - Windows: `JavaClientTorcs/scripts/test_auto_model.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/test_auto_model.sh`
+#### KNN Driving
+- **Human dataset**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
+- **Auto dataset**: `JavaClientTorcs/scripts/run_knn_driving_auto.bat`
+
+#### Simple Driver
+- `JavaClientTorcs/scripts/run_simpledriver.bat`
 
 #### Dataset Management
-- **Combine datasets**:
-  - Windows: `JavaClientTorcs/scripts/combine_datasets.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/combine_datasets.sh`
+- **Combine datasets**: `JavaClientTorcs/scripts/combine_datasets.bat`
+- **Test KNN**: `JavaClientTorcs/scripts/test_knn.bat`
 
 ## 🕹️ Driving Controls & Controller Support
 
@@ -171,7 +184,7 @@ The system supports **XInput compatible controllers** (Xbox controllers and comp
 1. **Controller not detected**: Ensure controller is connected before starting the application
 2. **No response**: Try restarting with controller already connected
 3. **Wrong mappings**: Use keyboard controls as fallback
-4. **Linux/Mac**: May require additional SDL2 installation
+
 
 ### Control Priority
 The system automatically prioritizes:
@@ -183,13 +196,70 @@ The system automatically prioritizes:
 - **Controller inputs** provide smoother steering for better training data
 - **Mixed input methods** are supported during collection
 
+## 🤖 KNN (K-Nearest Neighbors) System
+
+The project implements an advanced **K-Nearest Neighbors** algorithm for autonomous driving using machine learning.
+
+### KNN Features
+
+**Algorithm Implementation:**
+- **KD-Tree** data structure for efficient nearest neighbor search
+- **Euclidean distance** as distance metric
+- **Data normalization** for improved accuracy
+- **Weighted voting** system for predictions
+- **Configurable parameters** (K value, normalization, etc.)
+
+**Available Configurations:**
+- **Auto-Optimized**: Trained on SimpleDriver data (K=5, Euclidean distance)
+- **Human-Optimized**: Trained on human driving data (K=5, Euclidean distance)
+
+### KNN Usage
+
+**Testing the System:**
+```cmd
+# Use menu option 6 or run directly:
+JavaClientTorcs/scripts/test_knn.bat
+```
+
+**Autonomous Driving:**
+```cmd
+# Use menu option 7 for human dataset:
+JavaClientTorcs/scripts/run_knn_driving_human.bat
+
+# Use menu option 8 for automatic dataset:
+JavaClientTorcs/scripts/run_knn_driving_auto.bat
+```
+
+**Configuration Comparison:**
+```cmd
+# Use menu option 8 for detailed comparison
+```
+
+### KNN Technical Details
+
+**Input Features:**
+- Track sensors (19 distance sensors)
+- Speed, RPM, gear information
+- Track position and angle
+- Opponent positions (if available)
+
+**Output Actions:**
+- Steering angle (-1.0 to 1.0)
+- Acceleration (0.0 to 1.0)
+- Brake (0.0 to 1.0)
+- Gear selection
+
+**Performance:**
+- Real-time prediction (< 10ms per decision)
+- Adaptive learning from training data
+- Robust handling of edge cases
+
 ## 📊 Datasets & Car Configuration
 
 **Car Configuration**: All datasets and project configurations are specifically optimized for the **Ferrari F2001** (car1-ow1). The complete list of available TORCS cars can be found at: https://www.igcd.net/vehicle.php?id=15647
 
 **Changing the Car**: To use a different car, modify the `car name` field in the scr_server configuration file:
-- **Windows**: `C:\Program Files (x86)\torcs\drivers\scr_server\scr_server.xml`
-- **Linux**: `/usr/local/share/games/torcs/drivers/scr_server/scr_server.xml`
+- `C:\Program Files (x86)\torcs\drivers\scr_server\scr_server.xml`
 
 Example configuration:
 ```xml
@@ -260,7 +330,7 @@ Datasets are automatically created in the main directory:
 - Make sure TORCS is running before starting drivers
 - Datasets are saved in the directory where you run scripts
 - For best results, collect at least 1000-5000 examples per track
-- The system is cross-platform: works on Windows, Linux and macOS
+- The system is designed for Windows
 
 ## 🪟 TORCS Configuration for Windows
 
@@ -302,91 +372,3 @@ To properly configure TORCS on Windows for the MIVIA 2025 project:
 2. **Test connection**:
    - Start TORCS before running Java drivers
    - Java client will automatically connect on port 3001
-
-## 🐧 TORCS Configuration for Linux
-
-### ⚠️ Required Version: 1.3.7
-**Important Note**: The MIVIA 2025 project specifically requires **version 1.3.7**, not the more recent 1.3.8.
-
-### TORCS 1.3.7 + SCR Patch Installation
-
-To configure TORCS on Linux, use **one of the following options to get exactly 1.3.7**:
-
-#### Option 1: Package Manager Installation (Recommended - Version 1.3.7)
-
-**Ubuntu/Debian (confirmed 1.3.7 version):**
-```bash
-# Install TORCS 1.3.7 from repositories (current version: 1.3.7+dfsg-5)
-sudo apt update
-sudo apt install torcs=1.3.7+dfsg-5
-
-# Verify installed version
-torcs --version
-
-# Install additional dependencies for SCR
-sudo apt install libalut-dev libvorbis-dev libpng-dev
-```
-
-**Debian:**
-```bash
-# Debian stable/bookworm includes 1.3.7
-sudo apt update
-sudo apt install torcs
-```
-
-**Fedora:**
-```bash
-# Fedora includes 1.3.7 in repositories
-sudo dnf install torcs-1.3.7
-```
-
-**⚠️ Attention**: Some distributions might have updated to 1.3.8. In this case, use option 2 or 3.
-
-#### Option 2: Source Installation with SCR Patch
-
-**Complete Ubuntu/Debian:**
-```bash
-# Install all necessary dependencies
-sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential git
-
-# Download and compile TORCS 1.3.7 with SCR patch
-git clone https://github.com/fmirus/torcs-1.3.7.git
-cd torcs-1.3.7
-
-export CFLAGS="-fPIC"
-export CPPFLAGS=$CFLAGS
-export CXXFLAGS=$CFLAGS
-
-./configure --prefix=$(pwd)/BUILD
-make -j$(nproc)
-make install
-make datainstall
-```
-
-#### Option 3: Pre-patched GitHub Repository (Recommended for Linux)
-
-**GitHub repository with TORCS 1.3.7 + SCR already patched:**
-```bash
-# Clone repository with TORCS 1.3.7 pre-patched
-# Includes dependencies and SCR patch already applied
-git clone https://github.com/fmirus/torcs-1.3.7.git
-cd torcs-1.3.7
-
-# Install dependencies
-sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential
-
-# Compile and install
-export CFLAGS="-fPIC"
-export CPPFLAGS=$CFLAGS
-export CXXFLAGS=$CFLAGS
-./configure --prefix=$(pwd)/BUILD
-make -j$(nproc)
-make install
-make datainstall
-```
-
-### Next Steps for Linux
-After configuration:
-1. Test installation with `torcs_menu.sh`
-2. Verify client-server connection on port 3001
-3. Proceed with data collection using `.sh` scripts

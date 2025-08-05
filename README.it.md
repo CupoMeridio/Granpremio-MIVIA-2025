@@ -10,7 +10,7 @@ Questo progetto implementa un sistema di raccolta dati per TORCS che:
 - **Cattura il comportamento di guida umano** tramite dati sensoriali completi
 - **Genera dataset CSV** per applicazioni di machine learning
 - **Supporta raccolta dati** sia manuale che automatica
-- **È cross-platform** (Windows, Linux, macOS)
+- **Compatibile con Windows**
 
 ## 🚀 Installazione
 
@@ -47,12 +47,7 @@ ant clean
 ant jar
 ```
 
-#### Linux/Mac
-```bash
-cd JavaClientTorcs
-ant clean
-ant jar
-```
+
 
 ## 📁 Struttura del Progetto
 
@@ -60,7 +55,7 @@ ant jar
 Progetto/
 ├── README.md               # Questa documentazione
 ├── torcs_menu.bat          # Menu Windows
-├── torcs_menu.sh           # Menu Linux/Mac
+
 └── JavaClientTorcs/
     ├── build.xml           # Configurazione Ant
     ├── manifest.mf         # Manifest JAR
@@ -90,14 +85,13 @@ Progetto/
     │   ├── JavaClientTorcs.jar
     │   └── lib/            # Librerie copiate
     └── scripts/
-        ├── run_manual_driving.bat    # Guida manuale Windows
-        ├── run_manual_driving.sh     # Guida manuale Linux/Mac
-        ├── run_auto_collection.bat   # Raccolta automatica Windows
-        ├── run_auto_collection.sh    # Raccolta automatica Linux/Mac
-        ├── test_human_model.bat      # Test dati umani Windows
-        ├── test_human_model.sh       # Test dati umani Linux/Mac
-        ├── test_auto_model.bat       # Test dati automatici Windows
-        ├── test_auto_model.sh        # Test dati automatici Linux/Mac
+        ├── run_manual_driving.bat    # Guida manuale
+        ├── run_auto_collection.bat   # Raccolta automatica
+        ├── run_knn_driving_human.bat # KNN con dati umani
+        ├── run_knn_driving_auto.bat  # KNN con dati automatici
+        ├── run_simpledriver.bat      # Driver semplice
+        ├── combine_datasets.bat      # Combina dataset
+        └── test_knn.bat              # Test KNN
         ├── combine_datasets.bat      # Combina dataset Windows
         └── combine_datasets.sh       # Combina dataset Linux/Mac
 ```
@@ -106,38 +100,56 @@ Progetto/
 
 ### Metodo 1: Menu Interattivo (Raccomandato)
 
+Il progetto include un sistema di menu completo con tutte le funzionalità:
+
 #### Windows
 ```cmd
 torcs_menu.bat
 ```
 
-#### Linux/Mac
-```bash
-./torcs_menu.sh
-```
+
+
+### Opzioni del Menu
+
+**Raccolta Dati:**
+- Opzione 1: Guida manuale (raccolta dati umani)
+- Opzione 2: Raccolta automatica (SimpleDriver)
+
+**Gestione Dataset:**
+- Opzione 3: Combina dataset (auto + umano)
+- Opzione 4: Visualizza statistiche dataset
+- Opzione 5: Converti dataset per modelli ML
+
+**Intelligenza Artificiale:**
+- Opzione 6: **Test sistema KNN**
+- Opzione 7: **Guida autonoma con KNN**
+- Opzione 8: **Confronto configurazioni KNN**
+
+**Guida Autonoma Classica:**
+- Opzione 9: SimpleDriver (guida automatica base)
+
+**Utilità:**
+- Opzione 10: Pulisci file temporanei
+- Opzione 11: Informazioni sul progetto
 
 ### Metodo 2: Script Individuali
 
 #### Raccolta Dati Manuali
-- **Windows**: `JavaClientTorcs/scripts/run_manual_driving.bat`
-- **Linux/Mac**: `./JavaClientTorcs/scripts/run_manual_driving.sh`
+- `JavaClientTorcs/scripts/run_manual_driving.bat`
 
 #### Raccolta Dati Automatica
-- **Windows**: `JavaClientTorcs/scripts/run_auto_collection.bat`
-- **Linux/Mac**: `./JavaClientTorcs/scripts/run_auto_collection.sh`
+- `JavaClientTorcs/scripts/run_auto_collection.bat`
 
-#### Test Modello
-- **Test dati umani**: 
-  - Windows: `JavaClientTorcs/scripts/test_human_model.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/test_human_model.sh`
-- **Test dati automatici**:
-  - Windows: `JavaClientTorcs/scripts/test_auto_model.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/test_auto_model.sh`
+#### Guida KNN
+- **Dataset umano**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
+- **Dataset automatico**: `JavaClientTorcs/scripts/run_knn_driving_auto.bat`
+
+#### Driver Semplice
+- `JavaClientTorcs/scripts/run_simpledriver.bat`
 
 #### Gestione Dataset
-- **Combinare dataset**:
-  - Windows: `JavaClientTorcs/scripts/combine_datasets.bat`
-  - Linux/Mac: `./JavaClientTorcs/scripts/combine_datasets.sh`
+- **Combinare dataset**: `JavaClientTorcs/scripts/combine_datasets.bat`
+- **Test KNN**: `JavaClientTorcs/scripts/test_knn.bat`
 
 ## 🕹️ Controlli di Guida & Supporto Controller
 
@@ -170,7 +182,7 @@ Il sistema supporta **controller compatibili XInput** (controller Xbox e gamepad
 1. **Controller non rilevato**: Assicurati che il controller sia connesso prima di avviare l'applicazione
 2. **Nessuna risposta**: Prova a riavviare con il controller già connesso
 3. **Mappatura errata**: Usa i controlli tastiera come fallback
-4. **Linux/Mac**: Potrebbe richiedere installazione SDL2 aggiuntiva
+
 
 ### Priorità di Controllo
 Il sistema prioritizza automaticamente:
@@ -181,6 +193,64 @@ Il sistema prioritizza automaticamente:
 - **Tutti gli input di controllo** (tastiera e controller) vengono registrati nei dataset
 - **Input del controller** fornisce sterzo più fluido per dati di training migliori
 - **Metodi di input misti** sono supportati durante la raccolta
+
+## 🤖 Sistema KNN (K-Nearest Neighbors)
+
+Il progetto implementa un algoritmo avanzato **K-Nearest Neighbors** per la guida autonoma utilizzando machine learning.
+
+### Caratteristiche KNN
+
+**Implementazione Algoritmo:**
+- **Struttura dati KD-Tree** per ricerca efficiente dei vicini più prossimi
+- **Distanza Euclidea** come metrica di distanza
+- **Normalizzazione dati** per maggiore accuratezza
+- **Sistema di voto pesato** per le predizioni
+- **Parametri configurabili** (valore K, normalizzazione, ecc.)
+
+**Configurazioni Disponibili:**
+- **Auto-Ottimizzata**: Addestrata su dati SimpleDriver (K=5, distanza Euclidea)
+- **Umana-Ottimizzata**: Addestrata su dati di guida umana (K=5, distanza Euclidea)
+
+### Utilizzo KNN
+
+**Test del Sistema:**
+```cmd
+# Usa l'opzione 6 del menu o esegui direttamente:
+JavaClientTorcs/scripts/test_knn.bat
+```
+
+**Guida Autonoma:**
+```cmd
+# Usa l'opzione 7 per dataset umano:
+JavaClientTorcs/scripts/run_knn_driving_human.bat
+
+# Usa l'opzione 8 per dataset automatico:
+JavaClientTorcs/scripts/run_knn_driving_auto.bat
+```
+
+**Confronto Configurazioni:**
+```cmd
+# Usa l'opzione 8 del menu per confronto dettagliato
+```
+
+### Dettagli Tecnici KNN
+
+**Caratteristiche di Input:**
+- Sensori pista (19 sensori di distanza)
+- Velocità, RPM, informazioni marcia
+- Posizione e angolo in pista
+- Posizioni avversari (se disponibili)
+
+**Azioni di Output:**
+- Angolo sterzo (-1.0 a 1.0)
+- Accelerazione (0.0 a 1.0)
+- Freno (0.0 a 1.0)
+- Selezione marcia
+
+**Prestazioni:**
+- Predizione in tempo reale (< 10ms per decisione)
+- Apprendimento adattivo dai dati di training
+- Gestione robusta dei casi limite
 
 ## 📊 Dataset & Configurazione Auto
 
@@ -259,7 +329,7 @@ I dataset vengono creati automaticamente nella directory principale:
 - Assicurati che TORCS sia in esecuzione prima di avviare i driver
 - I dataset vengono salvati nella directory dove esegui gli script
 - Per migliori risultati, raccogli almeno 1000-5000 esempi per pista
-- Il sistema è cross-platform: funziona su Windows, Linux e macOS
+- Il sistema è progettato per Windows
 
 ## 🪟 Configurazione TORCS per Windows
 
@@ -309,185 +379,20 @@ Per configurare correttamente TORCS su Windows per il progetto MIVIA 2025:
 
 #### ⚠️ Problema: Versione Errata Installata (1.3.8 invece di 1.3.7)
 - **Windows**: Usa il link specifico fornito sopra per scaricare 1.3.7
-- **Linux**: Se il package manager installa 1.3.8, usa:
-  ```bash
-  # Verifica versione disponibile
-  apt-cache show torcs | grep Version
-  # Se solo 1.3.8 disponibile, usa la compilazione da sorgente
-  ```
+
 
 #### Problema: TORCS non si avvia
 - **Soluzione**: Controlla le dipendenze OpenGL
 - **Windows**: Aggiorna i driver della scheda video
-- **Linux**: Installa `libgl1-mesa-glx`
+
 
 #### Problema: SCR Patch non funziona
 - **Soluzione**: Verifica che il patch sia stato applicato nella directory corretta
 - **Windows**: Controlla che i file siano in `C:\Program Files\TORCS`
-- **Linux**: Verifica il percorso di installazione con `which torcs`
+
 
 ### Prossimi Passi
 Dopo la configurazione:
 1. Testa l'installazione avviando TORCS manualmente
 2. Usa `torcs_menu.bat` per accedere alle funzionalità del progetto
 3. Procedi con la raccolta dati o test del modello
-
-## 🐧 Configurazione TORCS per Linux
-
-### ⚠️ Versione Richiesta: 1.3.7
-**Nota Importante**: Il progetto MIVIA 2025 richiede **specificamente la versione 1.3.7**, non la 1.3.8 più recente.
-
-### Installazione TORCS 1.3.7 + SCR Patch
-
-Per configurare TORCS su Linux, usa **una delle seguenti opzioni per ottenere esattamente la 1.3.7**:
-
-#### Opzione 1: Installazione via Package Manager (Raccomandato - Versione 1.3.7)
-
-**Ubuntu/Debian (versione 1.3.7 confermata):**
-```bash
-# Installa TORCS 1.3.7 dai repository (versione attuale: 1.3.7+dfsg-5)
-sudo apt update
-sudo apt install torcs=1.3.7+dfsg-5
-
-# Verifica la versione installata
-torcs --version
-
-# Installa dipendenze aggiuntive per SCR
-sudo apt install libalut-dev libvorbis-dev libpng-dev
-```
-
-**Debian:**
-```bash
-# Debian stable/bookworm include 1.3.7
-sudo apt update
-sudo apt install torcs
-```
-
-**Fedora:**
-```bash
-# Fedora include 1.3.7 nei repository
-sudo dnf install torcs-1.3.7
-```
-
-**⚠️ Attenzione**: Alcune distribuzioni potrebbero avere aggiornato alla 1.3.8. In tal caso, usa l'opzione 2 o 3.
-
-#### Opzione 2: Installazione da Sorgente con SCR Patch
-
-**Ubuntu/Debian completo:**
-```bash
-# Installa tutte le dipendenze necessarie
-sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential git
-
-# Scarica e compila TORCS 1.3.7 con SCR patch
-git clone https://github.com/fmirus/torcs-1.3.7.git
-cd torcs-1.3.7
-
-export CFLAGS="-fPIC"
-export CPPFLAGS=$CFLAGS
-export CXXFLAGS=$CFLAGS
-
-./configure --prefix=$(pwd)/BUILD
-make -j$(nproc)
-make install
-make datainstall
-```
-
-**CentOS/RHEL:**
-```bash
-# Installa dipendenze
-sudo yum install gcc gcc-c++ mesa-libGL-devel mesa-libGLU-devel freeglut-devel plib-devel openal-soft-devel libvorbis-devel libpng-devel cmake git
-
-# Segui gli stessi passi di compilazione Ubuntu
-```
-
-#### Opzione 3: Repository GitHub Pre-Patchato (Raccomandato per Linux)
-
-**Repository GitHub con TORCS 1.3.7 + SCR già patchato:**
-```bash
-# Clona il repository con TORCS 1.3.7 pre-patchato
-# Include dipendenze e patch SCR già applicate
-git clone https://github.com/fmirus/torcs-1.3.7.git
-cd torcs-1.3.7
-
-# Installa dipendenze
-sudo apt-get install libglib2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev libpng-dev libvorbis-dev cmake build-essential
-
-# Compila e installa
-export CFLAGS="-fPIC"
-export CPPFLAGS=$CFLAGS
-export CXXFLAGS=$CFLAGS
-./configure --prefix=$(pwd)/BUILD
-make -j$(nproc)
-make install
-make datainstall
-```
-
-#### Opzione 4: Installazione Flatpak (Universale)
-```bash
-# Installa Flatpak se non presente
-sudo apt install flatpak  # Ubuntu/Debian
-sudo dnf install flatpak  # Fedora
-
-# Installa TORCS da Flathub
-flatpak install flathub net.sourceforge.torcs
-```
-
-### Applicazione Patch SCR su Linux
-
-Dopo l'installazione di TORCS, applica la patch SCR:
-
-1. **Scarica il pacchetto SCR:**
-   ```bash
-   wget http://sourceforge.net/projects/cig/files/scr-linux-patch.tar.gz
-   ```
-
-2. **Trova la directory di installazione di TORCS:**
-   - Package manager: `/usr/games/torcs` o `/opt/torcs`
-   - Sorgente: `~/torcs-1.3.7/BUILD/bin/torcs`
-
-3. **Applica la patch:**
-   ```bash
-   # Estrai la patch nella directory TORCS
-   sudo tar -xzvf scr-linux-patch.tar.gz -C /usr/share/games/torcs/
-   
-   # Dai i permessi necessari
-   sudo chmod +x /usr/games/torcs
-   ```
-
-### Verifica Installazione Linux
-
-1. **Test avvio TORCS:**
-   ```bash
-   # Se installato da package manager
-   torcs
-   
-   # Se installato da sorgente
-   ~/torcs-1.3.7/BUILD/bin/torcs
-   
-   # Se installato da Flatpak
-   flatpak run net.sourceforge.torcs
-   ```
-
-2. **Verifica patch SCR:**
-   - In TORCS, vai su "Race" → "Practice"
-   - Verifica che siano presenti opzioni SCR aggiuntive
-
-### Risoluzione Problemi Linux
-
-#### Problemi comuni:
-- **Librerie mancanti**: `sudo apt install --fix-missing`
-- **Permessi**: `sudo chmod +x /usr/games/torcs`
-- **OpenGL**: Verifica con `glxinfo | grep "direct rendering"`
-- **Audio**: Installa `libopenal-dev` se necessario
-
-#### Dipendenze specifiche per distribuzioni:
-- **Ubuntu 20.04+**: Tutte le dipendenze disponibili nei repository
-- **Ubuntu 18.04**: Potrebbe richiedere repository aggiuntivi
-- **Debian**: Usa `apt-get` con i repository non-free
-- **Fedora**: Usa `dnf` con i repository RPM Fusion
-
-### Prossimi Passi Linux
-Dopo la configurazione:
-1. Testa l'installazione con `torcs_menu.sh`
-2. Verifica la connessione client-server su porta 3001
-3. Procedi con la raccolta dati usando gli script `.sh`

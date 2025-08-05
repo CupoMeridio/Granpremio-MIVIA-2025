@@ -26,7 +26,6 @@ public class HumanController extends Controller {
     // Parametri per sterzo gamepad
     private static final float STEERING_DEADZONE = 0.25f;
     private static final float STEERING_SENSITIVITY = 1.2f;
-    private final float lastSteeringOutput = 0.0f;
     
     // Stato per raccolta dati
     private final EnhancedDataCollectionManager dataManager;
@@ -83,6 +82,16 @@ public class HumanController extends Controller {
             setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             setAlwaysOnTop(true);
             setLocationRelativeTo(null);
+            
+            // Aggiungi WindowListener per gestire la chiusura della finestra
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.out.println("[INFO] Chiusura controller richiesta dall'utente");
+                    shutdown();
+                    System.exit(0);
+                }
+            });
             
             // Aggiungi label con istruzioni
             JLabel label = new JLabel("<html><div style='padding: 20px; font-size: 12px;'>" +
@@ -490,7 +499,6 @@ public class HumanController extends Controller {
         // Controlli gamepad
         boolean gamepadA = gamepad.isAPressed();
         boolean gamepadB = gamepad.isBPressed();
-        boolean gamepadX = gamepad.isXPressed();
         boolean gamepadY = gamepad.isYPressed();
         boolean gamepadStart = gamepad.isStartPressed();
         boolean gamepadBack = gamepad.isBackPressed();

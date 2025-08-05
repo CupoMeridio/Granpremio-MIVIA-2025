@@ -1,7 +1,6 @@
 package it.unisa.javaclienttorcs;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * DatasetConverter - Utility per convertire dataset enhanced in formato standard

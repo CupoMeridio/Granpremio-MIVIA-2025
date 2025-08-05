@@ -1,0 +1,33 @@
+{
+    "java.project.sourcePaths": [
+        "JavaClientTorcs/src"
+    ],
+    "java.project.outputPath": "JavaClientTorcs/build/classes",
+    "java.project.referencedLibraries": {
+        "include": [
+            "JavaClientTorcs/lib/**/*.jar"
+        ],
+        "exclude": [],
+        "sources": {},
+        "javadoc": {}
+    },
+    "java.project.encoding": "UTF-8",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.maven.userSettings": null,
+    "java.configuration.gradle.userHome": null,
+    "java.project.buildPath": [
+        {
+            "kind": "src",
+            "path": "JavaClientTorcs/src",
+            "output": "JavaClientTorcs/build/classes"
+        },
+        {
+            "kind": "lib",
+            "path": "JavaClientTorcs/lib/Jamepad.jar"
+        },
+        {
+            "kind": "lib",
+            "path": "JavaClientTorcs/lib/sdl2gdx-1.0.5.jar"
+        }
+    ]
+}

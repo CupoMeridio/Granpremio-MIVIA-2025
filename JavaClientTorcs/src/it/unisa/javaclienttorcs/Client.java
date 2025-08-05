@@ -72,6 +72,29 @@ public class Client {
 			}
 		}
 		
+		// Gestione speciale per KNNDriver con dataset personalizzato
+		if (driver instanceof KNNDriver) {
+			// Cerca il nome del dataset negli argomenti
+			String datasetFile = null;
+			for (int i = 1; i < args.length; i++) {
+				if (!args[i].contains(":") && !args[i].startsWith("--")) {
+					datasetFile = args[i];
+					break;
+				}
+			}
+			
+			if (datasetFile != null) {
+				// Ricrea il KNNDriver con il dataset specificato
+				try {
+					driver = new KNNDriver(datasetFile);
+					System.out.println("[INFO] KNNDriver inizializzato con dataset: " + datasetFile);
+				} catch (Exception e) {
+					System.err.println("[ERRORE] Impossibile inizializzare KNNDriver con dataset " + datasetFile + ": " + e.getMessage());
+					System.err.println("[INFO] Utilizzo configurazione di default");
+				}
+			}
+		}
+		
 		// Gestione speciale per SimpleDriver con raccolta dati avanzata
 		if (driver instanceof SimpleDriver) {
 			// Controlla se è richiesta la modalità raccolta dati avanzata

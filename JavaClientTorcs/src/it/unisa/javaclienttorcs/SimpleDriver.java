@@ -225,7 +225,6 @@ public class SimpleDriver extends Controller {
 			double baseAccel = 2 / (1 + Math.exp(-speedDiff / 10.0)) - 1;
 			
 			// Limita l'accelerazione massima per evitare slittamenti
-			double maxAccelChange = 0.05; // Massimo cambio per ciclo
 			baseAccel = Math.max(-0.8, Math.min(0.8, baseAccel));
 			
 			// Applica smoothing per accelerazione graduale
