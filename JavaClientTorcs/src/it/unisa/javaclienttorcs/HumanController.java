@@ -1,10 +1,15 @@
 package it.unisa.javaclienttorcs;
 
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingUtilities;
 
 /**
  * Controller per guida manuale con tastiera e gamepad.
@@ -164,10 +169,13 @@ public class HumanController extends Controller {
         // Aggiorna i controlli in base ai tasti premuti
         updateControls();
         
+        // Applica adattamento velocità per sterzo da tastiera
+        double adaptedSteering = applySpeedAdaptation(sensors, steering);
+        
         // Applica assistenza sterzo se attiva
-        double finalSteering = steering;
+        double finalSteering = adaptedSteering;
         if (steeringAssist) {
-            finalSteering = getAssistedSteering(sensors, steering);
+            finalSteering = getAssistedSteering(sensors, adaptedSteering);
         }
         
         // Applica i controlli correnti
@@ -286,6 +294,37 @@ public class HumanController extends Controller {
         return Math.max(0.0f, Math.min(1.0f, (float)brake));
     }
 
+    /**
+     * Adatta la sensibilità dello sterzo in base alla velocità per migliorare
+     * la guidabilità ad alte velocità, specialmente con controlli da tastiera.
+     * 
+     * @param sensors Modello sensoriale con dati attuali
+     * @param rawSteering Sterzo grezzo dall'input [-1, 1]
+     * @return Sterzo adattato alla velocità
+     */
+    private double applySpeedAdaptation(SensorModel sensors, double rawSteering) {
+        double speed = sensors.getSpeed(); // km/h
+        
+        // Parametri di adattamento
+        final double LOW_SPEED_THRESHOLD = 50.0;  // Sotto questa velocità, sensibilità normale
+        final double HIGH_SPEED_THRESHOLD = 150.0; // Sopra questa velocità, sensibilità minima
+        final double MIN_SENSITIVITY = 0.3;        // Sensibilità minima (30% del normale)
+        
+        // Calcola il fattore di riduzione basato sulla velocità
+        double speedFactor = 1.0;
+        if (speed > LOW_SPEED_THRESHOLD) {
+            if (speed >= HIGH_SPEED_THRESHOLD) {
+                speedFactor = MIN_SENSITIVITY;
+            } else {
+                // Interpolazione lineare tra soglia bassa e alta
+                double speedRatio = (speed - LOW_SPEED_THRESHOLD) / (HIGH_SPEED_THRESHOLD - LOW_SPEED_THRESHOLD);
+                speedFactor = 1.0 - (speedRatio * (1.0 - MIN_SENSITIVITY));
+            }
+        }
+        
+        return rawSteering * speedFactor;
+    }
+    
     /**
      * Fornisce assistenza allo sterzo per una guida più fluida e precisa.
      * Corregge automaticamente l'angolo di sterzo in base alla posizione sulla pista.

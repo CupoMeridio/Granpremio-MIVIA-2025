@@ -21,12 +21,11 @@ echo AUTONOMOUS DRIVING:
 echo 5. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
-echo 6. Test KNN System
-echo 7. KNN Driving (Human Dataset)
-echo 8. KNN Driving (Auto Dataset)
+echo 6. KNN Driving (Human Dataset)
+echo 7. KNN Driving (Auto Dataset)
 echo.
 echo DOCUMENTATION:
-echo 9. Open Complete Guide
+echo 8. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -37,17 +36,16 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-9, X): "
+set /p choice="Select option (0-8, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto auto
 if "%choice%"=="3" goto combine
 if "%choice%"=="4" goto stats
 if "%choice%"=="5" goto simpledriver
-if "%choice%"=="6" goto testknn
-if "%choice%"=="7" goto knndriving_human
-if "%choice%"=="8" goto knndriving_auto
-if "%choice%"=="9" goto guide
+if "%choice%"=="6" goto knndriving_human
+if "%choice%"=="7" goto knndriving_auto
+if "%choice%"=="8" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -139,12 +137,7 @@ echo Press any key to return to menu...
 pause >nul
 goto menu
 
-:testknn
-call "%~dp0JavaClientTorcs\scripts\test_knn.bat"
-echo.
-echo Press any key to continue...
-pause >nul
-goto menu
+
 
 :knndriving_human
 call "%~dp0JavaClientTorcs\scripts\run_knn_driving_human.bat"

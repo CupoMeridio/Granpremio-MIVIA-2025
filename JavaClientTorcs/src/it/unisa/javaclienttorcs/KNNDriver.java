@@ -1,7 +1,10 @@
 package it.unisa.javaclienttorcs;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * KNN Driver che utilizza un algoritmo K-Nearest Neighbors basato su KD-tree

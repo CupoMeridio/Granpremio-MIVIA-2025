@@ -1,6 +1,8 @@
 package it.unisa.javaclienttorcs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Implementazione di un KD-Tree per la ricerca efficiente dei K vicini più prossimi.

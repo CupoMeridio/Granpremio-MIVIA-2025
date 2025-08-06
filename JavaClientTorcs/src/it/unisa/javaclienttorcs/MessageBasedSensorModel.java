@@ -34,8 +34,6 @@ public class MessageBasedSensorModel implements SensorModel {
 
         @Override
 	public int getGear() {
-		// This really can't be how they wanted it to be when they came up with
-		// generics!
 		return (int) (double) (Double) message.getReading("gear");
 	}
 
