@@ -313,10 +313,10 @@ public class KNNDriver extends Controller {
             return 1;
         
         // Logica upshift: se RPM supera soglia (solo marce avanti)
-        if (currentGear > 0 && currentGear < 6 && rpm >= 19000)
+        if (currentGear > 0 && currentGear < 6 && rpm >= 7500)
             return currentGear + 1;
         // Logica downshift: se RPM sotto soglia (solo marce avanti)
-        else if (currentGear > 1 && rpm <= 7000)
+        else if (currentGear > 1 && rpm <= 3000)
             return currentGear - 1;
         else
             return currentGear; // Mantieni marcia attuale
