@@ -45,6 +45,11 @@ public class HumanController extends Controller {
     private KeyListenerFrame keyFrame;
     private final AtomicBoolean running = new AtomicBoolean(true);
     
+    /**
+     * Costruisce un nuovo controller umano per la guida manuale.
+     * Inizializza il sistema di raccolta dati avanzata, il listener per la tastiera
+     * e il gamepad, e stampa le istruzioni di controllo.
+     */
     public HumanController() {
         this.dataManager = new EnhancedDataCollectionManager();
         initializeKeyListener();
@@ -78,10 +83,14 @@ public class HumanController extends Controller {
     }
     
     /**
-     * Classe interna per gestire la finestra di ascolto tasti
+     * Classe interna statica per gestire la finestra di ascolto tasti.
+     * Resa statica per evitare il "leaking this to constructor" warning.
      */
-    private class KeyListenerFrame extends JFrame implements KeyListener {
-        public KeyListenerFrame() {
+    private static class KeyListenerFrame extends JFrame implements KeyListener {
+        private final ConcurrentHashMap<Integer, Boolean> keysPressed;
+        
+        public KeyListenerFrame(ConcurrentHashMap<Integer, Boolean> keysPressed, HumanController controller) {
+            this.keysPressed = keysPressed;
             setTitle("TORCS Controller - Premi un tasto per guidare");
             setSize(600, 600);
             setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -93,7 +102,7 @@ public class HumanController extends Controller {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     System.out.println("[INFO] Chiusura controller richiesta dall'utente");
-                    shutdown();
+                    controller.shutdown();
                     System.exit(0);
                 }
             });
@@ -157,11 +166,19 @@ public class HumanController extends Controller {
     
     private void initializeKeyListener() {
         SwingUtilities.invokeLater(() -> {
-            keyFrame = new KeyListenerFrame();
+            keyFrame = new KeyListenerFrame(keysPressed, this);
             keyFrame.setVisible(true);
         });
     }
     
+    /**
+     * Metodo principale di controllo che gestisce l'input dell'utente e produce un'azione.
+     * Combina input da tastiera e gamepad, applica assistenze come ABS e sterzo assistito,
+     * gestisce il cambio automatico/manuale e registra i dati per la raccolta.
+     * 
+     * @param sensors Modello sensoriale contenente i dati attuali del veicolo
+     * @return Azione di controllo da inviare a TORCS
+     */
     @Override
     public Action control(SensorModel sensors) {
         Action action = new Action();

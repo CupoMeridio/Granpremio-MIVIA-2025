@@ -52,26 +52,22 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Costruttore semplificato che accetta solo il percorso del dataset
+     * Costruttore semplificato che accetta solo il percorso del dataset.
+     * Il caricamento dei dati viene rimandato al primo utilizzo per evitare errori prematuri.
+     * 
      * @param datasetFilename Nome del file dataset
      */
     public KNNDriver(String datasetFilename) {
         this.config = new KNNConfig(datasetFilename);
         this.trainingData = new ArrayList<>();
-        
-        // Rimanda il caricamento del dataset al primo utilizzo per evitare errori prematuri
-        // loadTrainingData();
-        // if (config.isNormalizeData()) {
-        //     calculateNormalizationParameters();
-        //     normalizeTrainingData();
-        // }
-        // buildKDTree();
     }
-    
-
-    
-
-    
+    /**
+     * Metodo principale di controllo che determina l'azione da eseguire basandosi sui sensori.
+     * Utilizza l'algoritmo K-Nearest Neighbors per predire l'azione ottimale.
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale del veicolo
+     * @return Azione da eseguire (sterzo, accelerazione, freno, marcia)
+     */
     @Override
     public Action control(SensorModel sensors) {
         // Carica il dataset al primo utilizzo se non è già stato caricato
@@ -90,20 +86,8 @@ public class KNNDriver extends Controller {
         }
         
         if (kdTree == null || trainingData.isEmpty()) {
-            // Fallback: comportamento di base se non ci sono dati
             return getDefaultAction(sensors);
         }
-        
-        // APPROCCIO 1: Gestione casi fuori pista - DISABILITATO
-        // Il fallback per auto fuori pista è stato disabilitato per permettere al KNN
-        // di gestire anche situazioni fuori pista e imparare da esse
-        // double trackPosition = sensors.getTrackPosition();
-        // if (trackPosition < -1.0 || trackPosition > 1.0) {
-        //     if (config.isEnableLogging()) {
-        //         System.out.println("[KNN] Auto fuori pista (trackPos=" + trackPosition + "), usando azione di default");
-        //     }
-        //     return getDefaultAction(sensors);
-        // }
         
         // Estrai le features dai sensori
         double[] features = extractFeatures(sensors);
@@ -148,15 +132,6 @@ public class KNNDriver extends Controller {
                 features[11] = Double.parseDouble(values[11]); // angleToTrackAxis
                 features[12] = Double.parseDouble(values[12]); // trackPosition
                 features[13] = Double.parseDouble(values[13]); // distanceFromStartLine
-                
-                // APPROCCIO 1: Inclusione di tutti i campioni - MODIFICATO
-                // Ora includiamo anche i campioni fuori pista per permettere al KNN
-                // di imparare a gestire tutte le situazioni possibili
-                // double trackPosition = features[12];
-                // if (trackPosition < -1.0 || trackPosition > 1.0) {
-                //     continue; // Salta questo campione
-                // }
-                
                 validSamples++;
                 
                 // Target actions (steering, acceleration, brake)
@@ -169,7 +144,6 @@ public class KNNDriver extends Controller {
             
             if (config.isEnableLogging()) {
                 System.out.println("[KNN] Caricati " + validSamples + "/" + totalSamples + " punti di training da " + datasetPath);
-                System.out.println("[KNN] Inclusi tutti i campioni, anche quelli fuori pista per apprendimento completo");
             }
             
         } catch (IOException e) {
@@ -217,7 +191,11 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Normalizza un array di features usando min-max scaling
+     * Normalizza un array di features usando normalizzazione ibrida.
+     * Applica diverse strategie di normalizzazione a seconda del tipo di sensore.
+     * 
+     * @param features Array delle features da normalizzare
+     * @return Array delle features normalizzate
      */
     private double[] normalizeFeatures(double[] features) {
         if (!config.isNormalizeData()) {
@@ -226,26 +204,21 @@ public class KNNDriver extends Controller {
         
         double[] normalized = new double[features.length];
         
-        // Normalizzazione ibrida a 4 livelli
         for (int i = 0; i < features.length; i++) {
             if (i < 10) {
                 // Track sensors (indici 0-9): normalizzazione manuale con range [0, 200]
-                // Gestisce valori -1 (fuori pista) impostandoli a 0 dopo normalizzazione
                 if (features[i] < 0) {
                     normalized[i] = 0.0; // Valore fuori pista
                 } else {
-                    normalized[i] = Math.min(features[i] / 200.0, 1.0); // Clamp a [0,1]
+                    normalized[i] = Math.min(features[i] / 200.0, 1.0);
                 }
             } else if (i == 11) {
-                // angleToTrackAxis (indice 11): normalizzazione manuale da [-π, +π] a [0, 1]
-                double angleRange = 2 * Math.PI; // 2π radianti (360°)
+                // angleToTrackAxis: normalizzazione da [-π, +π] a [0, 1]
+                double angleRange = 2 * Math.PI;
                 normalized[i] = (features[i] + Math.PI) / angleRange;
-                // Clamp per sicurezza
                 normalized[i] = Math.max(0.0, Math.min(1.0, normalized[i]));
             } else if (i == 12) {
-                // trackPosition (indice 12): normalizzazione manuale [-1, +1] -> [0, 1]
-                // CORREZIONE: -1=sinistra, +1=destra (convenzione TORCS standard)
-                // Clamp per gestire valori fuori pista
+                // trackPosition: normalizzazione da [-1, +1] a [0, 1]
                 normalized[i] = Math.max(0.0, Math.min(1.0, (features[i] + 1.0) / 2.0));
             } else {
                 // Altri position sensors (10, 13): normalizzazione automatica
@@ -270,7 +243,11 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Estrae le features dai sensori
+     * Estrae le features dai sensori del veicolo.
+     * Seleziona 10 sensori di pista specifici e 4 sensori di posizione.
+     * 
+     * @param sensors Modello sensoriale del veicolo
+     * @return Array di 14 features estratte
      */
     private double[] extractFeatures(SensorModel sensors) {
         double[] features = new double[14];
@@ -293,12 +270,12 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Predice l'azione basandosi sui vicini più prossimi.
+     * Predice l'azione da eseguire basandosi sui vicini più prossimi.
+     * Utilizza media pesata basata sulla distanza euclidea inversa.
      * 
-     * CORREZIONE APPLICATA:
-     * - Rimosso il sistema di pesatura basato sulla distanza dal traguardo che causava comportamenti anomali
-     * - Ripristinato sistema di pesatura semplice basato solo sulla distanza euclidea
-     * - Questo dovrebbe eliminare le sterzate premature e migliorare la stabilità
+     * @param neighbors Lista dei vicini più prossimi
+     * @param sensors Modello sensoriale per informazioni aggiuntive
+     * @return Azione predetta (sterzo, accelerazione, freno, marcia)
      */
     private Action predictAction(List<DataPoint> neighbors, SensorModel sensors) {
         if (neighbors.isEmpty()) {
@@ -308,24 +285,21 @@ public class KNNDriver extends Controller {
         double weightedSteering, weightedAcceleration, weightedBrake;
         
         if (config.isUseWeightedVoting()) {
-            // Media pesata delle azioni dei vicini basata solo sulla distanza euclidea
+            // Media pesata basata sulla distanza euclidea inversa
             double totalWeight = 0.0;
             weightedSteering = 0.0;
             weightedAcceleration = 0.0;
             weightedBrake = 0.0;
             
             for (DataPoint neighbor : neighbors) {
-                // Peso basato sulla distanza euclidea inversa
-                double weight = 1.0 / (neighbor.distance + 1e-10); // Piccolo valore per evitare divisione per zero
+                double weight = 1.0 / (neighbor.distance + 1e-10);
                 
                 totalWeight += weight;
-                
                 weightedSteering += neighbor.steering * weight;
                 weightedAcceleration += neighbor.acceleration * weight;
                 weightedBrake += neighbor.brake * weight;
             }
             
-            // Normalizza i pesi
             if (totalWeight > 0) {
                 weightedSteering /= totalWeight;
                 weightedAcceleration /= totalWeight;
@@ -360,7 +334,6 @@ public class KNNDriver extends Controller {
             System.out.printf("[DEBUG] Sterzo: %.3f | TrackPos: %.3f | AngleToTrack: %.3f | Vicini: %d%n", 
                 action.steering, sensors.getTrackPosition(), sensors.getAngleToTrackAxis(), neighbors.size());
             
-            // Debug aggiuntivo: mostra i valori di sterzo dei vicini
             System.out.print("[DEBUG] Sterzo vicini: ");
             for (int i = 0; i < Math.min(3, neighbors.size()); i++) {
                 System.out.printf("%.3f ", neighbors.get(i).steering);
@@ -429,24 +402,38 @@ public class KNNDriver extends Controller {
         return action;
     }
     
+    /**
+     * Resetta lo stato del driver per una nuova sessione.
+     */
     @Override
     public void reset() {
-        // Reset se necessario
         if (config.isEnableLogging()) {
             System.out.println("[KNN] Driver reset");
         }
     }
     
+    /**
+     * Esegue la pulizia delle risorse quando il driver viene terminato.
+     */
     @Override
     public void shutdown() {
         // Cleanup se necessario
     }
     
-    // Getters e setters
+    /**
+     * Restituisce la configurazione corrente del KNN.
+     * 
+     * @return Configurazione KNN
+     */
     public KNNConfig getConfig() {
         return config;
     }
     
+    /**
+     * Aggiorna la configurazione del KNN e ricostruisce il modello se necessario.
+     * 
+     * @param newConfig Nuova configurazione
+     */
     public void updateConfig(KNNConfig newConfig) {
         newConfig.validate();
         boolean needsRebuild = !config.getDatasetPath().equals(newConfig.getDatasetPath());
@@ -464,10 +451,20 @@ public class KNNDriver extends Controller {
         }
     }
     
+    /**
+     * Restituisce il numero di punti dati di training caricati.
+     * 
+     * @return Numero di punti dati di training
+     */
     public int getTrainingDataSize() {
         return trainingData.size();
     }
     
+    /**
+     * Verifica se il driver è pronto per essere utilizzato.
+     * 
+     * @return true se il KD-tree è costruito e i dati sono caricati
+     */
     public boolean isReady() {
         return kdTree != null && !trainingData.isEmpty();
     }

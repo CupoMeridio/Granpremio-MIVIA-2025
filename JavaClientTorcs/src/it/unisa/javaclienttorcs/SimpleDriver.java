@@ -239,14 +239,6 @@ public class SimpleDriver extends Controller {
 	 * Metodo principale di controllo che determina le azioni da compiere
 	 * in base ai dati sensoriali ricevuti.
 	 * 
-	 * @param sensors Tutti i dati sensoriali della macchina
-	 * @return Azione completa da inviare alla macchina
-	 */
-        @Override
-	/**
-	 * Metodo principale di controllo che determina le azioni da compiere
-	 * in base ai dati sensoriali ricevuti.
-	 * 
 	 * Logica di controllo completa:
 	 * 1. Controllo "stuck" - verifica se l'auto è bloccata
 	 * 2. Politica di recupero se stuck da troppo tempo
@@ -256,6 +248,7 @@ public class SimpleDriver extends Controller {
 	 * @param sensors Tutti i dati sensoriali della macchina
 	 * @return Azione completa da inviare alla macchina
 	 */
+	@Override
 	public Action control(SensorModel sensors) {
 		/* === FASE 1: CONTROLLO STUCK === */
 		// Verifica se l'auto è in una posizione anomala (angolo troppo elevato)

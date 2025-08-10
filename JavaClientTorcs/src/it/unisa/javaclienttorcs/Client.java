@@ -313,7 +313,14 @@ public class Client {
 		}
 	}
 
-        private static Controller load(String name) {
+        /**
+	 * Carica dinamicamente una classe controller utilizzando la reflection.
+	 * Se il caricamento fallisce per qualsiasi motivo, viene utilizzato SimpleDriver come fallback.
+	 * 
+	 * @param name Nome completo della classe controller da caricare
+	 * @return Istanza del controller richiesto o SimpleDriver in caso di errore
+	 */
+	private static Controller load(String name) {
             Controller controller;
 
             try {

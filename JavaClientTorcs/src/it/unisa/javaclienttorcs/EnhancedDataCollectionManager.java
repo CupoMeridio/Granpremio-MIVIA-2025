@@ -12,10 +12,18 @@ public class EnhancedDataCollectionManager {
     private final String enhancedFilePath;
     private final String outputDatasetFile;
     
+    /**
+     * Costruttore di default che utilizza "human_dataset.csv" come file di output.
+     */
     public EnhancedDataCollectionManager() {
         this("human_dataset.csv");
     }
     
+    /**
+     * Costruttore che permette di specificare il nome del file di output.
+     * 
+     * @param outputFilename Nome del file CSV di output per il dataset standard
+     */
     public EnhancedDataCollectionManager(String outputFilename) {
         this.enhancedCollector = new EnhancedDataCollector();
         this.enhancedFilePath = "enhanced_dataset.csv";
@@ -55,10 +63,11 @@ public class EnhancedDataCollectionManager {
     }
     
     /**
-     * Metodo per integrazione con HumanController
-     * @param sensors
-     * @param targetSpeed
-     * @param action
+     * Metodo per integrazione con HumanController per registrare i dati di guida.
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale del veicolo
+     * @param targetSpeed Velocità target desiderata
+     * @param action Azione di controllo eseguita
      */
     public void recordData(SensorModel sensors, double targetSpeed, Action action) {
         enhancedCollector.recordData(sensors, action, targetSpeed);
@@ -90,8 +99,9 @@ public class EnhancedDataCollectionManager {
     }
 
     /**
-     * Controlla se la raccolta è attiva
-     * @return 
+     * Controlla se la raccolta dati è attualmente attiva.
+     * 
+     * @return true se la raccolta è in corso, false altrimenti
      */
     public boolean isCollecting() {
         return enhancedCollector.isCollecting();

@@ -24,15 +24,20 @@ public class EnhancedDataCollector {
     private int recordCount = 0;
     private StringBuilder batchBuffer = new StringBuilder(IOConfig.STRINGBUILDER_BATCH);
     
+    /**
+     * Costruisce un nuovo raccoglitore di dati avanzato.
+     * Inizializza il dataset interno e imposta lo stato di raccolta a false.
+     */
     public EnhancedDataCollector() {
         this.dataset = new ArrayList<>();
         this.collecting = false;
     }
     
     /**
-     * Avvia la raccolta dati su file specifico
-     * @param filename
-     * @throws java.io.IOException
+     * Avvia la raccolta dati su file specifico.
+     * 
+     * @param filename Nome del file CSV dove salvare i dati raccolti
+     * @throws java.io.IOException Se si verificano errori durante la creazione del file
      */
     public void startCollection(String filename) throws IOException {
         if (collecting) {
@@ -62,21 +67,21 @@ public class EnhancedDataCollector {
     }
     
     /**
-     * Registra tutti i sensori (tranne avversari) e tutte le azioni (tranne meta)
-     * @param sensors
-     * @param action
-     * @param targetSpeed
+     * Registra tutti i sensori (tranne avversari) e tutte le azioni (tranne meta).
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale del veicolo
+     * @param action Azione di controllo eseguita dal driver
+     * @param targetSpeed Velocità target desiderata per questo momento
      */
     public void recordData(SensorModel sensors, Action action, double targetSpeed) {
         if (!collecting) return;
         
         EnhancedDataPoint point = new EnhancedDataPoint(sensors, action, targetSpeed);
         
-        // Ottimizzazione memoria: evita duplicazione dati se non necessario
+        // Ottimizzazione memoria: gestione buffer circolare
         if (dataset.size() < IOConfig.MAX_IN_MEMORY_RECORDS) {
             dataset.add(point);
         } else {
-            // Rimuovi il più vecchio per evitare memory leak
             dataset.remove(0);
             dataset.add(point);
         }
@@ -121,10 +126,11 @@ public class EnhancedDataCollector {
 
     
     /**
-     * Converte enhanced dataset in formato standard
-     * @param enhancedFile
-     * @param standardFile
-     * @throws java.io.IOException
+     * Converte enhanced dataset in formato standard.
+     * 
+     * @param enhancedFile Percorso del file enhanced dataset di input
+     * @param standardFile Percorso del file standard dataset di output
+     * @throws java.io.IOException Se si verificano errori durante la conversione
      */
     public void convertToStandardDataset(String enhancedFile, String standardFile) throws IOException {
         List<EnhancedDataPoint> enhancedData = loadEnhancedDataset(enhancedFile);
@@ -170,6 +176,10 @@ public class EnhancedDataCollector {
         return loaded;
     }
     
+    /**
+     * Ferma la raccolta dati e chiude tutti i file aperti.
+     * Esegue il flush finale del buffer e rilascia le risorse.
+     */
     public void stopCollection() {
         if (!collecting) {
             return;
@@ -203,10 +213,19 @@ public class EnhancedDataCollector {
         System.out.println("[INFO] Raccolta dati terminata (I/O ottimizzato). Punti raccolti: " + recordCount);
     }
     
+    /**
+     * Verifica se la raccolta dati è attualmente attiva.
+     * 
+     * @return true se la raccolta è in corso, false altrimenti
+     */
     public boolean isCollecting() {
         return collecting;
     }
     
+    /**
+     * Chiude il raccoglitore di dati e rilascia tutte le risorse.
+     * Equivalente a chiamare stopCollection().
+     */
     public void close() {
         stopCollection();
     }

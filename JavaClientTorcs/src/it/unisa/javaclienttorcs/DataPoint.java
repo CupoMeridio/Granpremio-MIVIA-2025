@@ -5,11 +5,20 @@ package it.unisa.javaclienttorcs;
  * Contiene le features (sensori) e le azioni target (steering, acceleration, brake).
  */
 public class DataPoint {
+    /** Array delle features (sensori) del punto dati */
     public double[] features;
+    
+    /** Valore di steering (-1.0 a 1.0) */
     public double steering;
+    
+    /** Valore di accelerazione (0.0 a 1.0) */
     public double acceleration;
+    
+    /** Valore di frenata (0.0 a 1.0) */
     public double brake;
-    public double distance; // Distanza calcolata durante la ricerca KNN
+    
+    /** Distanza calcolata durante la ricerca KNN */
+    public double distance;
     
     /**
      * Costruttore per un punto dati
@@ -39,9 +48,10 @@ public class DataPoint {
     }
     
     /**
-     * Calcola la distanza Euclidea tra questo punto e un altro
-     * @param other L'altro punto
+     * Calcola la distanza Euclidea tra questo punto e un altro set di features
+     * @param otherFeatures Le features dell'altro punto
      * @return La distanza Euclidea
+     * @throws IllegalArgumentException se le dimensioni delle features non sono uguali
      */
     public double euclideanDistance(double[] otherFeatures) {
         if (features.length != otherFeatures.length) {
@@ -77,6 +87,7 @@ public class DataPoint {
     
     /**
      * Restituisce una rappresentazione stringa del punto dati
+     * @return Una stringa che rappresenta il punto dati con features, steering, acceleration, brake e distance
      */
     @Override
     public String toString() {
@@ -93,6 +104,8 @@ public class DataPoint {
     
     /**
      * Verifica l'uguaglianza tra due punti dati
+     * @param obj L'oggetto da confrontare
+     * @return true se i punti dati sono uguali, false altrimenti
      */
     @Override
     public boolean equals(Object obj) {
@@ -110,6 +123,7 @@ public class DataPoint {
     
     /**
      * Calcola l'hash code del punto dati
+     * @return Il valore hash code del punto dati
      */
     @Override
     public int hashCode() {

@@ -8,6 +8,12 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+/**
+ * Gestore della comunicazione UDP con il server TORCS.
+ * Questa classe gestisce l'invio e la ricezione di messaggi tramite socket UDP,
+ * ottimizzando le performance attraverso buffer riutilizzabili e configurazioni
+ * specifiche per la comunicazione real-time con TORCS.
+ */
 public class SocketHandler {
 
 	private InetAddress address;
@@ -26,6 +32,14 @@ public class SocketHandler {
 	private long messagesSent = 0;
 	private long messagesReceived = 0;
 
+	/**
+	 * Costruisce un nuovo gestore socket per la comunicazione con TORCS.
+	 * 
+	 * @param host Hostname o indirizzo IP del server TORCS
+	 * @param port Porta UDP su cui il server TORCS è in ascolto
+	 * @param verbose Se true, abilita il logging dettagliato delle operazioni
+	 * @throws RuntimeException Se non è possibile connettersi al server
+	 */
 	public SocketHandler(String host, int port, boolean verbose) {
 		// Fase 1: Configurazione indirizzo server TORCS
 		try {
@@ -72,6 +86,11 @@ public class SocketHandler {
 		this.verbose = verbose;
 	}
 
+	/**
+	 * Invia un messaggio al server TORCS tramite UDP.
+	 * 
+	 * @param msg Messaggio da inviare al server TORCS
+	 */
 	public void send(String msg) {
 		// Fase 1: Log debug ottimizzato (se attivato)
 		if (verbose)
@@ -108,6 +127,13 @@ public class SocketHandler {
 		}
 	}
 
+	/**
+	 * Riceve un messaggio dal server TORCS tramite UDP.
+	 * Questo metodo è bloccante e attende fino alla ricezione di un pacchetto.
+	 * 
+	 * @return Messaggio ricevuto dal server TORCS
+	 * @throws RuntimeException Se si verifica un errore durante la ricezione
+	 */
 	public String receive() {
 		try {
 			// Fase 1: Reset del buffer riutilizzabile per performance migliori
@@ -149,6 +175,14 @@ public class SocketHandler {
 		return null; // Nessun dato ricevuto
 	}
 
+	/**
+	 * Riceve un messaggio dal server TORCS con timeout specificato.
+	 * Questo metodo imposta temporaneamente un timeout per la ricezione,
+	 * esegue la ricezione e poi ripristina il timeout infinito.
+	 * 
+	 * @param timeout Timeout in millisecondi (0 = infinito)
+	 * @return Messaggio ricevuto come stringa, null se timeout o errore
+	 */
 	public String receive(int timeout) {
 		try {
 			// Fase 1: Impostazione timeout ricezione
@@ -177,6 +211,11 @@ public class SocketHandler {
 		return null;
 	}
 
+	/**
+	 * Chiude il socket UDP e libera le risorse di sistema.
+	 * Stampa le statistiche finali di comunicazione se la modalità verbose è attiva.
+	 * Questo metodo dovrebbe essere chiamato quando la comunicazione con TORCS è terminata.
+	 */
 	public void close() {
 		// Chiusura pulita del socket con statistiche
 		// Libera la porta e le risorse di sistema
@@ -203,7 +242,10 @@ public class SocketHandler {
 	}
 	
 	/**
-	 * Restituisce statistiche di utilizzo del socket
+	 * Restituisce statistiche di utilizzo del socket.
+	 * Include il numero di messaggi inviati e ricevuti con i relativi byte trasferiti.
+	 * 
+	 * @return Stringa formattata con le statistiche di comunicazione
 	 */
 	public String getStats() {
 		return String.format("SocketHandler Stats - Sent: %d msg (%d byte), Received: %d msg (%d byte)", 

@@ -13,10 +13,11 @@ import java.io.IOException;
 public class DatasetConverter {
     
     /**
-     * Converte un file CSV enhanced nel formato dataset standard
-     * @param enhancedFile
-     * @param standardFile
-     * @throws java.io.IOException
+     * Converte un file CSV enhanced nel formato dataset standard.
+     * 
+     * @param enhancedFile Percorso del file CSV enhanced di input
+     * @param standardFile Percorso del file CSV standard di output
+     * @throws java.io.IOException Se si verificano errori durante la lettura/scrittura
      */
     public static void convertToStandardDataset(String enhancedFile, String standardFile) throws IOException {
         // Ottimizzazione I/O: Streaming invece di caricare tutto in memoria
@@ -114,8 +115,10 @@ public class DatasetConverter {
 
     
     /**
-     * Metodo main per testing standalone
-     * @param args
+     * Metodo main per testing standalone del convertitore di dataset.
+     * Permette di convertire un file enhanced in formato standard da riga di comando.
+     * 
+     * @param args Array di argomenti: [0]=file_enhanced.csv [1]=file_standard.csv
      */
     public static void main(String[] args) {
         if (args.length < 2) {

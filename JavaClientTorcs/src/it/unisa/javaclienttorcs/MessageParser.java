@@ -4,11 +4,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * Parser per i messaggi ricevuti dal server TORCS.
+ * Questa classe analizza i messaggi testuali contenenti i dati sensoriali
+ * e li converte in una struttura dati facilmente accessibile.
+ * 
+ * I messaggi TORCS hanno il formato: (nome_sensore valore1 valore2 ...)
+ * dove alcuni sensori restituiscono valori singoli e altri array di valori.
+ */
 public class MessageParser {
     // Mappa moderna per associare nomi e valori delle letture
     private Map<String, Object> table = new HashMap<>();
     private String message;
 
+    /**
+     * Costruisce un parser per il messaggio specificato.
+     * Il messaggio viene immediatamente analizzato e i dati sensoriali
+     * vengono estratti e memorizzati in una mappa interna.
+     * 
+     * @param message Messaggio ricevuto dal server TORCS da analizzare
+     */
     public MessageParser(String message) {
         // Memorizza il messaggio originale ricevuto da TORCS
         this.message = message;
@@ -77,6 +92,10 @@ public class MessageParser {
         }
     }
 
+    /**
+     * Stampa tutti i dati sensoriali estratti dal messaggio.
+     * Utile per debug e verifica del parsing.
+     */
     public void printAll() {
         for (Map.Entry<String, Object> entry : table.entrySet()) {
             System.out.print(entry.getKey() + ":  ");
@@ -85,10 +104,22 @@ public class MessageParser {
         }
     }
 
+    /**
+     * Restituisce il valore di un sensore specifico.
+     * 
+     * @param key Nome del sensore di cui ottenere il valore
+     * @return Valore del sensore (Double per valori singoli, double[] per array)
+     *         o null se il sensore non esiste
+     */
     public Object getReading(String key) {
         return table.get(key);
     }
 
+    /**
+     * Restituisce il messaggio originale ricevuto da TORCS.
+     * 
+     * @return Stringa del messaggio originale non processato
+     */
     public String getMessage() {
         return message;
     }
