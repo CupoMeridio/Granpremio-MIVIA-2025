@@ -304,8 +304,8 @@ public class Client {
 					System.err.println("[WARN] Parametri: formato atteso parametro:valore");
 				}
 			} else if (i == 1 && !args[i].startsWith("--") && !args[i].contains(":")) {
-				// Il secondo argomento può essere il nome del file dataset (gestito nel main)
-				continue;
+                            // Il secondo argomento può essere il nome del file dataset (gestito nel main)
+
 			} else {
 				System.err.println("[WARN] Parametri: parametro non riconosciuto - " + args[i]);
 				System.err.println("[WARN] Parametri: parametro ignorato");
