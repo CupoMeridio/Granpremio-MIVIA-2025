@@ -20,6 +20,8 @@ public class KNNDriver extends Controller {
     
 
     
+
+    
     /**
      * Costruttore del KNN Driver con configurazione
      * @param config Configurazione del KNN
@@ -92,6 +94,17 @@ public class KNNDriver extends Controller {
             return getDefaultAction(sensors);
         }
         
+        // APPROCCIO 1: Gestione casi fuori pista - DISABILITATO
+        // Il fallback per auto fuori pista è stato disabilitato per permettere al KNN
+        // di gestire anche situazioni fuori pista e imparare da esse
+        // double trackPosition = sensors.getTrackPosition();
+        // if (trackPosition < -1.0 || trackPosition > 1.0) {
+        //     if (config.isEnableLogging()) {
+        //         System.out.println("[KNN] Auto fuori pista (trackPos=" + trackPosition + "), usando azione di default");
+        //     }
+        //     return getDefaultAction(sensors);
+        // }
+        
         // Estrai le features dai sensori
         double[] features = extractFeatures(sensors);
         
@@ -112,10 +125,14 @@ public class KNNDriver extends Controller {
      */
     private void loadTrainingData() {
         String datasetPath = config.getDatasetPath();
+        int totalSamples = 0;
+        int validSamples = 0;
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(datasetPath))) {
             String line = reader.readLine(); // Skip header
             
             while ((line = reader.readLine()) != null) {
+                totalSamples++;
                 String[] values = line.split(",");
                 
                 // Estrai features (sensori) e target (azioni)
@@ -132,6 +149,16 @@ public class KNNDriver extends Controller {
                 features[12] = Double.parseDouble(values[12]); // trackPosition
                 features[13] = Double.parseDouble(values[13]); // distanceFromStartLine
                 
+                // APPROCCIO 1: Inclusione di tutti i campioni - MODIFICATO
+                // Ora includiamo anche i campioni fuori pista per permettere al KNN
+                // di imparare a gestire tutte le situazioni possibili
+                // double trackPosition = features[12];
+                // if (trackPosition < -1.0 || trackPosition > 1.0) {
+                //     continue; // Salta questo campione
+                // }
+                
+                validSamples++;
+                
                 // Target actions (steering, acceleration, brake)
                 double steering = Double.parseDouble(values[14]);
                 double acceleration = Double.parseDouble(values[15]);
@@ -140,10 +167,9 @@ public class KNNDriver extends Controller {
                 trainingData.add(new DataPoint(features, steering, acceleration, brake));
             }
             
-            // Carica tutti i dati disponibili senza limiti
-            
             if (config.isEnableLogging()) {
-                System.out.println("[KNN] Caricati " + trainingData.size() + " punti di training da " + datasetPath);
+                System.out.println("[KNN] Caricati " + validSamples + "/" + totalSamples + " punti di training da " + datasetPath);
+                System.out.println("[KNN] Inclusi tutti i campioni, anche quelli fuori pista per apprendimento completo");
             }
             
         } catch (IOException e) {
@@ -165,17 +191,24 @@ public class KNNDriver extends Controller {
         System.arraycopy(trainingData.get(0).features, 0, featureMin, 0, featureCount);
         System.arraycopy(trainingData.get(0).features, 0, featureMax, 0, featureCount);
         
-        // Trova min e max per ogni feature
+        // Trova min e max solo per position sensors con normalizzazione automatica
+        // Esclusi: track sensors (0-9), angleToTrackAxis (11) e trackPosition (12) che usano normalizzazione manuale
         for (DataPoint point : trainingData) {
-            for (int i = 0; i < featureCount; i++) {
-                featureMin[i] = Math.min(featureMin[i], point.features[i]);
-                featureMax[i] = Math.max(featureMax[i], point.features[i]);
+            for (int i = 10; i < featureCount; i++) {
+                if (i != 11 && i != 12) { // Escludi angleToTrackAxis e trackPosition (indici 11 e 12)
+                    featureMin[i] = Math.min(featureMin[i], point.features[i]);
+                    featureMax[i] = Math.max(featureMax[i], point.features[i]);
+                }
             }
         }
     }
     
     /**
-     * Normalizza i dati di training
+     * Normalizza tutti i dati di training usando normalizzazione ibrida a 4 livelli:
+     * - Track sensors (0-9): normalizzazione manuale [0,200]
+     * - angleToTrackAxis (11): normalizzazione manuale da [-π, +π] a [0, 1]
+     * - trackPosition (12): normalizzazione manuale [-1,+1] -> [0,1]
+     * - Altri position sensors (10,13): normalizzazione automatica
      */
     private void normalizeTrainingData() {
         for (DataPoint point : trainingData) {
@@ -192,11 +225,35 @@ public class KNNDriver extends Controller {
         }
         
         double[] normalized = new double[features.length];
+        
+        // Normalizzazione ibrida a 4 livelli
         for (int i = 0; i < features.length; i++) {
-            if (featureMax[i] - featureMin[i] != 0) {
-                normalized[i] = (features[i] - featureMin[i]) / (featureMax[i] - featureMin[i]);
+            if (i < 10) {
+                // Track sensors (indici 0-9): normalizzazione manuale con range [0, 200]
+                // Gestisce valori -1 (fuori pista) impostandoli a 0 dopo normalizzazione
+                if (features[i] < 0) {
+                    normalized[i] = 0.0; // Valore fuori pista
+                } else {
+                    normalized[i] = Math.min(features[i] / 200.0, 1.0); // Clamp a [0,1]
+                }
+            } else if (i == 11) {
+                // angleToTrackAxis (indice 11): normalizzazione manuale da [-π, +π] a [0, 1]
+                double angleRange = 2 * Math.PI; // 2π radianti (360°)
+                normalized[i] = (features[i] + Math.PI) / angleRange;
+                // Clamp per sicurezza
+                normalized[i] = Math.max(0.0, Math.min(1.0, normalized[i]));
+            } else if (i == 12) {
+                // trackPosition (indice 12): normalizzazione manuale [-1, +1] -> [0, 1]
+                // CORREZIONE: -1=sinistra, +1=destra (convenzione TORCS standard)
+                // Clamp per gestire valori fuori pista
+                normalized[i] = Math.max(0.0, Math.min(1.0, (features[i] + 1.0) / 2.0));
             } else {
-                normalized[i] = 0.0; // Se min == max, la feature è costante
+                // Altri position sensors (10, 13): normalizzazione automatica
+                if (featureMax[i] - featureMin[i] != 0) {
+                    normalized[i] = (features[i] - featureMin[i]) / (featureMax[i] - featureMin[i]);
+                } else {
+                    normalized[i] = 0.0; // Se min == max, la feature è costante
+                }
             }
         }
         return normalized;
@@ -236,7 +293,12 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Predice l'azione basandosi sui vicini più prossimi
+     * Predice l'azione basandosi sui vicini più prossimi.
+     * 
+     * CORREZIONE APPLICATA:
+     * - Rimosso il sistema di pesatura basato sulla distanza dal traguardo che causava comportamenti anomali
+     * - Ripristinato sistema di pesatura semplice basato solo sulla distanza euclidea
+     * - Questo dovrebbe eliminare le sterzate premature e migliorare la stabilità
      */
     private Action predictAction(List<DataPoint> neighbors, SensorModel sensors) {
         if (neighbors.isEmpty()) {
@@ -246,14 +308,16 @@ public class KNNDriver extends Controller {
         double weightedSteering, weightedAcceleration, weightedBrake;
         
         if (config.isUseWeightedVoting()) {
-            // Media pesata delle azioni dei vicini
+            // Media pesata delle azioni dei vicini basata solo sulla distanza euclidea
             double totalWeight = 0.0;
             weightedSteering = 0.0;
             weightedAcceleration = 0.0;
             weightedBrake = 0.0;
             
             for (DataPoint neighbor : neighbors) {
-                double weight = 1.0 / (neighbor.distance + config.getMinWeight());
+                // Peso basato sulla distanza euclidea inversa
+                double weight = 1.0 / (neighbor.distance + 1e-10); // Piccolo valore per evitare divisione per zero
+                
                 totalWeight += weight;
                 
                 weightedSteering += neighbor.steering * weight;
@@ -291,6 +355,19 @@ public class KNNDriver extends Controller {
         action.accelerate = Math.max(0.0, Math.min(1.0, weightedAcceleration));
         action.brake = Math.max(0.0, Math.min(1.0, weightedBrake));
         
+        // Debug: stampa informazioni quando lo sterzo è significativo
+        if (Math.abs(action.steering) > 0.3) {
+            System.out.printf("[DEBUG] Sterzo: %.3f | TrackPos: %.3f | AngleToTrack: %.3f | Vicini: %d%n", 
+                action.steering, sensors.getTrackPosition(), sensors.getAngleToTrackAxis(), neighbors.size());
+            
+            // Debug aggiuntivo: mostra i valori di sterzo dei vicini
+            System.out.print("[DEBUG] Sterzo vicini: ");
+            for (int i = 0; i < Math.min(3, neighbors.size()); i++) {
+                System.out.printf("%.3f ", neighbors.get(i).steering);
+            }
+            System.out.println();
+        }
+        
         // Aggiungi gestione automatica delle marce
         action.gear = getAutoGear(sensors);
         
@@ -323,12 +400,18 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Azione di default quando non ci sono dati
+     * Azione di default quando non ci sono dati o l'auto è fuori pista.
+     * Implementa un comportamento semplificato simile a SimpleDriver:
+     * - Accelerazione moderata (0.3) per rientrare in pista
+     * - Sterzo neutro
+     * - Gestione automatica delle marce
+     * - Evitamento ostacoli di base
      */
     private Action getDefaultAction(SensorModel sensors) {
         Action action = new Action();
         
         // Comportamento di base: vai dritto con accelerazione moderata
+        // Accelerazione 0.3 è la stessa usata da SimpleDriver per casi fuori pista
         action.steering = 0.0;
         action.accelerate = 0.3;
         action.brake = 0.0;
@@ -336,9 +419,9 @@ public class KNNDriver extends Controller {
         // Aggiungi gestione automatica delle marce anche per l'azione di default
         action.gear = getAutoGear(sensors);
         
-        // Evita ostacoli
+        // Evita ostacoli (solo se i sensori sono affidabili)
         double[] trackSensors = sensors.getTrackEdgeSensors();
-        if (trackSensors[9] < 10) { // Sensore frontale
+        if (trackSensors[9] > 0 && trackSensors[9] < 10) { // Sensore frontale valido e vicino
             action.brake = 0.8;
             action.accelerate = 0.0;
         }
@@ -349,6 +432,9 @@ public class KNNDriver extends Controller {
     @Override
     public void reset() {
         // Reset se necessario
+        if (config.isEnableLogging()) {
+            System.out.println("[KNN] Driver reset");
+        }
     }
     
     @Override

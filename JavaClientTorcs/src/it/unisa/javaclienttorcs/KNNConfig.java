@@ -7,15 +7,12 @@ package it.unisa.javaclienttorcs;
  */
 public class KNNConfig {
     
-    // Parametri ottimali fissi (non configurabili)
+
     private static final int K = 5;
     private static final boolean NORMALIZE_DATA = true;
     private static final boolean USE_WEIGHTED_VOTING = true;
-    private static final double MIN_WEIGHT = 1e-10;
-    // Rimosso il limite sui punti di training - ora carica tutti i dati disponibili
     private static final boolean ENABLE_LOGGING = true;
     
-    // Unico parametro configurabile
     private String datasetPath;
     
     /**
@@ -42,9 +39,7 @@ public class KNNConfig {
         return USE_WEIGHTED_VOTING;
     }
     
-    public double getMinWeight() {
-        return MIN_WEIGHT;
-    }
+    // MIN_WEIGHT rimosso - non più necessario con il nuovo sistema di pesatura
     
 
     
