@@ -53,36 +53,7 @@ public class Client {
 			System.exit(1);
 		}
 		
-		// Gestione speciale per controller con raccolta dati
-		if (driver instanceof BehavioralCloningDriver) {
-			// Controlla se è richiesta la modalità raccolta dati
-			boolean collectData = false;
-			for (String arg : args) {
-				if (arg.equals("--collect")) {
-					collectData = true;
-					break;
-				}
-			}
-			
-			// Controlla se è specificato un file dataset personalizzato
-			String datasetFile = "dataset.csv";
-			for (int i = 1; i < args.length; i++) {
-				if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
-					// Il secondo argomento potrebbe essere il nome del file dataset
-					datasetFile = args[i];
-					break;
-				}
-			}
-			
-			// Ricrea sempre il driver con il file dataset specificato
-			driver = new BehavioralCloningDriver(datasetFile);
-			System.out.println("[INFO] BehavioralCloningDriver inizializzato con dataset: " + datasetFile);
-			
-			if (collectData) {
-				((BehavioralCloningDriver)driver).setCollectingMode(true);
-				System.out.println("[INFO] Modalità raccolta dati attivata per BehavioralCloningDriver");
-			}
-		}
+
 		
 		// Gestione speciale per HumanController
 		if (driver instanceof HumanController humanController) {
@@ -101,6 +72,29 @@ public class Client {
 			}
 		}
 		
+		// Gestione speciale per KNNDriver con dataset personalizzato
+		if (driver instanceof KNNDriver) {
+			// Cerca il nome del dataset negli argomenti
+			String datasetFile = null;
+			for (int i = 1; i < args.length; i++) {
+				if (!args[i].contains(":") && !args[i].startsWith("--")) {
+					datasetFile = args[i];
+					break;
+				}
+			}
+			
+			if (datasetFile != null) {
+				// Ricrea il KNNDriver con il dataset specificato
+				try {
+					driver = new KNNDriver(datasetFile);
+					System.out.println("[INFO] KNNDriver inizializzato con dataset: " + datasetFile);
+				} catch (Exception e) {
+					System.err.println("[ERRORE] Impossibile inizializzare KNNDriver con dataset " + datasetFile + ": " + e.getMessage());
+					System.err.println("[INFO] Utilizzo configurazione di default");
+				}
+			}
+		}
+		
 		// Gestione speciale per SimpleDriver con raccolta dati avanzata
 		if (driver instanceof SimpleDriver) {
 			// Controlla se è richiesta la modalità raccolta dati avanzata
@@ -114,7 +108,7 @@ public class Client {
 			
 			if (collectData) {
 				// Determina il nome del file dataset da usare
-				String datasetFile = "dataset.csv";
+				String datasetFile = "auto_dataset.csv";
 				for (int i = 1; i < args.length; i++) {
 					if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
 						// Il secondo argomento potrebbe essere il nome del file dataset
@@ -126,7 +120,7 @@ public class Client {
 				// Crea e usa un wrapper per SimpleDriver con raccolta dati avanzata
 				SimpleDriverWithCollection simpleDriverWithCollection = new SimpleDriverWithCollection(datasetFile);
 				driver = simpleDriverWithCollection;
-				System.out.println("[INFO] Modalità raccolta dati avanzata attivata per SimpleDriver con output: " + datasetFile);
+				// Messaggio già stampato dal costruttore di SimpleDriverWithCollection
 			}
 		}
 		
@@ -283,7 +277,7 @@ public class Client {
                                             }
 					}
 					if (entity.equals("stage")) {
-						// Conversione stringa numerica in enum Stage tramite metodo fromInt
+			
 						stage = Stage.fromInt(Integer.parseInt(value));  // 0=WARMUP, 1=QUALIFYING, 2=RACE
 					}
 					if (entity.equals("trackName")) {
@@ -310,8 +304,8 @@ public class Client {
 					System.err.println("[WARN] Parametri: formato atteso parametro:valore");
 				}
 			} else if (i == 1 && !args[i].startsWith("--") && !args[i].contains(":")) {
-				// Il secondo argomento può essere il nome del file dataset (gestito nel main)
-				continue;
+                            // Il secondo argomento può essere il nome del file dataset (gestito nel main)
+
 			} else {
 				System.err.println("[WARN] Parametri: parametro non riconosciuto - " + args[i]);
 				System.err.println("[WARN] Parametri: parametro ignorato");
@@ -319,7 +313,14 @@ public class Client {
 		}
 	}
 
-        private static Controller load(String name) {
+        /**
+	 * Carica dinamicamente una classe controller utilizzando la reflection.
+	 * Se il caricamento fallisce per qualsiasi motivo, viene utilizzato SimpleDriver come fallback.
+	 * 
+	 * @param name Nome completo della classe controller da caricare
+	 * @return Istanza del controller richiesto o SimpleDriver in caso di errore
+	 */
+	private static Controller load(String name) {
             Controller controller;
 
             try {

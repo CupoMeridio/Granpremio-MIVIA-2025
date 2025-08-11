@@ -1,7 +1,14 @@
 package it.unisa.javaclienttorcs;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * EnhancedDataCollector - Raccoglie tutti i sensori disponibili tranne quelli degli avversari
@@ -10,100 +17,136 @@ import java.util.*;
 public class EnhancedDataCollector {
     private List<EnhancedDataPoint> dataset;
     private PrintWriter writer;
+    private BufferedWriter bufferedWriter;
     private boolean collecting;
     
+    // Ottimizzazioni I/O - utilizza configurazione centralizzata
+    private int recordCount = 0;
+    private StringBuilder batchBuffer = new StringBuilder(IOConfig.STRINGBUILDER_BATCH);
+    
+    /**
+     * Costruisce un nuovo raccoglitore di dati avanzato.
+     * Inizializza il dataset interno e imposta lo stato di raccolta a false.
+     */
     public EnhancedDataCollector() {
         this.dataset = new ArrayList<>();
         this.collecting = false;
     }
     
     /**
-     * Avvia la raccolta dati su file specifico
-     * @param filename
-     * @throws java.io.IOException
+     * Avvia la raccolta dati su file specifico.
+     * 
+     * @param filename Nome del file CSV dove salvare i dati raccolti
+     * @throws java.io.IOException Se si verificano errori durante la creazione del file
      */
     public void startCollection(String filename) throws IOException {
+        if (collecting) {
+            System.out.println("[WARNING] Raccolta dati già in corso. Fermando la raccolta precedente.");
+            stopCollection();
+        }
+        
         File file = new File(filename);
         boolean fileExists = file.exists();
         
-        writer = new PrintWriter(new BufferedWriter(new FileWriter(filename, true))); // buffered per performance
+        this.recordCount = 0;
+        this.batchBuffer.setLength(0); // Reset buffer
+        
+        // Ottimizzazione I/O: Buffer size dinamico da configurazione
+        FileWriter fileWriter = new FileWriter(filename, true);
+        int bufferSize = IOConfig.getOptimalBufferSize(file.length());
+        this.bufferedWriter = new BufferedWriter(fileWriter, bufferSize);
+        this.writer = new PrintWriter(bufferedWriter);
         
         // Scrivi header solo se il file è nuovo
         if (!fileExists) {
-            writer.println(getEnhancedHeader());
+            writeHeaderOptimized();
         }
         
         collecting = true;
-        System.out.println("[INFO] Raccolta dati avviata su: " + filename);
+        System.out.println("[INFO] Raccolta dati avviata (I/O ottimizzato) su: " + filename);
     }
     
     /**
-     * Registra tutti i sensori (tranne avversari) e tutte le azioni (tranne meta)
-     * @param sensors
-     * @param action
-     * @param targetSpeed
+     * Registra tutti i sensori (tranne avversari) e tutte le azioni (tranne meta).
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale del veicolo
+     * @param action Azione di controllo eseguita dal driver
+     * @param targetSpeed Velocità target desiderata per questo momento
      */
     public void recordData(SensorModel sensors, Action action, double targetSpeed) {
         if (!collecting) return;
         
         EnhancedDataPoint point = new EnhancedDataPoint(sensors, action, targetSpeed);
-        dataset.add(point);
         
-        // Salva su file CSV - rimosso flush() per performance
-        writer.println(point.toCSV());
-    }
-    
-    /**
-     * Genera header completo con tutti i sensori e azioni
-     */
-    private String getEnhancedHeader() {
-        StringBuilder header = new StringBuilder();
-        
-        // 19 sensori track
-        for (int i = 0; i < 19; i++) {
-            header.append("track").append(i).append(",");
+        // Ottimizzazione memoria: gestione buffer circolare
+        if (dataset.size() < IOConfig.MAX_IN_MEMORY_RECORDS) {
+            dataset.add(point);
+        } else {
+            dataset.remove(0);
+            dataset.add(point);
         }
         
-        // Sensori base
-        header.append("speedX,angleToTrackAxis,trackPosition,");
+        // Batch writing per performance migliori
+        batchBuffer.append(point.toCSV()).append("\n");
+        recordCount++;
         
-        // Sensori avanzati (tranne avversari)
-        header.append("lateralSpeed,currentLapTime,damage,distanceFromStartLine,");
-        header.append("distanceRaced,fuelLevel,lastLapTime,RPM,zSpeed,z,");
-        
-        // Sensori focus
-        header.append("focus0,focus1,focus2,focus3,focus4,");
-        
-        // Sensori ruote
-        header.append("wheelSpinFL,wheelSpinFR,wheelSpinRL,wheelSpinRR,");
-        
-        // Azioni (tranne meta)
-        header.append("targetSpeed,steering,acceleration,brake,gear,clutch");
-        
-        return header.toString();
+        if (recordCount % IOConfig.BATCH_WRITE_SIZE == 0) {
+            flushBatch();
+        }
     }
     
     /**
-     * Converte enhanced dataset in formato human_dataset.csv standard
-     * @param enhancedFile
-     * @param humanFile
-     * @throws java.io.IOException
+     * Header ottimizzato per performance migliori
      */
-    public void convertToHumanDataset(String enhancedFile, String humanFile) throws IOException {
+    private void writeHeaderOptimized() {
+        // Header pre-costruito per performance migliori
+        String header = "track0,track1,track2,track3,track4,track5,track6,track7,track8,track9," +
+                       "track10,track11,track12,track13,track14,track15,track16,track17,track18," +
+                       "speedX,angleToTrackAxis,trackPosition," +
+                       "lateralSpeed,currentLapTime,damage,distanceFromStartLine," +
+                       "distanceRaced,fuelLevel,lastLapTime,RPM,zSpeed,z," +
+                       "focus0,focus1,focus2,focus3,focus4," +
+                       "wheelSpinFL,wheelSpinFR,wheelSpinRL,wheelSpinRR," +
+                       "targetSpeed,steering,acceleration,brake,gear,clutch";
+        
+        writer.println(header);
+    }
+    
+    /**
+     * Flush del batch buffer per scrittura ottimizzata
+     */
+    private void flushBatch() {
+        if (batchBuffer.length() > 0 && writer != null) {
+            writer.print(batchBuffer.toString());
+            writer.flush(); // Forza scrittura su disco
+            batchBuffer.setLength(0); // Reset buffer
+        }
+    }
+    
+
+    
+    /**
+     * Converte enhanced dataset in formato standard.
+     * 
+     * @param enhancedFile Percorso del file enhanced dataset di input
+     * @param standardFile Percorso del file standard dataset di output
+     * @throws java.io.IOException Se si verificano errori durante la conversione
+     */
+    public void convertToStandardDataset(String enhancedFile, String standardFile) throws IOException {
         List<EnhancedDataPoint> enhancedData = loadEnhancedDataset(enhancedFile);
         
-        try (PrintWriter humanWriter = new PrintWriter(new FileWriter(humanFile))) {
+        try (PrintWriter humanWriter = new PrintWriter(new FileWriter(standardFile))) {
             // Header standard human_dataset
             StringBuilder header = new StringBuilder();
             for (int i = 0; i < 19; i++) {
                 header.append("track").append(i).append(",");
             }
-            header.append("speedX,angleToTrackAxis,trackPosition,targetSpeed,steer");
+            header.append("speedX,angleToTrackAxis,trackPosition,targetSpeed,steering,acceleration,brake");
             humanWriter.println(header.toString());
             
             // Converti ogni punto
             for (EnhancedDataPoint point : enhancedData) {
-                humanWriter.println(point.toHumanCSV());
+                humanWriter.println(point.toStandardCSV());
             }
         }
         
@@ -133,23 +176,56 @@ public class EnhancedDataCollector {
         return loaded;
     }
     
+    /**
+     * Ferma la raccolta dati e chiude tutti i file aperti.
+     * Esegue il flush finale del buffer e rilascia le risorse.
+     */
     public void stopCollection() {
+        if (!collecting) {
+            return;
+        }
+        
+        // Flush finale del batch buffer
+        if (batchBuffer.length() > 0) {
+            flushBatch();
+        }
+        
         if (writer != null) {
             try {
                 writer.flush(); // Forza scrittura buffer
                 writer.close();
+                writer = null;
             } catch (Exception e) {
                 System.err.println("[ERROR] Errore durante chiusura file: " + e.getMessage());
             }
         }
+        
+        if (bufferedWriter != null) {
+            try {
+                bufferedWriter.close();
+            } catch (IOException e) {
+                System.err.println("[ERROR] Errore chiusura BufferedWriter: " + e.getMessage());
+            }
+            bufferedWriter = null;
+        }
+        
         collecting = false;
-        System.out.println("[INFO] Raccolta dati terminata. Punti raccolti: " + dataset.size());
+        System.out.println("[INFO] Raccolta dati terminata (I/O ottimizzato). Punti raccolti: " + recordCount);
     }
     
+    /**
+     * Verifica se la raccolta dati è attualmente attiva.
+     * 
+     * @return true se la raccolta è in corso, false altrimenti
+     */
     public boolean isCollecting() {
         return collecting;
     }
     
+    /**
+     * Chiude il raccoglitore di dati e rilascia tutte le risorse.
+     * Equivalente a chiamare stopCollection().
+     */
     public void close() {
         stopCollection();
     }
@@ -229,72 +305,72 @@ class EnhancedDataPoint {
         this.clutch = action.clutch;
     }
     
+    // Pool di StringBuilder per ottimizzare allocazioni - utilizza IOConfig
+    private static final ThreadLocal<StringBuilder> CSV_BUILDER_POOL = 
+        ThreadLocal.withInitial(() -> new StringBuilder(IOConfig.STRINGBUILDER_CSV_FULL));
+    
+    private static final ThreadLocal<StringBuilder> STANDARD_CSV_BUILDER_POOL = 
+        ThreadLocal.withInitial(() -> new StringBuilder(IOConfig.STRINGBUILDER_CSV_STANDARD));
+    
     /**
-     * Converte in formato CSV completo
+     * Converte in formato CSV completo (ottimizzato)
      */
     public String toCSV() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = CSV_BUILDER_POOL.get();
+        sb.setLength(0); // Reset del buffer riutilizzabile
         
-        // Track sensors (19)
-        for (double sensor : trackSensors) {
-            sb.append(sensor).append(",");
-        }
+        // Track sensors (19) - accesso diretto per performance
+        sb.append(trackSensors[0]).append(',').append(trackSensors[1]).append(',').append(trackSensors[2]).append(',')
+          .append(trackSensors[3]).append(',').append(trackSensors[4]).append(',').append(trackSensors[5]).append(',')
+          .append(trackSensors[6]).append(',').append(trackSensors[7]).append(',').append(trackSensors[8]).append(',')
+          .append(trackSensors[9]).append(',').append(trackSensors[10]).append(',').append(trackSensors[11]).append(',')
+          .append(trackSensors[12]).append(',').append(trackSensors[13]).append(',').append(trackSensors[14]).append(',')
+          .append(trackSensors[15]).append(',').append(trackSensors[16]).append(',').append(trackSensors[17]).append(',')
+          .append(trackSensors[18]).append(',');
         
-        // Base sensors
-        sb.append(speedX).append(",")
-          .append(angleToTrackAxis).append(",")
-          .append(trackPosition).append(",");
+        // Base sensors - concatenazione ottimizzata
+        sb.append(speedX).append(',').append(angleToTrackAxis).append(',').append(trackPosition).append(',');
         
-        // Advanced sensors
-        sb.append(lateralSpeed).append(",")
-          .append(currentLapTime).append(",")
-          .append(damage).append(",")
-          .append(distanceFromStartLine).append(",")
-          .append(distanceRaced).append(",")
-          .append(fuelLevel).append(",")
-          .append(lastLapTime).append(",")
-          .append(RPM).append(",")
-          .append(zSpeed).append(",")
-          .append(z).append(",");
+        // Advanced sensors - concatenazione ottimizzata
+        sb.append(lateralSpeed).append(',').append(currentLapTime).append(',').append(damage).append(',')
+          .append(distanceFromStartLine).append(',').append(distanceRaced).append(',').append(fuelLevel).append(',')
+          .append(lastLapTime).append(',').append(RPM).append(',').append(zSpeed).append(',').append(z).append(',');
         
-        // Focus sensors (5)
-        for (double focus : focusSensors) {
-            sb.append(focus).append(",");
-        }
+        // Focus sensors (5) - accesso diretto
+        sb.append(focusSensors[0]).append(',').append(focusSensors[1]).append(',').append(focusSensors[2]).append(',')
+          .append(focusSensors[3]).append(',').append(focusSensors[4]).append(',');
         
-        // Wheel sensors (4)
-        for (double wheel : wheelSpinVelocity) {
-            sb.append(wheel).append(",");
-        }
+        // Wheel sensors (4) - accesso diretto
+        sb.append(wheelSpinVelocity[0]).append(',').append(wheelSpinVelocity[1]).append(',')
+          .append(wheelSpinVelocity[2]).append(',').append(wheelSpinVelocity[3]).append(',');
         
-        // Actions
-        sb.append(targetSpeed).append(",")
-          .append(steering).append(",")
-          .append(acceleration).append(",")
-          .append(brake).append(",")
-          .append(gear).append(",")
-          .append(clutch);
+        // Actions - concatenazione finale
+        sb.append(targetSpeed).append(',').append(steering).append(',').append(acceleration).append(',')
+          .append(brake).append(',').append(gear).append(',').append(clutch);
         
         return sb.toString();
     }
     
     /**
-     * Converte in formato CSV standard human_dataset
+     * Converte in formato CSV standard ottimizzato per modello di guida autonoma
+     * Sensori selezionati: track alternati, posizione/velocità essenziali, azioni principali
      */
-    public String toHumanCSV() {
-        StringBuilder sb = new StringBuilder();
+    public String toStandardCSV() {
+        StringBuilder sb = STANDARD_CSV_BUILDER_POOL.get();
+        sb.setLength(0); // Reset del buffer riutilizzabile
         
-        // Solo i 19 sensori track
-        for (double sensor : trackSensors) {
-            sb.append(sensor).append(",");
-        }
+        // Track sensors alternati (0,2,4,6,8,10,12,14,16,18) per copertura ottimale
+        sb.append(trackSensors[0]).append(',').append(trackSensors[2]).append(',').append(trackSensors[4]).append(',')
+          .append(trackSensors[6]).append(',').append(trackSensors[8]).append(',').append(trackSensors[10]).append(',')
+          .append(trackSensors[12]).append(',').append(trackSensors[14]).append(',').append(trackSensors[16]).append(',')
+          .append(trackSensors[18]).append(',');
         
-        // Base sensors
-        sb.append(speedX).append(",")
-          .append(angleToTrackAxis).append(",")
-          .append(trackPosition).append(",")
-          .append(targetSpeed).append(",")
-          .append(steering);
+        // Sensori di posizione e velocità essenziali
+        sb.append(speedX).append(',').append(angleToTrackAxis).append(',').append(trackPosition).append(',')
+          .append(distanceFromStartLine).append(',');
+        
+        // Azioni di controllo principali
+        sb.append(steering).append(',').append(acceleration).append(',').append(brake);
         
         return sb.toString();
     }

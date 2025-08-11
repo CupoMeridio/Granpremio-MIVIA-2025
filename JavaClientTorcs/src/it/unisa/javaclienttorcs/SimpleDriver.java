@@ -17,9 +17,9 @@ public class SimpleDriver extends Controller {
 
 	/* === COSTANTI PER IL CAMBIO MARCIA === */
 	// RPM minimi per salire di marcia [per marcia 1-6]
-	final int[] gearUp = { 19000, 19000, 19000, 19000, 19000, 0 };
+	final int[] gearUp = { 7500, 7500, 7500, 7500, 7500, 0 };
 	// RPM massimi per scalare di marcia [per marcia 1-6]
-	final int[] gearDown = { 0, 7000, 7000, 7000, 7000, 7000 };
+	final int[] gearDown = { 0, 3000, 3000, 3000, 3000, 3000 };
 
 	/* === COSTANTI PER GESTIONE STUCK === */
 	// Tempo in cicli prima di attivare la procedura di recupero
@@ -225,7 +225,6 @@ public class SimpleDriver extends Controller {
 			double baseAccel = 2 / (1 + Math.exp(-speedDiff / 10.0)) - 1;
 			
 			// Limita l'accelerazione massima per evitare slittamenti
-			double maxAccelChange = 0.05; // Massimo cambio per ciclo
 			baseAccel = Math.max(-0.8, Math.min(0.8, baseAccel));
 			
 			// Applica smoothing per accelerazione graduale
@@ -240,14 +239,6 @@ public class SimpleDriver extends Controller {
 	 * Metodo principale di controllo che determina le azioni da compiere
 	 * in base ai dati sensoriali ricevuti.
 	 * 
-	 * @param sensors Tutti i dati sensoriali della macchina
-	 * @return Azione completa da inviare alla macchina
-	 */
-        @Override
-	/**
-	 * Metodo principale di controllo che determina le azioni da compiere
-	 * in base ai dati sensoriali ricevuti.
-	 * 
 	 * Logica di controllo completa:
 	 * 1. Controllo "stuck" - verifica se l'auto è bloccata
 	 * 2. Politica di recupero se stuck da troppo tempo
@@ -257,6 +248,7 @@ public class SimpleDriver extends Controller {
 	 * @param sensors Tutti i dati sensoriali della macchina
 	 * @return Azione completa da inviare alla macchina
 	 */
+	@Override
 	public Action control(SensorModel sensors) {
 		/* === FASE 1: CONTROLLO STUCK === */
 		// Verifica se l'auto è in una posizione anomala (angolo troppo elevato)

@@ -1,0 +1,23 @@
+{
+    "java.project.sourcePaths": [
+        "JavaClientTorcs/src"
+    ],
+    "java.project.outputPath": "JavaClientTorcs/build/classes",
+    "java.project.referencedLibraries": [
+        "JavaClientTorcs/lib/**/*.jar"
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.project.resourceFilters": [
+        "node_modules",
+        ".git"
+    ],
+    "files.exclude": {
+        "**/build": true,
+        "**/dist": true,
+        "**/.git": true,
+        "**/node_modules": true
+    },
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.saveActions.organizeImports": true
+}

@@ -1,0 +1,69 @@
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven/Gradle
+**/target/
+**/build/
+**/out/
+**/dist/
+**/.gradle/
+**/gradle/
+
+# IDE - NetBeans
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE - Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# JavaClientTorcs specific - KEEP these directories
+# !JavaClientTorcs/lib/  (explicitly keep lib dependencies)
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Compiled binaries
+**/bin/
+
+# Network cache
+.cache/
+.network/
+
+# Configuration overrides
+config.local.properties

@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-java-dependency",
+        "vscjava.vscode-java-test",
+        "vscjava.vscode-java-debug",
+        "redhat.java",
+        "vscjava.vscode-maven",
+        "ms-vscode.vscode-json",
+        "formulahendry.auto-rename-tag",
+        "bradlc.vscode-tailwindcss"
+    ],
+    "unwantedRecommendations": []
+}

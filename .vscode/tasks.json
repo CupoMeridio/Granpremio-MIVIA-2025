@@ -1,0 +1,90 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Project (Ant)",
+            "type": "shell",
+            "command": "ant",
+            "args": [
+                "-f",
+                "JavaClientTorcs/build.xml",
+                "compile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Compila il progetto usando Ant"
+        },
+        {
+            "label": "Clean Project (Ant)",
+            "type": "shell",
+            "command": "ant",
+            "args": [
+                "-f",
+                "JavaClientTorcs/build.xml",
+                "clean"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Pulisce i file di build usando Ant"
+        },
+        {
+            "label": "Build JAR (Ant)",
+            "type": "shell",
+            "command": "ant",
+            "args": [
+                "-f",
+                "JavaClientTorcs/build.xml",
+                "jar"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Crea il file JAR usando Ant"
+        },
+        {
+            "label": "Compile Java Files (Manual)",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-cp",
+                "JavaClientTorcs/lib/*",
+                "-d",
+                "JavaClientTorcs/build/classes",
+                "JavaClientTorcs/src/it/unisa/javaclienttorcs/*.java"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Compila manualmente i file Java"
+        }
+    ]
+}

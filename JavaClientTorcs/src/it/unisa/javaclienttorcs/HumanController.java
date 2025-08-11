@@ -1,10 +1,15 @@
 package it.unisa.javaclienttorcs;
 
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingUtilities;
 
 /**
  * Controller per guida manuale con tastiera e gamepad.
@@ -26,7 +31,6 @@ public class HumanController extends Controller {
     // Parametri per sterzo gamepad
     private static final float STEERING_DEADZONE = 0.25f;
     private static final float STEERING_SENSITIVITY = 1.2f;
-    private final float lastSteeringOutput = 0.0f;
     
     // Stato per raccolta dati
     private final EnhancedDataCollectionManager dataManager;
@@ -41,6 +45,11 @@ public class HumanController extends Controller {
     private KeyListenerFrame keyFrame;
     private final AtomicBoolean running = new AtomicBoolean(true);
     
+    /**
+     * Costruisce un nuovo controller umano per la guida manuale.
+     * Inizializza il sistema di raccolta dati avanzata, il listener per la tastiera
+     * e il gamepad, e stampa le istruzioni di controllo.
+     */
     public HumanController() {
         this.dataManager = new EnhancedDataCollectionManager();
         initializeKeyListener();
@@ -74,15 +83,29 @@ public class HumanController extends Controller {
     }
     
     /**
-     * Classe interna per gestire la finestra di ascolto tasti
+     * Classe interna statica per gestire la finestra di ascolto tasti.
+     * Resa statica per evitare il "leaking this to constructor" warning.
      */
-    private class KeyListenerFrame extends JFrame implements KeyListener {
-        public KeyListenerFrame() {
+    private static class KeyListenerFrame extends JFrame implements KeyListener {
+        private final ConcurrentHashMap<Integer, Boolean> keysPressed;
+        
+        public KeyListenerFrame(ConcurrentHashMap<Integer, Boolean> keysPressed, HumanController controller) {
+            this.keysPressed = keysPressed;
             setTitle("TORCS Controller - Premi un tasto per guidare");
             setSize(600, 600);
             setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             setAlwaysOnTop(true);
             setLocationRelativeTo(null);
+            
+            // Aggiungi WindowListener per gestire la chiusura della finestra
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    System.out.println("[INFO] Chiusura controller richiesta dall'utente");
+                    controller.shutdown();
+                    System.exit(0);
+                }
+            });
             
             // Aggiungi label con istruzioni
             JLabel label = new JLabel("<html><div style='padding: 20px; font-size: 12px;'>" +
@@ -143,11 +166,19 @@ public class HumanController extends Controller {
     
     private void initializeKeyListener() {
         SwingUtilities.invokeLater(() -> {
-            keyFrame = new KeyListenerFrame();
+            keyFrame = new KeyListenerFrame(keysPressed, this);
             keyFrame.setVisible(true);
         });
     }
     
+    /**
+     * Metodo principale di controllo che gestisce l'input dell'utente e produce un'azione.
+     * Combina input da tastiera e gamepad, applica assistenze come ABS e sterzo assistito,
+     * gestisce il cambio automatico/manuale e registra i dati per la raccolta.
+     * 
+     * @param sensors Modello sensoriale contenente i dati attuali del veicolo
+     * @return Azione di controllo da inviare a TORCS
+     */
     @Override
     public Action control(SensorModel sensors) {
         Action action = new Action();
@@ -155,10 +186,13 @@ public class HumanController extends Controller {
         // Aggiorna i controlli in base ai tasti premuti
         updateControls();
         
+        // Applica adattamento velocità per sterzo da tastiera
+        double adaptedSteering = applySpeedAdaptation(sensors, steering);
+        
         // Applica assistenza sterzo se attiva
-        double finalSteering = steering;
+        double finalSteering = adaptedSteering;
         if (steeringAssist) {
-            finalSteering = getAssistedSteering(sensors, steering);
+            finalSteering = getAssistedSteering(sensors, adaptedSteering);
         }
         
         // Applica i controlli correnti
@@ -233,10 +267,10 @@ public class HumanController extends Controller {
             return 1;
         
         // Logica upshift: se RPM supera soglia (solo marce avanti)
-        if (currentGear > 0 && currentGear < 6 && rpm >= 19000)
+        if (currentGear > 0 && currentGear < 6 && rpm >= 7500)
             return currentGear + 1;
         // Logica downshift: se RPM sotto soglia (solo marce avanti)
-        else if (currentGear > 1 && rpm <= 7000)
+        else if (currentGear > 1 && rpm <= 3000)
             return currentGear - 1;
         else
             // Nessun cambio marcia necessario
@@ -277,6 +311,37 @@ public class HumanController extends Controller {
         return Math.max(0.0f, Math.min(1.0f, (float)brake));
     }
 
+    /**
+     * Adatta la sensibilità dello sterzo in base alla velocità per migliorare
+     * la guidabilità ad alte velocità, specialmente con controlli da tastiera.
+     * 
+     * @param sensors Modello sensoriale con dati attuali
+     * @param rawSteering Sterzo grezzo dall'input [-1, 1]
+     * @return Sterzo adattato alla velocità
+     */
+    private double applySpeedAdaptation(SensorModel sensors, double rawSteering) {
+        double speed = sensors.getSpeed(); // km/h
+        
+        // Parametri di adattamento
+        final double LOW_SPEED_THRESHOLD = 50.0;  // Sotto questa velocità, sensibilità normale
+        final double HIGH_SPEED_THRESHOLD = 150.0; // Sopra questa velocità, sensibilità minima
+        final double MIN_SENSITIVITY = 0.3;        // Sensibilità minima (30% del normale)
+        
+        // Calcola il fattore di riduzione basato sulla velocità
+        double speedFactor = 1.0;
+        if (speed > LOW_SPEED_THRESHOLD) {
+            if (speed >= HIGH_SPEED_THRESHOLD) {
+                speedFactor = MIN_SENSITIVITY;
+            } else {
+                // Interpolazione lineare tra soglia bassa e alta
+                double speedRatio = (speed - LOW_SPEED_THRESHOLD) / (HIGH_SPEED_THRESHOLD - LOW_SPEED_THRESHOLD);
+                speedFactor = 1.0 - (speedRatio * (1.0 - MIN_SENSITIVITY));
+            }
+        }
+        
+        return rawSteering * speedFactor;
+    }
+    
     /**
      * Fornisce assistenza allo sterzo per una guida più fluida e precisa.
      * Corregge automaticamente l'angolo di sterzo in base alla posizione sulla pista.
@@ -490,7 +555,6 @@ public class HumanController extends Controller {
         // Controlli gamepad
         boolean gamepadA = gamepad.isAPressed();
         boolean gamepadB = gamepad.isBPressed();
-        boolean gamepadX = gamepad.isXPressed();
         boolean gamepadY = gamepad.isYPressed();
         boolean gamepadStart = gamepad.isStartPressed();
         boolean gamepadBack = gamepad.isBackPressed();
@@ -634,7 +698,5 @@ public class HumanController extends Controller {
         }
     }
     
-    public void printDatasetStats() {
-        System.out.println("[INFO] Statistiche raccolta dati: consulta i file CSV generati");
-    }
+
 }
