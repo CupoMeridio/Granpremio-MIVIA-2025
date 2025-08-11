@@ -29,8 +29,8 @@ public class HumanController extends Controller {
     private int gear = 1;
     
     // Parametri per sterzo gamepad
-    private static final float STEERING_DEADZONE = 0.25f;
-    private static final float STEERING_SENSITIVITY = 1.2f;
+    private static final float STEERING_DEADZONE = 0.02f;
+    private static final float STEERING_SENSITIVITY = 0.5f;
     
     // Stato per raccolta dati
     private final EnhancedDataCollectionManager dataManager;
