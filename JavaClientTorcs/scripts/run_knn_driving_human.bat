@@ -16,7 +16,6 @@ if not exist "human_dataset.csv" (
     echo Esegui prima la raccolta dati manuale con:
     echo   - scripts\run_manual_driving.bat
     echo.
-    pause
     exit /b 1
 )
 

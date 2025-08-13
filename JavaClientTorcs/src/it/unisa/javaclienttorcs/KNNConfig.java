@@ -8,7 +8,7 @@ package it.unisa.javaclienttorcs;
 public class KNNConfig {
     
 
-    private static final int K = 5;
+    private static final int K =5;
     private static final boolean NORMALIZE_DATA = true;
     private static final boolean USE_WEIGHTED_VOTING = true;
     private static final boolean ENABLE_LOGGING = false;
@@ -84,15 +84,7 @@ public class KNNConfig {
         this.datasetPath = datasetPath;
     }
     
-    /**
-     * Crea una configurazione KNN per il dataset automatico.
-     * Utilizza il file "auto_dataset.csv" come dataset di training.
-     * 
-     * @return Configurazione KNN per dataset automatico
-     */
-    public static KNNConfig forAutoDataset() {
-        return new KNNConfig("auto_dataset.csv");
-    }
+
     
     /**
      * Crea una configurazione KNN per il dataset umano.

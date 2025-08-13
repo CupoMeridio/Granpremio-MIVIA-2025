@@ -95,34 +95,7 @@ public class Client {
 			}
 		}
 		
-		// Gestione speciale per SimpleDriver con raccolta dati avanzata
-		if (driver instanceof SimpleDriver) {
-			// Controlla se è richiesta la modalità raccolta dati avanzata
-			boolean collectData = false;
-			for (String arg : args) {
-				if (arg.equals("--collect-data")) {
-					collectData = true;
-					break;
-				}
-			}
-			
-			if (collectData) {
-				// Determina il nome del file dataset da usare
-				String datasetFile = "auto_dataset.csv";
-				for (int i = 1; i < args.length; i++) {
-					if (!args[i].contains(":") && !args[i].startsWith("--") && i == 1) {
-						// Il secondo argomento potrebbe essere il nome del file dataset
-						datasetFile = args[i];
-						break;
-					}
-				}
-				
-				// Crea e usa un wrapper per SimpleDriver con raccolta dati avanzata
-				SimpleDriverWithCollection simpleDriverWithCollection = new SimpleDriverWithCollection(datasetFile);
-				driver = simpleDriverWithCollection;
-				// Messaggio già stampato dal costruttore di SimpleDriverWithCollection
-			}
-		}
+
 		
 		driver.setStage(stage);
 	driver.setTrackName(trackName);

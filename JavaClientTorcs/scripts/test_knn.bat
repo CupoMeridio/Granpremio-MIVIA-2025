@@ -10,17 +10,14 @@ echo.
 REM Vai alla directory del progetto
 cd /d "%~dp0.."
 
-REM Verifica che esistano i dataset
-if not exist "auto_dataset.csv" (
-    if not exist "human_dataset.csv" (
-        echo [ERROR] Nessun dataset trovato!
-        echo Esegui prima la raccolta dati con:
-        echo   - scripts\run_auto_collection.bat
-        echo   - scripts\run_manual_driving.bat
-        echo.
-        pause
-        exit /b 1
-    )
+REM Verifica che esista il dataset umano
+if not exist "human_dataset.csv" (
+    echo [ERROR] Dataset umano non trovato!
+    echo Esegui prima la raccolta dati con:
+    echo   - scripts\run_manual_driving.bat
+    echo.
+    pause
+    exit /b 1
 )
 
 REM Compila il progetto

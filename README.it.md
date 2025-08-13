@@ -9,7 +9,7 @@ Un sistema di raccolta dati per TORCS (The Open Racing Car Simulator) che cattur
 Questo progetto implementa un sistema di raccolta dati per TORCS che:
 - **Cattura il comportamento di guida umano** tramite dati sensoriali completi
 - **Genera dataset CSV** per applicazioni di machine learning
-- **Supporta raccolta dati** sia manuale che automatica
+- **Supporta raccolta dati manuale** tramite guida umana
 - **Compatibile con Windows**
 
 ## 🚀 Installazione
@@ -86,7 +86,7 @@ Progetto/
     │   └── lib/            # Librerie copiate
     └── scripts/
         ├── run_manual_driving.bat    # Guida manuale
-        ├── run_auto_collection.bat   # Raccolta automatica
+
         ├── run_knn_driving_human.bat # KNN con dati umani
         ├── run_knn_driving_auto.bat  # KNN con dati automatici
         ├── run_simpledriver.bat      # Driver semplice
@@ -113,12 +113,10 @@ torcs_menu.bat
 
 **Raccolta Dati:**
 - Opzione 1: Guida manuale (raccolta dati umani)
-- Opzione 2: Raccolta automatica (SimpleDriver)
 
 **Gestione Dataset:**
-- Opzione 3: Combina dataset (auto + umano)
-- Opzione 4: Visualizza statistiche dataset
-- Opzione 5: Converti dataset per modelli ML
+- Opzione 2: Visualizza statistiche dataset
+- Opzione 3: Converti dataset per modelli ML
 
 **Intelligenza Artificiale:**
 - Opzione 6: **Test sistema KNN**
@@ -137,12 +135,10 @@ torcs_menu.bat
 #### Raccolta Dati Manuali
 - `JavaClientTorcs/scripts/run_manual_driving.bat`
 
-#### Raccolta Dati Automatica
-- `JavaClientTorcs/scripts/run_auto_collection.bat`
+
 
 #### Guida KNN
 - **Dataset umano**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
-- **Dataset automatico**: `JavaClientTorcs/scripts/run_knn_driving_auto.bat`
 
 #### Driver Semplice
 - `JavaClientTorcs/scripts/run_simpledriver.bat`
@@ -208,7 +204,7 @@ Il progetto implementa un algoritmo avanzato **K-Nearest Neighbors** per la guid
 - **Parametri configurabili** (valore K, normalizzazione, ecc.)
 
 **Configurazioni Disponibili:**
-- **Auto-Ottimizzata**: Addestrata su dati SimpleDriver (K=5, distanza Euclidea)
+- **Auto-Ottimizzata**: Addestrata su dati automatici esistenti (K=5, distanza Euclidea)
 - **Umana-Ottimizzata**: Addestrata su dati di guida umana (K=5, distanza Euclidea)
 
 ### Utilizzo KNN
@@ -224,8 +220,7 @@ JavaClientTorcs/scripts/test_knn.bat
 # Usa l'opzione 7 per dataset umano:
 JavaClientTorcs/scripts/run_knn_driving_human.bat
 
-# Usa l'opzione 8 per dataset automatico:
-JavaClientTorcs/scripts/run_knn_driving_auto.bat
+
 ```
 
 **Confronto Configurazioni:**
@@ -292,10 +287,10 @@ Esempio di configurazione:
 - Modifica la logica del cambio se la tua auto ha un numero diverso di marce
 
 I dataset vengono creati automaticamente nella directory principale:
-- `auto_dataset.csv` - Dati raccolti automaticamente (SimpleDriver) - Contiene sensori essenziali per analisi
+- `auto_dataset.csv` - Dati automatici precedentemente raccolti (se disponibili) - Contiene sensori essenziali per analisi
 - `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per analisi
 - `enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
-- `combined_dataset.csv` - Dataset combinati (auto_dataset.csv + human_dataset.csv) - Solo sensori essenziali
+
 
 ## 🔧 Tecnologia
 

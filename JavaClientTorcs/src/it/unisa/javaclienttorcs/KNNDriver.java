@@ -45,10 +45,10 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Costruttore con parametri di default (usa dataset automatico)
+     * Costruttore con parametri di default (usa dataset umano)
      */
     public KNNDriver() {
-        this("auto_dataset.csv"); // Default dataset
+        this("human_dataset.csv"); // Default dataset
     }
     
     /**
@@ -152,7 +152,9 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Calcola i parametri per la normalizzazione (min-max scaling)
+     * Calcola i parametri di normalizzazione (min e max) per ogni feature
+     * dai dati di training. Mantenuto per uso futuro anche se attualmente
+     * tutti i sensori utilizzano normalizzazione manuale.
      */
     private void calculateNormalizationParameters() {
         if (trainingData.isEmpty()) return;
@@ -165,24 +167,23 @@ public class KNNDriver extends Controller {
         System.arraycopy(trainingData.get(0).features, 0, featureMin, 0, featureCount);
         System.arraycopy(trainingData.get(0).features, 0, featureMax, 0, featureCount);
         
-        // Trova min e max solo per position sensors con normalizzazione automatica
-        // Esclusi: track sensors (0-9), angleToTrackAxis (11) e trackPosition (12) che usano normalizzazione manuale
+        // Trova min e max per tutti i sensori
         for (DataPoint point : trainingData) {
-            for (int i = 10; i < featureCount; i++) {
-                if (i != 11 && i != 12) { // Escludi angleToTrackAxis e trackPosition (indici 11 e 12)
-                    featureMin[i] = Math.min(featureMin[i], point.features[i]);
-                    featureMax[i] = Math.max(featureMax[i], point.features[i]);
-                }
+            for (int i = 0; i < featureCount; i++) {
+                featureMin[i] = Math.min(featureMin[i], point.features[i]);
+                featureMax[i] = Math.max(featureMax[i], point.features[i]);
             }
         }
     }
-    
+
     /**
-     * Normalizza tutti i dati di training usando normalizzazione ibrida a 4 livelli:
-     * - Track sensors (0-9): normalizzazione manuale [0,200]
-     * - angleToTrackAxis (11): normalizzazione manuale da [-π, +π] a [0, 1]
-     * - trackPosition (12): normalizzazione manuale [-1,+1] -> [0,1]
-     * - Altri position sensors (10,13): normalizzazione automatica
+     * Normalizza tutti i dati di training usando normalizzazione manuale ottimizzata.
+     * Tutti i sensori utilizzano normalizzazione manuale con range [0, 10]:
+     * - Track sensors (0-9): [0, 200] -> [0, 10]
+     * - speedX (10): [0, 288] -> [0, 10]
+     * - angleToTrackAxis (11): [-π, +π] -> [0, 10]
+     * - trackPosition (12): [-1, +1] -> [0, 10]
+     * - distanceFromStartLine (13): [0, 5784.10] -> [0, 10]
      */
     private void normalizeTrainingData() {
         for (DataPoint point : trainingData) {
@@ -191,11 +192,12 @@ public class KNNDriver extends Controller {
     }
     
     /**
-     * Normalizza un array di features usando normalizzazione ibrida.
-     * Applica diverse strategie di normalizzazione a seconda del tipo di sensore.
+     * Normalizza un array di features usando normalizzazione manuale con range ottimizzato.
+     * Applica normalizzazione manuale per tutti i sensori con valori fissi predefiniti.
+     * Range ottimizzato [0, 10] per bilanciare granularità e performance.
      * 
      * @param features Array delle features da normalizzare
-     * @return Array delle features normalizzate
+     * @return Array delle features normalizzate nel range [0, 10]
      */
     private double[] normalizeFeatures(double[] features) {
         if (!config.isNormalizeData()) {
@@ -206,27 +208,30 @@ public class KNNDriver extends Controller {
         
         for (int i = 0; i < features.length; i++) {
             if (i < 10) {
-                // Track sensors (indici 0-9): normalizzazione manuale con range [0, 200]
+                // Track sensors (indici 0-9): normalizzazione manuale con range [0, 200] -> [0, 10]
                 if (features[i] < 0) {
                     normalized[i] = 0.0; // Valore fuori pista
                 } else {
-                    normalized[i] = Math.min(features[i] / 200.0, 1.0);
+                    // Normalizza da [0, 200] a [0, 10]
+                    normalized[i] = Math.min(features[i] / 200.0, 1.0) * 10.0;
                 }
+            } else if (i == 10) {
+                // speedX: normalizza da [0, 288] a [0, 10]
+                normalized[i] = Math.max(0.0, Math.min(features[i] / 288.0, 1.0)) * 10.0;
             } else if (i == 11) {
-                // angleToTrackAxis: normalizzazione da [-π, +π] a [0, 1]
-                double angleRange = 2 * Math.PI;
-                normalized[i] = (features[i] + Math.PI) / angleRange;
-                normalized[i] = Math.max(0.0, Math.min(1.0, normalized[i]));
+                // angleToTrackAxis: normalizza da [-π, +π] a [0, 10]
+                double normalizedAngle = (features[i] + Math.PI) / (2 * Math.PI);
+                normalized[i] = Math.max(0.0, Math.min(1.0, normalizedAngle)) * 10.0;
             } else if (i == 12) {
-                // trackPosition: normalizzazione da [-1, +1] a [0, 1]
-                normalized[i] = Math.max(0.0, Math.min(1.0, (features[i] + 1.0) / 2.0));
+                // trackPosition: normalizza da [-1, +1] a [0, 10]
+                double normalizedPos = (features[i] + 1.0) / 2.0;
+                normalized[i] = Math.max(0.0, Math.min(1.0, normalizedPos)) * 10.0;
+            } else if (i == 13) {
+                // distanceFromStartLine: normalizza da [0, 5784.10] a [0, 10]
+                normalized[i] = Math.max(0.0, Math.min(features[i] / 5784.10, 1.0)) * 10.0;
             } else {
-                // Altri position sensors (10, 13): normalizzazione automatica
-                if (featureMax[i] - featureMin[i] != 0) {
-                    normalized[i] = (features[i] - featureMin[i]) / (featureMax[i] - featureMin[i]);
-                } else {
-                    normalized[i] = 0.0; // Se min == max, la feature è costante
-                }
+                // Altri sensori (se presenti): mantieni valore originale
+                normalized[i] = features[i];
             }
         }
         return normalized;

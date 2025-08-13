@@ -9,7 +9,7 @@ A data collection system for TORCS (The Open Racing Car Simulator) that captures
 This project implements a data collection system for TORCS that:
 - **Captures human driving behavior** through comprehensive sensor data
 - **Generates CSV datasets** for machine learning applications
-- **Supports data collection** both manual and automatic
+- **Supports manual data collection** through human driving
 - **Windows compatible**
 
 ## 🚀 Installation
@@ -87,7 +87,7 @@ Project/
     │   └── lib/            # Copied libraries
     └── scripts/
         ├── run_manual_driving.bat    # Manual driving
-        ├── run_auto_collection.bat   # Automatic collection
+
         ├── run_knn_driving_human.bat # KNN with human data
         ├── run_knn_driving_auto.bat  # KNN with auto data
         ├── run_simpledriver.bat      # Simple driver
@@ -115,12 +115,10 @@ torcs_menu.bat
 
 **Data Collection:**
 - Option 1: Manual driving (human data collection)
-- Option 2: Automatic collection (SimpleDriver)
 
 **Dataset Management:**
-- Option 3: Combine datasets (auto + human)
-- Option 4: View dataset statistics
-- Option 5: Convert datasets for ML models
+- Option 2: View dataset statistics
+- Option 3: Convert datasets for ML models
 
 **Artificial Intelligence:**
 - Option 6: **Test KNN system**
@@ -139,12 +137,10 @@ torcs_menu.bat
 #### Manual Data Collection
 - `JavaClientTorcs/scripts/run_manual_driving.bat`
 
-#### Automatic Data Collection
-- `JavaClientTorcs/scripts/run_auto_collection.bat`
+
 
 #### KNN Driving
 - **Human dataset**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
-- **Auto dataset**: `JavaClientTorcs/scripts/run_knn_driving_auto.bat`
 
 #### Simple Driver
 - `JavaClientTorcs/scripts/run_simpledriver.bat`
@@ -210,7 +206,7 @@ The project implements an advanced **K-Nearest Neighbors** algorithm for autonom
 - **Configurable parameters** (K value, normalization, etc.)
 
 **Available Configurations:**
-- **Auto-Optimized**: Trained on SimpleDriver data (K=5, Euclidean distance)
+- **Auto-Optimized**: Trained on existing automatic data (K=5, Euclidean distance)
 - **Human-Optimized**: Trained on human driving data (K=5, Euclidean distance)
 
 ### KNN Usage
@@ -226,8 +222,7 @@ JavaClientTorcs/scripts/test_knn.bat
 # Use menu option 7 for human dataset:
 JavaClientTorcs/scripts/run_knn_driving_human.bat
 
-# Use menu option 8 for automatic dataset:
-JavaClientTorcs/scripts/run_knn_driving_auto.bat
+
 ```
 
 **Configuration Comparison:**
@@ -293,10 +288,10 @@ Example configuration:
 - Modify gear logic if your car has different number of gears
 
 Datasets are automatically created in the main directory:
-- `auto_dataset.csv` - Automatically collected data (SimpleDriver) - Contains essential sensors for analysis
+- `auto_dataset.csv` - Previously collected automatic data (if available) - Contains essential sensors for analysis
 - `human_dataset.csv` - Manually collected data (HumanController) - Contains essential sensors for analysis
 - `enhanced_dataset.csv` - Comprehensive dataset with almost all available TORCS sensors - Ideal for future implementations and data analysis
-- `combined_dataset.csv` - Combined datasets (auto_dataset.csv + human_dataset.csv) - Essential sensors only
+
 
 ## 🔧 Technology
 

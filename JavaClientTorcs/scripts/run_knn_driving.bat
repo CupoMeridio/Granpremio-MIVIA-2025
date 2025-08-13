@@ -10,29 +10,25 @@ echo.
 REM Vai alla directory del progetto
 cd /d "%~dp0.."
 
-REM Verifica che esistano i dataset
-if not exist "auto_dataset.csv" (
-    if not exist "human_dataset.csv" (
-        echo [ERROR] Nessun dataset trovato!
-        echo Esegui prima la raccolta dati con:
-        echo   - scripts\run_auto_collection.bat
-        echo   - scripts\run_manual_driving.bat
-        echo.
-        pause
-        exit /b 1
-    )
+REM Verifica che esista il dataset umano
+if not exist "human_dataset.csv" (
+    echo [ERROR] Dataset umano non trovato!
+    echo Esegui prima la raccolta dati con:
+    echo   - scripts\run_manual_driving.bat
+    echo.
+    pause
+    exit /b 1
 )
 
 REM Mostra opzioni di configurazione
 echo Seleziona la configurazione KNN:
 echo.
-echo 1. Configurazione automatica ottimizzata (dataset auto)
-echo 2. Configurazione umana ottimizzata (dataset umano)
-echo 3. Configurazione personalizzata Euclidea
-echo 4. Configurazione personalizzata Minkowski
-echo 5. Test comparativo (solo test, non guida)
+echo 1. Configurazione umana ottimizzata (dataset umano)
+echo 2. Configurazione personalizzata Euclidea
+echo 3. Configurazione personalizzata Minkowski
+echo 4. Test comparativo (solo test, non guida)
 echo.
-set /p choice="Inserisci la tua scelta (1-5): "
+set /p choice="Inserisci la tua scelta (1-4): "
 
 REM Compila il progetto
 echo.
@@ -47,7 +43,7 @@ if errorlevel 1 (
 echo [SUCCESS] Compilazione completata!
 echo.
 
-if "%choice%"=="5" (
+if "%choice%"=="4" (
     echo [INFO] Esecuzione test comparativo...
     java -cp "lib\*;." it.unisa.javaclienttorcs.KNNTestDriver
     echo.
@@ -79,15 +75,12 @@ echo.
 
 REM Esegui il driver KNN con la configurazione selezionata
 if "%choice%"=="1" (
-    echo [INFO] Usando configurazione automatica ottimizzata
-    java -cp "lib\*;." it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.KNNDriver auto
-) else if "%choice%"=="2" (
     echo [INFO] Usando configurazione umana ottimizzata
     java -cp "lib\*;." it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.KNNDriver human
-) else if "%choice%"=="3" (
+) else if "%choice%"=="2" (
     echo [INFO] Usando configurazione Euclidea personalizzata
     java -cp "lib\*;." it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.KNNDriver euclidean
-) else if "%choice%"=="4" (
+) else if "%choice%"=="3" (
     echo [INFO] Usando configurazione Minkowski personalizzata
     java -cp "lib\*;." it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.KNNDriver minkowski
 ) else (

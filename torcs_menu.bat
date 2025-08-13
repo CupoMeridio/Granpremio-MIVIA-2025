@@ -11,21 +11,19 @@ echo ==========================
 echo.
 echo DATA COLLECTION:
 echo 1. Manual Driving (Data Collection)
-echo 2. Automatic Data Collection
 echo.
 echo DATA MANAGEMENT:
-echo 3. Combine Datasets
-echo 4. View Dataset Statistics
+echo 2. View Dataset Statistics
+echo 3. Convert Enhanced to Human Dataset
 echo.
 echo AUTONOMOUS DRIVING:
-echo 5. SimpleDriver (Basic Autonomous)
+echo 4. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
-echo 6. KNN Driving (Human Dataset)
-echo 7. KNN Driving (Auto Dataset)
+echo 5. KNN Driving (Human Dataset)
 echo.
 echo DOCUMENTATION:
-echo 8. Open Complete Guide
+echo 6. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -36,16 +34,14 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-8, X): "
+set /p choice="Select option (0-6, X): "
 
 if "%choice%"=="1" goto manual
-if "%choice%"=="2" goto auto
-if "%choice%"=="3" goto combine
-if "%choice%"=="4" goto stats
-if "%choice%"=="5" goto simpledriver
-if "%choice%"=="6" goto knndriving_human
-if "%choice%"=="7" goto knndriving_auto
-if "%choice%"=="8" goto guide
+if "%choice%"=="2" goto stats
+if "%choice%"=="3" goto convert
+if "%choice%"=="4" goto simpledriver
+if "%choice%"=="5" goto knndriving_human
+if "%choice%"=="6" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -62,51 +58,117 @@ echo Press any key to continue...
 pause >nul
 goto menu
 
-:auto
-call "%~dp0JavaClientTorcs\scripts\run_auto_collection.bat"
+:convert
+echo ========================================
+echo   CONVERT ENHANCED TO HUMAN DATASET
+echo ========================================
 echo.
-echo Press any key to continue...
-pause >nul
-goto menu
+cd /d "%~dp0JavaClientTorcs"
+if not exist "enhanced_dataset.csv" (
+    echo [ERROR] enhanced_dataset.csv not found!
+    echo Please run data collection first.
+    echo.
+    echo Press any key to return to menu...
+    pause >nul
+    goto menu
+)
 
-
-
-:combine
-call "%~dp0JavaClientTorcs\scripts\combine_datasets.bat"
+echo [INFO] Converting enhanced_dataset.csv to human_dataset.csv...
 echo.
-echo Press any key to continue...
+java -cp "dist\JavaClientTorcs.jar;lib\*" it.unisa.javaclienttorcs.DatasetConverter enhanced_dataset.csv human_dataset.csv
+
+if errorlevel 1 (
+    echo [ERROR] Conversion failed!
+    echo.
+) else (
+    echo [SUCCESS] Conversion completed successfully!
+    echo.
+    if exist "human_dataset.csv" (
+        echo File created: human_dataset.csv
+        for %%A in ("human_dataset.csv") do echo Size: %%~zA bytes
+        find /c /v "" human_dataset.csv | find /v "------"
+    )
+)
+echo.
+cd /d "%~dp0"
+echo Press any key to return to menu...
 pause >nul
 goto menu
 
 :stats
 	cd /d "%~dp0JavaClientTorcs"
+	color 0B
 	echo.
-	echo === DATASET STATISTICS ===
-	if exist "dataset.csv" (
-	    echo dataset.csv: 
-	    find /c /v "" dataset.csv
+	echo ========================================
+	echo           DATASET STATISTICS
+	echo ========================================
+	echo.
+	
+	REM Check human_dataset.csv
+	    echo [✓] HUMAN DATASET ^(human_dataset.csv^)
+	    for %%A in ("human_dataset.csv") do (
+	        set /a size_kb=%%~zA/1024
+	        echo     Size: %%~zA bytes ^(!size_kb! KB^)
+	        echo     Modified: %%~tA
+	    )
+	    for /f "tokens=3" %%i in ('find /c /v "" human_dataset.csv 2^>nul') do (
+	        set /a total_lines=%%i
+	        set /a data_records=%%i-1
+	        echo     Total lines: !total_lines!
+	        if !data_records! gtr 0 (
+	            echo     Data records: !data_records! training points
+	        ) else (
+	            echo     Data records: 0 ^(empty or header only^)
+	        )
+	    )
+	    echo     Status: Ready for KNN training
 	) else (
-	    echo dataset.csv: Not found
+	    echo [✗] HUMAN DATASET ^(human_dataset.csv^)
+	    echo     Status: NOT FOUND - Run manual data collection first
+	)
+	echo.if exist "human_dataset.csv" (
+	
+	
+	REM Check enhanced_dataset.csv
+	if exist "enhanced_dataset.csv" (
+	    echo [✓] ENHANCED DATASET ^(enhanced_dataset.csv^)
+	    for %%A in ("enhanced_dataset.csv") do (
+	        set /a size_kb=%%~zA/1024
+	        echo     Size: %%~zA bytes ^(!size_kb! KB^)
+	        echo     Modified: %%~tA
+	    )
+	    for /f "tokens=3" %%i in ('find /c /v "" enhanced_dataset.csv 2^>nul') do (
+	        set /a total_lines=%%i
+	        set /a data_records=%%i-1
+	        echo     Total lines: !total_lines!
+	        if !data_records! gtr 0 (
+	            echo     Data records: !data_records! sensor readings
+	        ) else (
+	            echo     Data records: 0 ^(empty or header only^)
+	        )
+	    )
+	    echo     Status: Complete sensor data available
+	) else (
+	    echo [✗] ENHANCED DATASET ^(enhanced_dataset.csv^)
+	    echo     Status: NOT FOUND - Run manual data collection to generate
+	)
+	echo.
+	
+	echo ========================================
+	echo SUMMARY:
+	if exist "human_dataset.csv" (
+	    echo • Human dataset: AVAILABLE - Ready for AI training
+	) else (
+	    echo • Human dataset: MISSING - Collect data first
 	)
 	if exist "enhanced_dataset.csv" (
-	    echo enhanced_dataset.csv: 
-	    find /c /v "" enhanced_dataset.csv
+	    echo • Enhanced dataset: AVAILABLE - Full sensor data
 	) else (
-	    echo enhanced_dataset.csv: Not found
+	    echo • Enhanced dataset: MISSING - Run data collection
 	)
-	if exist "human_dataset.csv" (
-	    echo human_dataset.csv: 
-	    find /c /v "" human_dataset.csv
-	) else (
-	    echo human_dataset.csv: Not found
-	)
-	if exist "combined_dataset.csv" (
-	    echo combined_dataset.csv: 
-	    find /c /v "" combined_dataset.csv
-	) else (
-	    echo combined_dataset.csv: Not found
-	)
+	echo ========================================
 	echo.
+	color 0A
 	cd /d "%~dp0"
 echo Press any key to return to menu...
 pause >nul
@@ -146,12 +208,7 @@ echo Press any key to continue...
 pause >nul
 goto menu
 
-:knndriving_auto
-call "%~dp0JavaClientTorcs\scripts\run_knn_driving_auto.bat"
-echo.
-echo Press any key to continue...
-pause >nul
-goto menu
+
 
 :exit
 echo Goodbye!

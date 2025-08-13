@@ -29,8 +29,14 @@ public class HumanController extends Controller {
     private int gear = 1;
     
     // Parametri per sterzo gamepad
-    private static final float STEERING_DEADZONE = 0.02f;
-    private static final float STEERING_SENSITIVITY = 0.5f;
+    private static final float STEERING_DEADZONE = 0.02f;  // Minima per massima responsività
+    private static final float STEERING_SENSITIVITY = 0.5f; // Ridotta per controllo più preciso e graduale
+    
+    // === COSTANTI PER IL CAMBIO MARCIA AUTOMATICO (da SimpleDriver) ===
+    // RPM minimi per salire di marcia [per marcia 1-6]
+    private static final int[] gearUp = { 5000, 6000, 6000, 6500, 7000, 0 };
+    // RPM massimi per scalare di marcia [per marcia 1-6]
+    private static final int[] gearDown = { 0, 2500, 3000, 3000, 3500, 3500 };
     
     // Stato per raccolta dati
     private final EnhancedDataCollectionManager dataManager;
@@ -70,8 +76,8 @@ public class HumanController extends Controller {
         System.out.println("    Esci: X");
         System.out.println("  GAMEPAD:");
         System.out.println("    Sterzo: Left Stick X");
-        System.out.println("    Accelerazione: Right Trigger");
-        System.out.println("    Frenata: Left Trigger");
+        System.out.println("    Accelerazione/Avanti: Right Trigger");
+        System.out.println("    Frenata/Retromarcia: Left Trigger");
         System.out.println("    Cambio marcia manuale: LB (-) / RB (+)");
         System.out.println("    Toggle cambio automatico: BACK");
         System.out.println("    Toggle ABS: B");
@@ -108,7 +114,7 @@ public class HumanController extends Controller {
             });
             
             // Aggiungi label con istruzioni
-            JLabel label = new JLabel("<html><div style='padding: 20px; font-size: 12px;'>" +
+            JLabel label = new JLabel("<html><div style='padding: 20px; font-size: 10px;'>" +
                 "<h2 style='text-align: center; margin-bottom: 15px;'>🎮 TORCS CONTROLLER</h2>" +
                 "<div style='margin-bottom: 10px;'><b>🚗 MOVIMENTO TASTIERA:</b></div>" +
                 "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
@@ -119,7 +125,7 @@ public class HumanController extends Controller {
                 "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
                 "• <b>Left Stick X</b> → Sterzo analogico</div>" +
                 "<div style='margin-left: 15px; margin-bottom: 15px;'>" +
-                "• <b>Right Trigger</b> → Accelerazione | <b>Left Trigger</b> → Frenata</div>" +
+                "• <b>Right Trigger</b> → Accelerazione/Avanti | <b>Left Trigger</b> → Frenata/Retromarcia</div>" +
                 "<div style='margin-bottom: 10px;'><b>⚙️ CONTROLLI AVANZATI:</b></div>" +
                 "<div style='margin-left: 15px; margin-bottom: 5px;'>" +
                 "• <b>Q/E</b> | <b>LB/RB</b> → Cambio marcia manuale (solo modalità manuale)</div>" +
@@ -234,16 +240,34 @@ public class HumanController extends Controller {
      * @param sensors Modello sensoriale contenente lo stato attuale della macchina
      * @return Marcia raccomandata (-1 per retromarcia, 0 per folle, 1-6 per marce avanti)
      */
+    /**
+     * Determina la marcia ottimale utilizzando il sistema avanzato del SimpleDriver.
+     * Implementa cambio automatico intelligente con soglie RPM ottimizzate per ogni marcia.
+     * 
+     * @param sensors Modello sensoriale contenente lo stato attuale della macchina
+     * @return Marcia raccomandata (-1 per retromarcia, 0 per folle, 1-6 per marce avanti)
+     */
     private int getGear(SensorModel sensors) {
         int currentGear = sensors.getGear();
         double rpm = sensors.getRPM();
         double speed = sensors.getSpeed(); // km/h
         
-        // Arcade-style reverse: switch to reverse when pressing backward at low speed
+        // === GESTIONE RETROMARCIA ARCADE-STYLE ===
+        // Input da tastiera
         boolean isBackwardPressed = isKeyPressed(KeyEvent.VK_S) || isKeyPressed(KeyEvent.VK_DOWN) || 
                                    isKeyPressed(KeyEvent.VK_NUMPAD2) || isKeyPressed(KeyEvent.VK_K);
         boolean isForwardPressed = isKeyPressed(KeyEvent.VK_W) || isKeyPressed(KeyEvent.VK_UP) || 
                                   isKeyPressed(KeyEvent.VK_NUMPAD8) || isKeyPressed(KeyEvent.VK_I);
+        
+        // Input da gamepad - aggiunta retromarcia con trigger
+        float leftTrigger = gamepad.getLeftTrigger();
+        float rightTrigger = gamepad.getRightTrigger();
+        boolean gamepadBackwardPressed = leftTrigger > 0.3; // Left trigger per retromarcia
+        boolean gamepadForwardPressed = rightTrigger > 0.3; // Right trigger per avanti
+        
+        // Combina input tastiera e gamepad
+        isBackwardPressed = isBackwardPressed || gamepadBackwardPressed;
+        isForwardPressed = isForwardPressed || gamepadForwardPressed;
         
         // Allow immediate reverse when stopped or very low speed
         if (speed < 5.0) {
@@ -262,15 +286,16 @@ public class HumanController extends Controller {
             return -1; // Stay in reverse
         }
         
+        // === SISTEMA CAMBIO AUTOMATICO AVANZATO (da SimpleDriver) ===
         // Gestione marcia 0 (folle) - imposta sempre 1ª marcia
         if (currentGear < 1)
             return 1;
         
-        // Logica upshift: se RPM supera soglia (solo marce avanti)
-        if (currentGear > 0 && currentGear < 6 && rpm >= 7500)
+        // Logica upshift: se RPM supera soglia specifica per marcia attuale
+        if (currentGear < 6 && rpm >= gearUp[currentGear - 1])
             return currentGear + 1;
-        // Logica downshift: se RPM sotto soglia (solo marce avanti)
-        else if (currentGear > 1 && rpm <= 3000)
+        // Logica downshift: se RPM sotto soglia specifica per marcia attuale
+        else if (currentGear > 1 && rpm <= gearDown[currentGear - 1])
             return currentGear - 1;
         else
             // Nessun cambio marcia necessario
@@ -427,15 +452,13 @@ public class HumanController extends Controller {
     }
     
     /**
-     * Applica una curva di sensibilità non lineare per migliorare il controllo.
+     * Applica una curva di sensibilità lineare per controllo più graduale.
      * @param input Input grezzo [-1, 1]
      * @param sensitivity Sensibilità della curva
      * @return Valore con curva applicata
      */
     private float applySteeringCurve(float input, float sensitivity) {
-        float sign = Math.signum(input);
-        float absInput = Math.abs(input);
-        return sign * (float) Math.pow(absInput, 1.0 / sensitivity);
+        return input * sensitivity;
     }
     
     private void updateControls() {
@@ -458,12 +481,13 @@ public class HumanController extends Controller {
                                 isKeyPressed(KeyEvent.VK_NUMPAD6) || isKeyPressed(KeyEvent.VK_L);
         
         // Sterzo: priorità al gamepad, fallback tastiera
-        if (Math.abs(leftStickX) > 0.1) {
+        // Documentazione TORCS: -1 = sterzo completo a destra, +1 = sterzo completo a sinistra
+        if (Math.abs(leftStickX) > 0.05) {
             steering = getSteer(); // Gamepad con deadzone, curva e filtro
         } else if (isLeftPressed) {
-            steering = Math.max(-1.0, steering + 0.05);
+            steering = Math.min(1.0, steering + 0.05); // Sinistra = +1
         } else if (isRightPressed) {
-            steering = Math.min(1.0, steering - 0.05);
+            steering = Math.max(-1.0, steering - 0.05); // Destra = -1
         } else {
             // Ritorno al centro
             steering *= 0.95;

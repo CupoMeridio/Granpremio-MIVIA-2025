@@ -17,9 +17,11 @@ public class SimpleDriver extends Controller {
 
 	/* === COSTANTI PER IL CAMBIO MARCIA === */
 	// RPM minimi per salire di marcia [per marcia 1-6]
-	final int[] gearUp = { 7500, 7500, 7500, 7500, 7500, 0 };
+	final int[] gearUp = { 4500, 5500, 6500, 6500, 7000, 0 };
 	// RPM massimi per scalare di marcia [per marcia 1-6]
-	final int[] gearDown = { 0, 3000, 3000, 3000, 3000, 3000 };
+	final int[] gearDown = { 0, 2500, 3500, 4000, 4500, 5000 };
+
+
 
 	/* === COSTANTI PER GESTIONE STUCK === */
 	// Tempo in cicli prima di attivare la procedura di recupero
