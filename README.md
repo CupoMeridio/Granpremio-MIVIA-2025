@@ -117,7 +117,6 @@ Project/
 ├── README.md               # This documentation
 ├── README.it.md            # Italian documentation
 ├── torcs_menu.bat          # Windows menu
-
 └── JavaClientTorcs/
     ├── build.xml           # Ant configuration
     ├── manifest.mf         # JAR manifest
@@ -148,12 +147,11 @@ Project/
     │   └── lib/            # Copied libraries
     └── scripts/
         ├── run_manual_driving.bat    # Manual driving
-
         ├── run_knn_driving_human.bat # KNN with human data
         ├── run_knn_driving_auto.bat  # KNN with auto data
         ├── run_simpledriver.bat      # Simple driver
         ├── combine_datasets.bat      # Combine datasets
-        └── test_knn.bat              # Test KNN
+        ├── test_knn.bat              # Test KNN
         ├── test_auto_model.sh        # Test automatic data Linux/Mac
         ├── combine_datasets.bat      # Combine datasets Windows
         └── combine_datasets.sh       # Combine datasets Linux/Mac

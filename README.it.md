@@ -115,7 +115,6 @@ torcs_menu.bat
 Progetto/
 ├── README.md               # Questa documentazione
 ├── torcs_menu.bat          # Menu Windows
-
 └── JavaClientTorcs/
     ├── build.xml           # Configurazione Ant
     ├── manifest.mf         # Manifest JAR
@@ -146,12 +145,11 @@ Progetto/
     │   └── lib/            # Librerie copiate
     └── scripts/
         ├── run_manual_driving.bat    # Guida manuale
-
         ├── run_knn_driving_human.bat # KNN con dati umani
         ├── run_knn_driving_auto.bat  # KNN con dati automatici
         ├── run_simpledriver.bat      # Driver semplice
         ├── combine_datasets.bat      # Combina dataset
-        └── test_knn.bat              # Test KNN
+        ├── test_knn.bat              # Test KNN
         ├── combine_datasets.bat      # Combina dataset Windows
         └── combine_datasets.sh       # Combina dataset Linux/Mac
 ```
