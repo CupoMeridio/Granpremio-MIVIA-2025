@@ -1,22 +1,38 @@
-# TORCS Data Collection System
+# 🏎️ TORCS Data Collection and Autonomous Driving System
 
 [![Language: English](https://img.shields.io/badge/lang-en-green.svg)](README.md) [![Language: Italian](https://img.shields.io/badge/lang-it-blue.svg)](README.it.md)
 
-A data collection system for TORCS (The Open Racing Car Simulator) that captures driving behavior through CSV files for analysis and machine learning.
+A comprehensive system for TORCS (The Open Racing Car Simulator) that combines intelligent data collection, autonomous driving via KNN machine learning, and manual control with keyboard and gamepad support.
 
-## 🎯 What It Is
+## 📋 Table of Contents
 
-This project implements a data collection system for TORCS that:
-- **Captures human driving behavior** through comprehensive sensor data
-- **Generates CSV datasets** for machine learning applications
-- **Supports manual data collection** through human driving
-- **Windows compatible**
+- [🎯 Project Overview](#-project-overview)
+- [🚀 Installation and Setup](#-installation-and-setup)
+- [🎮 How to Use the System](#-how-to-use-the-system)
+- [📁 Project Structure](#-project-structure)
+- [🕹️ Driving Controls & Controller Support](#️-driving-controls--controller-support)
+- [🤖 KNN System](#-knn-system)
+- [📊 Datasets & Car Configuration](#-datasets--car-configuration)
+- [🔧 Technology and Architecture](#-technology-and-architecture)
+- [⚡ Quick Start Guide](#-quick-start-guide)
+- [📋 Important Notes](#-important-notes)
+- [🪟 TORCS Configuration for Windows](#-torcs-configuration-for-windows)
 
-## 🚀 Installation
+## 🎯 Project Overview
+
+This advanced system for TORCS offers:
+- 🧠 **Autonomous driving via KNN** with machine learning algorithms
+- 🎮 **Manual driving** with keyboard and gamepad support
+- 📊 **Intelligent data collection** for training and analysis
+- 🔧 **Modular system** with multiple controllers and configurations
+- 🪟 **Windows compatibility** with optimized setup
+
+## 🚀 Installation and Setup
 
 ### Prerequisites
 - **Java 21+** installed and in PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
 - **Apache Ant** for project building ([Download Apache Ant](https://ant.apache.org/bindownload.cgi)) (or **NetBeans 26+** for IDE build - [Download NetBeans](https://netbeans.apache.org/front/main/download/nb26))
+- **TORCS 1.3.7 with SCR patch** (see [TORCS Configuration for Windows](#-torcs-configuration-for-windows))
 - TORCS started with JavaClientTorcs module
 
 ### Build
@@ -47,7 +63,52 @@ ant clean
 ant jar
 ```
 
+## 🎮 How to Use the System
 
+### Method 1: Interactive Menu (Recommended)
+
+The project includes a comprehensive menu system with all functionalities:
+
+#### Windows
+```cmd
+torcs_menu.bat
+```
+
+### Menu Options
+
+**Data Collection:**
+- Option 1: Manual driving (human data collection)
+
+**Dataset Management:**
+- Option 2: View dataset statistics
+- Option 3: Convert datasets for ML models
+
+**Artificial Intelligence:**
+- Option 6: **Test KNN system**
+- Option 7: **KNN autonomous driving**
+- Option 8: **Compare KNN configurations**
+
+**Classic Autonomous Driving:**
+- Option 9: SimpleDriver (basic automatic driving)
+
+**Utilities:**
+- Option 10: Clean temporary files
+- Option 11: Project information
+
+### Method 2: Individual Scripts
+
+#### Manual Data Collection
+- `JavaClientTorcs/scripts/run_manual_driving.bat`
+
+#### KNN Driving
+- **Human dataset**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
+
+#### Simple Driver
+- `JavaClientTorcs/scripts/run_simpledriver.bat`
+
+#### Dataset Management
+- **Combine datasets**: `JavaClientTorcs/scripts/combine_datasets.bat`
+- **Test KNN**: `JavaClientTorcs/scripts/test_knn.bat`
 
 ## 📁 Project Structure
 
@@ -97,57 +158,6 @@ Project/
         ├── combine_datasets.bat      # Combine datasets Windows
         └── combine_datasets.sh       # Combine datasets Linux/Mac
 ```
-
-## 🎮 How to Use
-
-### Method 1: Interactive Menu (Recommended)
-
-The project includes a comprehensive menu system with all functionalities:
-
-#### Windows
-```cmd
-torcs_menu.bat
-```
-
-
-
-### Menu Options
-
-**Data Collection:**
-- Option 1: Manual driving (human data collection)
-
-**Dataset Management:**
-- Option 2: View dataset statistics
-- Option 3: Convert datasets for ML models
-
-**Artificial Intelligence:**
-- Option 6: **Test KNN system**
-- Option 7: **KNN autonomous driving**
-- Option 8: **Compare KNN configurations**
-
-**Classic Autonomous Driving:**
-- Option 9: SimpleDriver (basic automatic driving)
-
-**Utilities:**
-- Option 10: Clean temporary files
-- Option 11: Project information
-
-### Method 2: Individual Scripts
-
-#### Manual Data Collection
-- `JavaClientTorcs/scripts/run_manual_driving.bat`
-
-
-
-#### KNN Driving
-- **Human dataset**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
-
-#### Simple Driver
-- `JavaClientTorcs/scripts/run_simpledriver.bat`
-
-#### Dataset Management
-- **Combine datasets**: `JavaClientTorcs/scripts/combine_datasets.bat`
-- **Test KNN**: `JavaClientTorcs/scripts/test_knn.bat`
 
 ## 🕹️ Driving Controls & Controller Support
 
@@ -293,39 +303,43 @@ Datasets are automatically created in the main directory:
 - `enhanced_dataset.csv` - Comprehensive dataset with almost all available TORCS sensors - Ideal for future implementations and data analysis
 
 
-## 🔧 Technology
+## 🔧 Technology and Architecture
 
-- **Language**: Java
+### Technology Stack
+- **Language**: Java 21+
+- **Machine Learning**: KNN with KD-Tree optimization
+- **Controller Libraries**: Jamepad (gamepad), SDL2 (input handling)
 - **IDE**: NetBeans 26 (native project)
 - **Build Tool**: Apache Ant
 - **Data Format**: CSV
 - **Communication**: UDP Socket with TORCS
-- **Data Format**: CSV
+
+### System Architecture
+- **Modular Controllers**: HumanController, SimpleDriver, KNNDriver
+- **Intelligent Data Collection**: Automatic sensor data capture
+- **TORCS Communication**: Real-time UDP protocol
+- **Sensor Model**: Comprehensive track and vehicle sensors
 
 ### NetBeans Compatibility
 - **Tested with**: NetBeans 26 + JDK 21/24 ✅
 - **Compatible with**: NetBeans 25+ and JDK 21+
 - **Native project**: Open the `JavaClientTorcs` folder directly as Ant project
 
-## 🚗 TORCS Setup
+## ⚡ Quick Start Guide
 
-1. Start TORCS
-2. Configure race with Java client
-3. The driver will automatically connect to port 3001
-
-## ⚡ Quick Start
-
-1. **Build**: `ant clean && ant jar` (from JavaClientTorcs/)
-2. **Menu**: Use appropriate menu for your system
-3. **Collect data**: Drive manually or automatically
-4. **Test**: Use model with your data
+1. **Setup TORCS**: Install TORCS 1.3.7 with SCR patch (see configuration section)
+2. **Build Project**: `ant clean && ant jar` (from JavaClientTorcs/) or use NetBeans
+3. **Launch Menu**: Run `torcs_menu.bat` for interactive options
+4. **Data Collection**: Choose option 1 for manual driving data collection
+5. **Test KNN**: Choose option 6 to test autonomous driving
 
 ## 📋 Important Notes
 
-- Make sure TORCS is running before starting drivers
-- Datasets are saved in the directory where you run scripts
-- For best results, collect at least 1000-5000 examples per track
-- The system is designed for Windows
+- ⚠️ **TORCS must be running** before starting any driver
+- 📁 **Datasets are saved** in the directory where you run scripts
+- 📊 **For best results**, collect at least 1000-5000 examples per track
+- 🪟 **Optimized for Windows** with specific TORCS configuration
+- 🏎️ **Ferrari F2001 optimized** - all configurations tuned for this car
 
 ## 🪟 TORCS Configuration for Windows
 
@@ -367,3 +381,29 @@ To properly configure TORCS on Windows for the MIVIA 2025 project:
 2. **Test connection**:
    - Start TORCS before running Java drivers
    - Java client will automatically connect on port 3001
+
+---
+
+## 🎯 Conclusion
+
+This TORCS system represents a comprehensive solution for:
+- **🤖 Autonomous driving research** with advanced KNN algorithms
+- **📊 Data collection and analysis** for machine learning applications
+- **🎮 Interactive driving simulation** with multiple control methods
+- **🔬 Educational purposes** in AI and automotive engineering
+
+### 🚀 Future Developments
+- Enhanced neural network implementations
+- Multi-track optimization
+- Advanced sensor fusion techniques
+- Real-time performance analytics
+
+### 📞 Support
+For technical support or questions:
+- Check the [TORCS Configuration](#-torcs-configuration-for-windows) section
+- Review [Important Notes](#-important-notes) for common issues
+- Ensure all prerequisites are correctly installed
+
+---
+
+**🏁 Ready to race with AI? Start your engines and let the algorithms drive!**
