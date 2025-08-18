@@ -57,19 +57,9 @@ public class Client {
 		
 		// Gestione speciale per HumanController
 		if (driver instanceof HumanController humanController) {
-			// Controlla se è richiesta la modalità raccolta dati
-			boolean collectData = false;
-			for (String arg : args) {
-				if (arg.equals("--collect")) {
-					collectData = true;
-					break;
-				}
-			}
-			
-			if (collectData) {
-				humanController.setCollectingMode(true);
-				System.out.println("[INFO] Modalità raccolta dati attivata per HumanController");
-			}
+			// La raccolta dati è ora controllata solo manualmente tramite il tasto 'C'
+			// Non viene più attivata automaticamente all'avvio
+			System.out.println("[INFO] HumanController caricato.");
 		}
 		
 		// Gestione speciale per KNNDriver con dataset personalizzato
@@ -90,6 +80,29 @@ public class Client {
 					System.out.println("[INFO] KNNDriver inizializzato con dataset: " + datasetFile);
 				} catch (Exception e) {
 					System.err.println("[ERRORE] Impossibile inizializzare KNNDriver con dataset " + datasetFile + ": " + e.getMessage());
+					System.err.println("[INFO] Utilizzo configurazione di default");
+				}
+			}
+		}
+		
+		// Gestione speciale per KNNClassifierDriver con dataset personalizzato
+		if (driver instanceof KNNClassifierDriver) {
+			// Cerca il nome del dataset negli argomenti
+			String datasetFile = null;
+			for (int i = 1; i < args.length; i++) {
+				if (!args[i].contains(":") && !args[i].startsWith("--")) {
+					datasetFile = args[i];
+					break;
+				}
+			}
+			
+			if (datasetFile != null) {
+				// Ricrea il KNNClassifierDriver con il dataset specificato
+				try {
+					driver = new KNNClassifierDriver(datasetFile);
+					System.out.println("[INFO] KNNClassifierDriver inizializzato con dataset: " + datasetFile);
+				} catch (Exception e) {
+					System.err.println("[ERRORE] Impossibile inizializzare KNNClassifierDriver con dataset " + datasetFile + ": " + e.getMessage());
 					System.err.println("[INFO] Utilizzo configurazione di default");
 				}
 			}

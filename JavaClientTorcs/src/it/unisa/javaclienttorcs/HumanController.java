@@ -62,30 +62,8 @@ public class HumanController extends Controller {
         
         // Messaggio di avvio
         System.out.println("=== CONTROLLER UMANO ATTIVO ===");
-        System.out.println("Controlli tastiera e gamepad attivi!");
-        System.out.println("  TASTIERA:");
-        System.out.println("    Accelerazione/Frenata: W/S ↑↓ 8/2 I/K");
-        System.out.println("    Sterzo Sinistra/Destra: A/D ←→ 4/6 J/L");
-        System.out.println("    Cambio marcia manuale: Q/E (solo se manuale)");
-        System.out.println("    Toggle cambio automatico: G");
-        System.out.println("    Toggle ABS: V");
-        System.out.println("    Toggle assistenza sterzo: B");
-        System.out.println("    Toggle frizione automatica: N");
-        System.out.println("    Raccolta dati enhanced: C (ON/OFF)");
-        System.out.println("    Reset: R");
-        System.out.println("    Esci: X");
-        System.out.println("  GAMEPAD:");
-        System.out.println("    Sterzo: Left Stick X");
-        System.out.println("    Accelerazione/Avanti: Right Trigger");
-        System.out.println("    Frenata/Retromarcia: Left Trigger");
-        System.out.println("    Cambio marcia manuale: LB (-) / RB (+)");
-        System.out.println("    Toggle cambio automatico: BACK");
-        System.out.println("    Toggle ABS: B");
-        System.out.println("    Toggle assistenza sterzo: Y");
-        System.out.println("    Toggle frizione automatica: A");
-        System.out.println("    Raccolta dati enhanced: START");
-        System.out.println("  Cambio marcia: " + (autoGearMode ? "AUTOMATICO" : "MANUALE") + " (default: AUTOMATICO)");
-        System.out.println("================================");
+        System.out.println("Controlli disponibili nella finestra separata.");
+        System.out.println("Raccolta dati: INIZIALMENTE SPENTA (usa C o START per attivare)");
     }
     
     /**
