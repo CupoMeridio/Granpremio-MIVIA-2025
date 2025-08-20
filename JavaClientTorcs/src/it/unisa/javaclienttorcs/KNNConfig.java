@@ -1,87 +1,162 @@
 package it.unisa.javaclienttorcs;
 
 /**
- * Classe di configurazione semplificata per il sistema KNN.
- * Mantiene solo il percorso del dataset come parametro configurabile,
- * con tutti gli altri parametri ottimali fissi.
+ * Configurazione per l'algoritmo KNN.
+ * Contiene i parametri necessari per il funzionamento del driver KNN.
+ * Supporta sia modalità regressiva che classificatoria.
  */
 public class KNNConfig {
     
-
-    private static final int K =4;
-    private static final boolean NORMALIZE_DATA = true;
-    private static final boolean USE_WEIGHTED_VOTING = true;
-    private static final boolean ENABLE_LOGGING = false;
+    // Numero di vicini da considerare nell'algoritmo KNN
+    private int k = 8;
     
-    private String datasetPath;
+    // Percorso del file dataset
+    private String datasetPath = "dataset.csv";
+    
+    // Flag per abilitare la normalizzazione dei dati
+    private boolean normalizeData = true;
+    
+    // Modalità di funzionamento: true per classificatore, false per regressore
+    private boolean classifierMode = false;
     
     /**
-     * Costruttore che accetta solo il percorso del dataset
-     * @param datasetPath Percorso del file dataset CSV
+     * Costruttore di default.
+     */
+    public KNNConfig() {
+        // Configurazione di default
+    }
+    
+    /**
+     * Costruttore con solo il percorso del dataset (per compatibilità).
+     * 
+     * @param datasetPath Percorso del dataset
      */
     public KNNConfig(String datasetPath) {
-        if (datasetPath == null || datasetPath.trim().isEmpty()) {
-            throw new IllegalArgumentException("Il percorso del dataset non può essere vuoto");
-        }
         this.datasetPath = datasetPath;
     }
     
     /**
-     * Restituisce il valore K per l'algoritmo KNN.
+     * Costruttore con parametri personalizzati.
      * 
-     * @return Numero di vicini più prossimi da considerare (fisso a 5)
+     * @param k Numero di vicini
+     * @param datasetPath Percorso del dataset
+     * @param normalizeData Flag per la normalizzazione
+     */
+    public KNNConfig(int k, String datasetPath, boolean normalizeData) {
+        this.k = k;
+        this.datasetPath = datasetPath;
+        this.normalizeData = normalizeData;
+    }
+    
+    /**
+     * Costruttore completo con modalità classificatore.
+     * 
+     * @param k Numero di vicini
+     * @param datasetPath Percorso del dataset
+     * @param normalizeData Flag per la normalizzazione
+     * @param classifierMode Flag per modalità classificatore
+     */
+    public KNNConfig(int k, String datasetPath, boolean normalizeData, boolean classifierMode) {
+        this.k = k;
+        this.datasetPath = datasetPath;
+        this.normalizeData = normalizeData;
+        this.classifierMode = classifierMode;
+    }
+    
+    /**
+     * Restituisce il numero di vicini K.
+     * 
+     * @return Numero di vicini
      */
     public int getK() {
-        return K;
+        return k;
     }
     
     /**
-     * Verifica se la normalizzazione dei dati è abilitata.
+     * Imposta il numero di vicini K.
      * 
-     * @return true se la normalizzazione è abilitata (sempre true)
+     * @param k Numero di vicini (deve essere > 0)
      */
-    public boolean isNormalizeData() {
-        return NORMALIZE_DATA;
+    public void setK(int k) {
+        if (k <= 0) {
+            throw new IllegalArgumentException("K deve essere maggiore di 0");
+        }
+        this.k = k;
     }
     
     /**
-     * Verifica se il voto pesato è abilitato per le predizioni.
+     * Restituisce il percorso del dataset.
      * 
-     * @return true se il voto pesato è abilitato (sempre true)
-     */
-    public boolean isUseWeightedVoting() {
-        return USE_WEIGHTED_VOTING;
-    }
-    
-    /**
-     * Verifica se il logging dettagliato è abilitato.
-     * 
-     * @return true se il logging è abilitato (sempre false)
-     */
-    public boolean isEnableLogging() {
-        return ENABLE_LOGGING;
-    }
-    
-    /**
-     * Restituisce il percorso del file dataset configurato.
-     * 
-     * @return Percorso del file dataset CSV
+     * @return Percorso del file dataset
      */
     public String getDatasetPath() {
         return datasetPath;
     }
     
     /**
-     * Imposta il percorso del file dataset.
+     * Imposta il percorso del dataset.
      * 
-     * @param datasetPath Nuovo percorso del file dataset CSV
-     * @throws IllegalArgumentException Se il percorso è null o vuoto
+     * @param datasetPath Percorso del file dataset
      */
     public void setDatasetPath(String datasetPath) {
         if (datasetPath == null || datasetPath.trim().isEmpty()) {
             throw new IllegalArgumentException("Il percorso del dataset non può essere vuoto");
         }
         this.datasetPath = datasetPath;
+    }
+    
+    /**
+     * Verifica se la normalizzazione dei dati è abilitata.
+     * 
+     * @return true se la normalizzazione è abilitata
+     */
+    public boolean isNormalizeData() {
+        return normalizeData;
+    }
+    
+    /**
+     * Abilita o disabilita la normalizzazione dei dati.
+     * 
+     * @param normalizeData Flag per la normalizzazione
+     */
+    public void setNormalizeData(boolean normalizeData) {
+        this.normalizeData = normalizeData;
+    }
+    
+    /**
+     * Verifica se è abilitata la modalità classificatore.
+     * 
+     * @return true se è in modalità classificatore, false per regressore
+     */
+    public boolean isClassifierMode() {
+        return classifierMode;
+    }
+    
+    /**
+     * Imposta la modalità di funzionamento.
+     * 
+     * @param classifierMode true per classificatore, false per regressore
+     */
+    public void setClassifierMode(boolean classifierMode) {
+        this.classifierMode = classifierMode;
+    }
+    
+    /**
+     * Verifica se il logging è abilitato (per compatibilità).
+     * 
+     * @return false (logging disabilitato di default)
+     */
+    public boolean isEnableLogging() {
+        return false; // Logging disabilitato per performance
+    }
+    
+    /**
+     * Verifica se il voto pesato è abilitato (per compatibilità).
+     * 
+     * @return true (voto pesato sempre abilitato)
+     */
+    public boolean isUseWeightedVoting() {
+        return true; // Voto pesato sempre abilitato
     }
     
 
@@ -109,14 +184,13 @@ public class KNNConfig {
     }
     
     /**
-     * Restituisce una rappresentazione testuale della configurazione KNN.
-     * Include il percorso del dataset e tutti i parametri di configurazione.
+     * Restituisce una rappresentazione testuale della configurazione.
      * 
-     * @return Stringa formattata con i dettagli della configurazione
+     * @return Stringa con i parametri di configurazione
      */
     @Override
     public String toString() {
-        return String.format("KNNConfig{datasetPath='%s', k=%d, normalizeData=%s, useWeightedVoting=%s}",
-                datasetPath, K, NORMALIZE_DATA, USE_WEIGHTED_VOTING);
+        return String.format("KNNConfig{k=%d, datasetPath='%s', normalizeData=%s, classifierMode=%s}", 
+                           k, datasetPath, normalizeData, classifierMode);
     }
 }

@@ -21,10 +21,11 @@ echo 4. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
 echo 5. KNN Driving (Human Dataset)
-echo 6. MLP Driving (Neural Network)
+echo 6. KNN Classifier (Discrete Actions)
+echo 7. MLP Driving (Neural Network)
 echo.
 echo DOCUMENTATION:
-echo 7. Open Complete Guide
+echo 8. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -35,15 +36,16 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-7, X): "
+set /p choice="Select option (0-8, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto stats
 if "%choice%"=="3" goto convert
 if "%choice%"=="4" goto simpledriver
 if "%choice%"=="5" goto knndriving_human
-if "%choice%"=="6" goto mlpdriving
-if "%choice%"=="7" goto guide
+if "%choice%"=="6" goto knnclassifier
+if "%choice%"=="7" goto mlpdriving
+if "%choice%"=="8" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -205,6 +207,13 @@ goto menu
 
 :knndriving_human
 call "%~dp0JavaClientTorcs\scripts\run_knn_driving_human.bat"
+echo.
+echo Press any key to continue...
+pause >nul
+goto menu
+
+:knnclassifier
+call "%~dp0JavaClientTorcs\scripts\run_knn_classifier.bat"
 echo.
 echo Press any key to continue...
 pause >nul
