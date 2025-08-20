@@ -15,17 +15,18 @@ echo.
 echo DATA MANAGEMENT:
 echo 2. View Dataset Statistics
 echo 3. Convert Enhanced to Human Dataset
+echo 4. Open Dataset Analysis Tools (Google Colab)
 echo.
 echo AUTONOMOUS DRIVING:
-echo 4. SimpleDriver (Basic Autonomous)
+echo 5. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
-echo 5. KNN Driving (Human Dataset)
-echo 6. KNN Classifier (Discrete Actions)
-echo 7. MLP Driving (Neural Network)
+echo 6. KNN Driving (Human Dataset)
+echo 7. KNN Classifier (Discrete Actions)
+echo 8. MLP Driving (Neural Network)
 echo.
 echo DOCUMENTATION:
-echo 8. Open Complete Guide
+echo 9. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -36,16 +37,17 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-8, X): "
+set /p choice="Select option (0-9, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto stats
 if "%choice%"=="3" goto convert
-if "%choice%"=="4" goto simpledriver
-if "%choice%"=="5" goto knndriving_human
-if "%choice%"=="6" goto knnclassifier
-if "%choice%"=="7" goto mlpdriving
-if "%choice%"=="8" goto guide
+if "%choice%"=="4" goto colab
+if "%choice%"=="5" goto simpledriver
+if "%choice%"=="6" goto knndriving_human
+if "%choice%"=="7" goto knnclassifier
+if "%choice%"=="8" goto mlpdriving
+if "%choice%"=="9" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -246,6 +248,29 @@ echo Press any key to continue...
 pause >nul
 goto menu
 
+
+:colab
+echo =======================================
+echo  DATASET ANALYSIS TOOLS - GOOGLE COLAB
+echo =======================================
+echo.
+echo Opening Google Colab notebook for dataset analysis...
+echo This tool provides:
+echo • Dataset normalization and balancing
+echo • Feature analysis and visualization
+echo • Data quality assessment
+echo • Statistical insights
+echo.
+echo The browser will open automatically.
+echo.
+start "" "https://colab.research.google.com/drive/1k-cV_NJBRxCdNuzrNbqFrxhazVwFKo3e?usp=sharing"
+echo.
+echo Google Colab opened in your default browser!
+echo You can now upload your dataset files and use the analysis tools.
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
 
 :exit
 echo Goodbye!

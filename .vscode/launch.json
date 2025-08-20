@@ -43,15 +43,6 @@
                 "port:3001"
             ],
             "console": "integratedTerminal"
-        },
-        {
-            "type": "java",
-            "name": "Test KNN System",
-            "request": "launch",
-            "mainClass": "it.unisa.javaclienttorcs.KNNTestDriver",
-            "projectName": "JavaClientTorcs",
-            "cwd": "${workspaceFolder}/JavaClientTorcs",
-            "console": "integratedTerminal"
         }
     ]
 }
