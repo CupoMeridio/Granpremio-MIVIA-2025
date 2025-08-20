@@ -111,6 +111,7 @@ goto menu
 	echo.
 	
 	REM Check human_dataset.csv
+	if exist "human_dataset.csv" (
 	    echo [✓] HUMAN DATASET ^(human_dataset.csv^)
 	    for %%A in ("human_dataset.csv") do (
 	        set /a size_kb=%%~zA/1024
@@ -132,7 +133,7 @@ goto menu
 	    echo [✗] HUMAN DATASET ^(human_dataset.csv^)
 	    echo     Status: NOT FOUND - Run manual data collection first
 	)
-	echo.if exist "human_dataset.csv" (
+	echo.
 	
 	
 	REM Check enhanced_dataset.csv
