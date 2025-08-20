@@ -30,10 +30,30 @@ This advanced system for TORCS offers:
 ## 🚀 Installation and Setup
 
 ### Prerequisites
-- **Java 21+** installed and in PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
+- **Java 24+** installed and in PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
 - **Apache Ant** for project building ([Download Apache Ant](https://ant.apache.org/bindownload.cgi)) (or **NetBeans 26+** for IDE build - [Download NetBeans](https://netbeans.apache.org/front/main/download/nb26))
+- **Python 3.13.X+** for MLP neural network functionality ([Download Python](https://www.python.org/downloads/))
 - **TORCS 1.3.7 with SCR patch** (see [TORCS Configuration for Windows](#-torcs-configuration-for-windows))
 - TORCS started with JavaClientTorcs module
+
+### Python Setup for MLP Neural Network
+
+The MLP (Multi-Layer Perceptron) autonomous driving feature requires Python. The virtual environment and dependencies are already provided in the repository.
+
+#### 1. Install Latest Python Version
+- Download the latest Python version from [python.org](https://www.python.org/downloads/)
+- **Important:** During installation, check "Add Python to PATH"
+- Verify installation: `python --version`
+
+#### 2. Virtual Environment (Already Provided)
+The repository includes a pre-configured virtual environment (`.venv` folder) with all necessary dependencies already installed. No additional setup is required.
+
+**Pre-installed Libraries in Virtual Environment:**
+- `pandas` - Data manipulation and analysis
+- `numpy` - Numerical computing
+- `scikit-learn` - Machine learning algorithms (MLPRegressor)
+- `joblib` - Model serialization
+- `jupyter` - For running training notebooks (optional)
 
 ### Build
 
@@ -81,19 +101,20 @@ torcs_menu.bat
 
 **Dataset Management:**
 - Option 2: View dataset statistics
-- Option 3: Convert datasets for ML models
+- Option 3: Convert enhanced to human dataset
+
+**Autonomous Driving:**
+- Option 4: SimpleDriver (basic autonomous)
 
 **Artificial Intelligence:**
-- Option 6: **Test KNN system**
-- Option 7: **KNN autonomous driving**
-- Option 8: **Compare KNN configurations**
+- Option 5: **KNN Driving** (Human Dataset)
+- Option 6: **MLP Driving** (Neural Network) - *Requires Python setup*
 
-**Classic Autonomous Driving:**
-- Option 9: SimpleDriver (basic automatic driving)
+**Documentation:**
+- Option 7: Open complete guide
 
-**Utilities:**
-- Option 10: Clean temporary files
-- Option 11: Project information
+**TORCS Game:**
+- Option 0: Start TORCS Game
 
 ### Method 2: Individual Scripts
 
@@ -256,6 +277,85 @@ JavaClientTorcs/scripts/run_knn_driving_human.bat
 - Real-time prediction (< 10ms per decision)
 - Adaptive learning from training data
 - Robust handling of edge cases
+
+## 🧠 MLP (Multi-Layer Perceptron) Neural Network System
+
+The project includes an advanced **Neural Network** implementation using **Multi-Layer Perceptron** for autonomous driving with deep learning capabilities.
+
+### MLP Features
+
+**Neural Network Architecture:**
+- **Multi-Layer Perceptron** with configurable hidden layers
+- **Scikit-learn MLPRegressor** implementation
+- **Data preprocessing** with scaling and normalization
+- **Grid search optimization** for hyperparameter tuning
+- **Real-time prediction** via UDP communication
+
+**Training Process:**
+- **Jupyter Notebook** training environment (`mlpFitting.ipynb`)
+- **Cross-validation** for model evaluation
+- **Pipeline architecture** with preprocessing and model
+- **Model serialization** using joblib
+- **Performance metrics** (MSE, R²)
+
+### MLP Usage
+
+**Autonomous Driving:**
+```cmd
+# Use menu option 6 - automatically starts Python server:
+torcs_menu.bat
+# Select option 6: MLP Driving (Neural Network)
+```
+
+**Manual Server Start:**
+```cmd
+# Start Python MLP server manually:
+python mlpDriver\mlpDrive.py
+
+# Then run Java client:
+JavaClientTorcs\scripts\run_mlp_driving_human.bat
+```
+
+**Training New Models:**
+```cmd
+# Open Jupyter notebook for training:
+jupyter notebook mlpDriver\mlpFitting.ipynb
+```
+
+### MLP Technical Details
+
+**Architecture:**
+- **Input Layer**: 14 features (track sensors + vehicle state)
+- **Hidden Layers**: Configurable (default: 2 layers, 100 neurons each)
+- **Output Layer**: 3 actions (steering, acceleration, brake)
+- **Activation**: ReLU for hidden layers, linear for output
+
+**Input Features:**
+- Track sensors: `track0, track2, track4, track6, track8, track10, track12, track14, track16, track18`
+- Vehicle state: `speedX, angleToTrackAxis, trackPosition, distanceFromStartLine`
+
+**Output Actions:**
+- Steering angle (-1.0 to 1.0)
+- Acceleration (0.0 to 1.0)
+- Brake (0.0 to 1.0)
+
+**Communication:**
+- **UDP Server**: Python server on `localhost:35567`
+- **Java Client**: Sends sensor data, receives predictions
+- **Protocol**: Comma-separated values
+- **Graceful shutdown**: Handles termination commands
+
+**Performance:**
+- **Training dataset**: 55,307 samples
+- **Real-time inference**: < 5ms per prediction
+- **Model size**: Optimized for fast loading
+- **Error handling**: Robust parsing and validation
+
+**Dependencies:**
+- `pandas` - Data manipulation
+- `numpy` - Numerical operations
+- `scikit-learn` - Neural network implementation
+- `joblib` - Model serialization
 
 ## 📊 Datasets & Car Configuration
 

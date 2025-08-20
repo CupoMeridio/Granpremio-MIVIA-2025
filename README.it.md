@@ -30,9 +30,29 @@ Questo progetto implementa un sistema avanzato per TORCS che:
 ## 🚀 Installazione e Setup
 
 ### Prerequisiti
-- **Java 21+** installato e nel PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
+- **Java 24+** installato e nel PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
 - **Apache Ant** per build del progetto ([Download Apache Ant](https://ant.apache.org/bindownload.cgi)) (o **NetBeans 26+** per build IDE - [Download NetBeans](https://netbeans.apache.org/front/main/download/nb26))
+- **Python 3.13.X+** per la funzionalità di rete neurale MLP ([Download Python](https://www.python.org/downloads/))
 - **TORCS 1.3.7** con patch SCR (vedi sezione [Configurazione TORCS](#-configurazione-torcs-per-windows))
+
+### Setup Python per Rete Neurale MLP
+
+La funzionalità di guida autonoma MLP (Multi-Layer Perceptron) richiede Python. L'ambiente virtuale e le dipendenze sono già forniti nel repository.
+
+#### 1. Installare l'Ultima Versione di Python
+- Scarica l'ultima versione di Python da [python.org](https://www.python.org/downloads/)
+- **Importante:** Durante l'installazione, spunta "Add Python to PATH"
+- Verifica installazione: `python --version`
+
+#### 2. Ambiente Virtuale (Già Fornito)
+Il repository include un ambiente virtuale pre-configurato (cartella `.venv`) con tutte le dipendenze necessarie già installate. Non è richiesta alcuna configurazione aggiuntiva.
+
+**Librerie Pre-installate nell'Ambiente Virtuale:**
+- `pandas` - Manipolazione e analisi dati
+- `numpy` - Calcolo numerico
+- `scikit-learn` - Algoritmi di machine learning (MLPRegressor)
+- `joblib` - Serializzazione modelli
+- `jupyter` - Per eseguire notebook di training (opzionale)
 
 ### Build
 

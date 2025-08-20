@@ -21,9 +21,7 @@ echo 4. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
 echo 5. KNN Driving (Human Dataset)
-echo.
-echo ARTIFICIAL INTELLIGENCE:
-echo 6. MLP Driving
+echo 6. MLP Driving (Neural Network)
 echo.
 echo DOCUMENTATION:
 echo 7. Open Complete Guide
@@ -214,6 +212,25 @@ goto menu
 
 
 :mlpdriving
+echo ========================================
+echo        MLP AUTONOMOUS DRIVING
+echo ========================================
+echo.
+echo [INFO] Starting MLP Python server...
+echo Please wait while the MLP model loads...
+echo.
+
+REM Start Python MLP server in background
+start "MLP Server" /min "%~dp0.venv\Scripts\python.exe" "%~dp0mlpDriver\mlpDrive.py"
+
+REM Wait a moment for the server to start
+timeout /t 3 >nul
+
+echo [INFO] MLP server started successfully!
+echo [INFO] Starting TORCS and MLP driver...
+echo.
+
+REM Start the Java MLP driver
 call "%~dp0JavaClientTorcs\scripts\run_mlp_driving_human.bat"
 echo.
 echo Press any key to continue...
