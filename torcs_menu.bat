@@ -22,8 +22,11 @@ echo.
 echo ARTIFICIAL INTELLIGENCE:
 echo 5. KNN Driving (Human Dataset)
 echo.
+echo ARTIFICIAL INTELLIGENCE:
+echo 6. MLP Driving
+echo.
 echo DOCUMENTATION:
-echo 6. Open Complete Guide
+echo 7. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -34,14 +37,15 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-6, X): "
+set /p choice="Select option (0-7, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto stats
 if "%choice%"=="3" goto convert
 if "%choice%"=="4" goto simpledriver
 if "%choice%"=="5" goto knndriving_human
-if "%choice%"=="6" goto guide
+if "%choice%"=="6" goto mlpdriving
+if "%choice%"=="7" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -208,6 +212,13 @@ echo Press any key to continue...
 pause >nul
 goto menu
 
+
+:mlpdriving
+call "%~dp0JavaClientTorcs\scripts\run_mlp_driving_human.bat"
+echo.
+echo Press any key to continue...
+pause >nul
+goto menu
 
 
 :exit
