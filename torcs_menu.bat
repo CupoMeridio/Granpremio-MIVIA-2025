@@ -235,11 +235,29 @@ echo.
 REM Start Python MLP server in background
 start "MLP Server" /min "%~dp0.venv\Scripts\python.exe" "%~dp0mlpDriver\mlpDrive.py"
 
-REM Wait a moment for the server to start
-timeout /t 3 >nul
+REM Wait for the server to start and check connectivity
+echo [INFO] Waiting for MLP server to start...
+timeout /t 2 >nul
 
-echo [INFO] MLP server started successfully!
-echo [INFO] Starting TORCS and MLP driver...
+REM Check if server is responding on port 35567
+echo [INFO] Checking server connectivity...
+powershell -Command "$ErrorActionPreference = 'SilentlyContinue'; try { $client = New-Object System.Net.Sockets.UdpClient; $client.Connect('127.0.0.1', 35567); $client.Close(); Write-Host '[SUCCESS] MLP server is responding on port 35567'; exit 0 } catch { Write-Host '[ERROR] MLP server is not responding on port 35567'; exit 1 }" >nul 2>&1
+
+if %errorlevel% equ 0 (
+    echo [INFO] MLP server started successfully!
+    echo [INFO] Starting TORCS and MLP driver...
+) else (
+    echo [ERROR] Failed to connect to MLP server!
+    echo [ERROR] Please check:
+    echo   1. Python is installed and in PATH
+    echo   2. Virtual environment is properly configured
+    echo   3. MLP dependencies are installed
+    echo   4. Port 35567 is not in use by another application
+    echo.
+    echo Press any key to return to menu...
+    pause >nul
+    goto menu
+)
 echo.
 
 REM Start the Java MLP driver

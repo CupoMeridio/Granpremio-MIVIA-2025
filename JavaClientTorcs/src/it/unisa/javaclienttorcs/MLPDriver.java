@@ -60,10 +60,38 @@ public class MLPDriver extends Controller {
         try {
             InetAddress serverAddress = InetAddress.getByName("localhost");
             this.socket = new SocketUDPClient(serverAddress,port);
+            
+            // Test initial connectivity to MLP server
+            System.out.println("[MLP] Testing connection to Python server on port " + port + "...");
+            testServerConnection();
+            System.out.println("[MLP] Successfully connected to Python server!");
+            
         } catch (UnknownHostException ex) {
-            Logger.getLogger(MLPDriver.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("[MLP ERROR] Cannot resolve localhost address!");
+            Logger.getLogger(MLPDriver.class.getName()).log(Level.SEVERE, "Cannot resolve localhost", ex);
+            throw new RuntimeException("MLP Server connection failed: Cannot resolve localhost", ex);
         } catch (IOException ex) {
-            Logger.getLogger(MLPDriver.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("[MLP ERROR] Cannot connect to Python server on port " + port + "!");
+            System.err.println("[MLP ERROR] Please ensure the Python MLP server is running.");
+            Logger.getLogger(MLPDriver.class.getName()).log(Level.SEVERE, "Cannot connect to MLP server", ex);
+            throw new RuntimeException("MLP Server connection failed: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Tests the connection to the MLP Python server by sending a test message.
+     * @throws IOException if the server is not responding
+     */
+    private void testServerConnection() throws IOException {
+        try {
+            // Send a simple test message to verify server is responding
+            String testResponse = socket.sendAndReceive("test");
+            if (testResponse == null || testResponse.trim().isEmpty()) {
+                throw new IOException("Server responded with empty message");
+            }
+        } catch (IOException ex) {
+            throw new IOException("MLP Python server is not responding on port " + port + ". " +
+                                "Please start the server using: python mlpDriver/mlpDrive.py", ex);
         }
     }
     
