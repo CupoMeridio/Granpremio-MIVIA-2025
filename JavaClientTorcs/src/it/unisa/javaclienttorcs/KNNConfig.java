@@ -8,7 +8,7 @@ package it.unisa.javaclienttorcs;
 public class KNNConfig {
     
 
-    private static final int K =5;
+    private static final int K =4;
     private static final boolean NORMALIZE_DATA = true;
     private static final boolean USE_WEIGHTED_VOTING = true;
     private static final boolean ENABLE_LOGGING = false;

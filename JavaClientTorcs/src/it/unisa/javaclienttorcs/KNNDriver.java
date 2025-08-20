@@ -386,6 +386,7 @@ public class KNNDriver extends Controller {
      * - Evitamento ostacoli di base
      */
     private Action getDefaultAction(SensorModel sensors) {
+       //System.out.println("-------------------------------Sensori----------------------\n "+ sensors.toString() +"\n---------------------------------------------------");
         Action action = new Action();
         
         // Comportamento di base: vai dritto con accelerazione moderata
