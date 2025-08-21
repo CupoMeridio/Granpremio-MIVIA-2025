@@ -16,17 +16,18 @@ echo DATA MANAGEMENT:
 echo 2. View Dataset Statistics
 echo 3. Convert Enhanced to Human Dataset
 echo 4. Open Dataset Analysis Tools (Google Colab)
+echo 5. Open MLP Analysis Tools (Google Colab)
 echo.
 echo AUTONOMOUS DRIVING:
-echo 5. SimpleDriver (Basic Autonomous)
+echo 6. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
-echo 6. KNN Driving (Human Dataset)
-echo 7. KNN Classifier (Discrete Actions)
-echo 8. MLP Driving (Neural Network)
+echo 7. KNN Driving (Human Dataset)
+echo 8. KNN Classifier (Discrete Actions)
+echo 9. MLP Driving (Neural Network)
 echo.
 echo DOCUMENTATION:
-echo 9. Open Complete Guide
+echo 10. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -37,17 +38,18 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-9, X): "
+set /p choice="Select option (0-10, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto stats
 if "%choice%"=="3" goto convert
 if "%choice%"=="4" goto colab
-if "%choice%"=="5" goto simpledriver
-if "%choice%"=="6" goto knndriving_human
-if "%choice%"=="7" goto knnclassifier
-if "%choice%"=="8" goto mlpdriving
-if "%choice%"=="9" goto guide
+if "%choice%"=="5" goto mlpcolab
+if "%choice%"=="6" goto simpledriver
+if "%choice%"=="7" goto knndriving_human
+if "%choice%"=="8" goto knnclassifier
+if "%choice%"=="9" goto mlpdriving
+if "%choice%"=="10" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -286,6 +288,30 @@ start "" "https://colab.research.google.com/drive/1k-cV_NJBRxCdNuzrNbqFrxhazVwFK
 echo.
 echo Google Colab opened in your default browser!
 echo You can now upload your dataset files and use the analysis tools.
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:mlpcolab
+echo =======================================
+echo   MLP ANALYSIS TOOLS - GOOGLE COLAB
+echo =======================================
+echo.
+echo Opening Google Colab notebook for MLP analysis...
+echo This tool provides:
+echo • MLP model training and optimization
+echo • Neural network architecture design
+echo • Hyperparameter tuning with GridSearchCV
+echo • Performance evaluation and metrics
+echo • Model comparison and validation
+echo.
+echo The browser will open automatically.
+echo.
+start "" "https://colab.research.google.com/drive/1XAEiH73iZE-34AJtFhzwkA2Zlrb5FeF6?usp=sharing#scrollTo=efc24a75bbcf4b1f"
+echo.
+echo Google Colab opened in your default browser!
+echo You can now access the MLP training and analysis tools.
 echo.
 echo Press any key to return to menu...
 pause >nul
