@@ -26,9 +26,8 @@ echo.
 echo 1. Configurazione umana ottimizzata (dataset umano)
 echo 2. Configurazione personalizzata Euclidea
 echo 3. Configurazione personalizzata Minkowski
-echo 4. Test comparativo (solo test, non guida)
 echo.
-set /p choice="Inserisci la tua scelta (1-4): "
+set /p choice="Inserisci la tua scelta (1-3): "
 
 REM Compila il progetto
 echo.
@@ -43,14 +42,7 @@ if errorlevel 1 (
 echo [SUCCESS] Compilazione completata!
 echo.
 
-if "%choice%"=="4" (
-    echo [INFO] Esecuzione test comparativo...
-    java -cp "lib\*;." it.unisa.javaclienttorcs.KNNTestDriver
-    echo.
-    echo Test completato!
-    pause
-    exit /b 0
-)
+
 
 REM Avvia TORCS in background
 echo [INFO] Avvio di TORCS...

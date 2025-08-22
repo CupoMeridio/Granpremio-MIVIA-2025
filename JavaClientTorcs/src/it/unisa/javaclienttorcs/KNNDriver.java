@@ -53,38 +53,50 @@ public class KNNDriver extends Controller {
     
     /**
      * Costruttore semplificato che accetta solo il percorso del dataset.
-     * Il caricamento dei dati viene rimandato al primo utilizzo per evitare errori prematuri.
+     * PRECARICAMENTO: I dati vengono caricati immediatamente per evitare timeout.
      * 
      * @param datasetFilename Nome del file dataset
      */
     public KNNDriver(String datasetFilename) {
         this.config = new KNNConfig(datasetFilename);
         this.trainingData = new ArrayList<>();
+        
+        // PRECARICAMENTO - Inizializzazione immediata per evitare timeout
+        try {
+            if (config.isEnableLogging()) {
+                System.out.println("[KNN] Inizializzazione dataset: " + datasetFilename);
+            }
+            
+            loadTrainingData();
+            
+            if (config.isNormalizeData()) {
+                calculateNormalizationParameters();
+                normalizeTrainingData();
+            }
+            
+            buildKDTree();
+            
+            if (config.isEnableLogging()) {
+                System.out.println("[KNN] Inizializzazione completata! Dataset: " + getTrainingDataSize() + " punti");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("[KNN] ERRORE durante l'inizializzazione: " + e.getMessage());
+            System.err.println("[KNN] Il driver utilizzerà azioni di default");
+            e.printStackTrace();
+        }
     }
     /**
      * Metodo principale di controllo che determina l'azione da eseguire basandosi sui sensori.
      * Utilizza l'algoritmo K-Nearest Neighbors per predire l'azione ottimale.
+     * PERFORMANCE: Nessun caricamento lazy - tutto precaricato nel costruttore.
      * 
      * @param sensors Modello sensoriale contenente lo stato attuale del veicolo
      * @return Azione da eseguire (sterzo, accelerazione, freno, marcia)
      */
     @Override
     public Action control(SensorModel sensors) {
-        // Carica il dataset al primo utilizzo se non è già stato caricato
-        if (kdTree == null && trainingData.isEmpty()) {
-            try {
-                loadTrainingData();
-                if (config.isNormalizeData()) {
-                    calculateNormalizationParameters();
-                    normalizeTrainingData();
-                }
-                buildKDTree();
-            } catch (Exception e) {
-                System.err.println("[KNN] Errore nel caricamento del dataset: " + e.getMessage());
-                return getDefaultAction(sensors);
-            }
-        }
-        
+        // Controllo rapido: se non inizializzato, usa azione di default
         if (kdTree == null || trainingData.isEmpty()) {
             return getDefaultAction(sensors);
         }
@@ -386,6 +398,7 @@ public class KNNDriver extends Controller {
      * - Evitamento ostacoli di base
      */
     private Action getDefaultAction(SensorModel sensors) {
+       //System.out.println("-------------------------------Sensori----------------------\n "+ sensors.toString() +"\n---------------------------------------------------");
         Action action = new Action();
         
         // Comportamento di base: vai dritto con accelerazione moderata

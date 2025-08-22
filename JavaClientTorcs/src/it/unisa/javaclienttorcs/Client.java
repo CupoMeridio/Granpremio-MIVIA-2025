@@ -53,7 +53,9 @@ public class Client {
 			System.exit(1);
 		}
 		
-
+                if( driver instanceof MLPDriver){
+                    
+                }
 		
 		// Gestione speciale per HumanController
 		if (driver instanceof HumanController humanController) {
@@ -94,7 +96,6 @@ public class Client {
 				}
 			}
 		}
-		
 
 		
 		driver.setStage(stage);

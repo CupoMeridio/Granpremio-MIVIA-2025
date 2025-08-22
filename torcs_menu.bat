@@ -15,15 +15,19 @@ echo.
 echo DATA MANAGEMENT:
 echo 2. View Dataset Statistics
 echo 3. Convert Enhanced to Human Dataset
+echo 4. Open Dataset Analysis Tools (Google Colab)
+echo 5. Open MLP Analysis Tools (Google Colab)
 echo.
 echo AUTONOMOUS DRIVING:
-echo 4. SimpleDriver (Basic Autonomous)
+echo 6. SimpleDriver (Basic Autonomous)
 echo.
 echo ARTIFICIAL INTELLIGENCE:
-echo 5. KNN Driving (Human Dataset)
+echo 7. KNN Driving (Human Dataset)
+echo 8. KNN Classifier (Discrete Actions)
+echo 9. MLP Driving (Neural Network)
 echo.
 echo DOCUMENTATION:
-echo 6. Open Complete Guide
+echo 10. Open Complete Guide
 echo.
 echo TORCS GAME:
 echo 0. Start TORCS Game
@@ -34,14 +38,18 @@ echo.
 echo =================================================
 echo   NOTE: Press Ctrl+C to interrupt any operation
 echo =================================================
-set /p choice="Select option (0-6, X): "
+set /p choice="Select option (0-10, X): "
 
 if "%choice%"=="1" goto manual
 if "%choice%"=="2" goto stats
 if "%choice%"=="3" goto convert
-if "%choice%"=="4" goto simpledriver
-if "%choice%"=="5" goto knndriving_human
-if "%choice%"=="6" goto guide
+if "%choice%"=="4" goto colab
+if "%choice%"=="5" goto mlpcolab
+if "%choice%"=="6" goto simpledriver
+if "%choice%"=="7" goto knndriving_human
+if "%choice%"=="8" goto knnclassifier
+if "%choice%"=="9" goto mlpdriving
+if "%choice%"=="10" goto guide
 if "%choice%"=="0" goto torcs
 if "%choice%"=="X" goto exit
 if "%choice%"=="x" goto exit
@@ -105,6 +113,7 @@ goto menu
 	echo.
 	
 	REM Check human_dataset.csv
+	if exist "human_dataset.csv" (
 	    echo [✓] HUMAN DATASET ^(human_dataset.csv^)
 	    for %%A in ("human_dataset.csv") do (
 	        set /a size_kb=%%~zA/1024
@@ -126,7 +135,7 @@ goto menu
 	    echo [✗] HUMAN DATASET ^(human_dataset.csv^)
 	    echo     Status: NOT FOUND - Run manual data collection first
 	)
-	echo.if exist "human_dataset.csv" (
+	echo.
 	
 	
 	REM Check enhanced_dataset.csv
@@ -208,7 +217,105 @@ echo Press any key to continue...
 pause >nul
 goto menu
 
+:knnclassifier
+call "%~dp0JavaClientTorcs\scripts\run_knn_classifier.bat"
+echo.
+echo Press any key to continue...
+pause >nul
+goto menu
 
+
+:mlpdriving
+echo ========================================
+echo        MLP AUTONOMOUS DRIVING
+echo ========================================
+echo.
+echo [INFO] Starting MLP Python server...
+echo Please wait while the MLP model loads...
+echo.
+
+REM Start Python MLP server in background
+start "MLP Server" /min "%~dp0.venv\Scripts\python.exe" "%~dp0mlpDriver\mlpDrive.py"
+
+REM Wait for the server to start and check connectivity
+echo [INFO] Waiting for MLP server to start...
+timeout /t 2 >nul
+
+REM Check if server is responding on port 35567
+echo [INFO] Checking server connectivity...
+powershell -Command "$ErrorActionPreference = 'SilentlyContinue'; try { $client = New-Object System.Net.Sockets.UdpClient; $client.Connect('127.0.0.1', 35567); $client.Close(); Write-Host '[SUCCESS] MLP server is responding on port 35567'; exit 0 } catch { Write-Host '[ERROR] MLP server is not responding on port 35567'; exit 1 }" >nul 2>&1
+
+if %errorlevel% equ 0 (
+    echo [INFO] MLP server started successfully!
+    echo [INFO] Starting TORCS and MLP driver...
+) else (
+    echo [ERROR] Failed to connect to MLP server!
+    echo [ERROR] Please check:
+    echo   1. Python is installed and in PATH
+    echo   2. Virtual environment is properly configured
+    echo   3. MLP dependencies are installed
+    echo   4. Port 35567 is not in use by another application
+    echo.
+    echo Press any key to return to menu...
+    pause >nul
+    goto menu
+)
+echo.
+
+REM Start the Java MLP driver
+call "%~dp0JavaClientTorcs\scripts\run_mlp_driving_human.bat"
+echo.
+echo Press any key to continue...
+pause >nul
+goto menu
+
+
+:colab
+echo =======================================
+echo  DATASET ANALYSIS TOOLS - GOOGLE COLAB
+echo =======================================
+echo.
+echo Opening Google Colab notebook for dataset analysis...
+echo This tool provides:
+echo • Dataset normalization and balancing
+echo • Feature analysis and visualization
+echo • Data quality assessment
+echo • Statistical insights
+echo.
+echo The browser will open automatically.
+echo.
+start "" "https://colab.research.google.com/drive/1k-cV_NJBRxCdNuzrNbqFrxhazVwFKo3e?usp=sharing"
+echo.
+echo Google Colab opened in your default browser!
+echo You can now upload your dataset files and use the analysis tools.
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:mlpcolab
+echo =======================================
+echo   MLP ANALYSIS TOOLS - GOOGLE COLAB
+echo =======================================
+echo.
+echo Opening Google Colab notebook for MLP analysis...
+echo This tool provides:
+echo • MLP model training and optimization
+echo • Neural network architecture design
+echo • Hyperparameter tuning with GridSearchCV
+echo • Performance evaluation and metrics
+echo • Model comparison and validation
+echo.
+echo The browser will open automatically.
+echo.
+start "" "https://colab.research.google.com/drive/1XAEiH73iZE-34AJtFhzwkA2Zlrb5FeF6?usp=sharing#scrollTo=efc24a75bbcf4b1f"
+echo.
+echo Google Colab opened in your default browser!
+echo You can now access the MLP training and analysis tools.
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
 
 :exit
 echo Goodbye!

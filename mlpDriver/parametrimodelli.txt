@@ -1,0 +1,15 @@
+best_mlp_model_fixabile = paramGrid = {
+    "mlp__hidden_layer_sizes": [(10,8)],
+    "mlp__activation": ["relu"],
+    "mlp__solver": ["adam"],
+    "mlp__alpha": [0.01],
+    "mlp__learning_rate": ["constant"],
+}
+
+best_mlp_model_ottimo = paramGrid = {
+    "mlp__hidden_layer_sizes": [(32,16)],
+    "mlp__activation": ["relu"],
+    "mlp__solver": ["adam"],
+    "mlp__alpha": [0.01],
+    "mlp__learning_rate": ["constant"],
+}

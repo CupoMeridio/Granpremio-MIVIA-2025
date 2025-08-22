@@ -2,7 +2,7 @@
 
 [![Language: English](https://img.shields.io/badge/lang-en-green.svg)](README.md) [![Language: Italian](https://img.shields.io/badge/lang-it-blue.svg)](README.it.md)
 
-Un sistema completo per TORCS (The Open Racing Car Simulator) che combina raccolta dati, machine learning e guida autonoma tramite algoritmi KNN.
+Un sistema completo per TORCS (The Open Racing Car Simulator) che combina raccolta dati, machine learning e guida autonoma tramite multiple tecnologie di intelligenza artificiale: algoritmi KNN, reti neurali MLP e driver tradizionali.
 
 ## 📋 Indice
 
@@ -20,24 +20,49 @@ Un sistema completo per TORCS (The Open Racing Car Simulator) che combina raccol
 
 ## 🎯 Panoramica del Progetto
 
-Questo progetto implementa un sistema avanzato per TORCS che:
+Questo progetto implementa un sistema avanzato per TORCS che offre:
 - **🎮 Guida manuale** con supporto tastiera e gamepad per raccolta dati
-- **🤖 Guida autonoma** tramite algoritmo K-Nearest Neighbors (KNN)
+- **🤖 Guida autonoma avanzata** tramite multiple tecnologie AI:
+  - **K-Nearest Neighbors (KNN)** con algoritmo KD-Tree ottimizzato
+  - **Reti Neurali MLP** (Multi-Layer Perceptron) con comunicazione Python-Java
+  - **SimpleDriver** con logiche di controllo tradizionali
 - **📊 Raccolta dati intelligente** con dataset CSV ottimizzati per machine learning
 - **🔧 Sistema modulare** con controller intercambiabili
 - **🪟 Compatibilità Windows** completa con menu interattivo
 
+[⬆️ Torna all'indice](#-indice)
+
 ## 🚀 Installazione e Setup
 
 ### Prerequisiti
-- **Java 21+** installato e nel PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
+- **Java 24+** installato e nel PATH ([Download JDK](https://www.oracle.com/it/java/technologies/downloads))
 - **Apache Ant** per build del progetto ([Download Apache Ant](https://ant.apache.org/bindownload.cgi)) (o **NetBeans 26+** per build IDE - [Download NetBeans](https://netbeans.apache.org/front/main/download/nb26))
+- **Python 3.13.X+** per la funzionalità di rete neurale MLP ([Download Python](https://www.python.org/downloads/))
 - **TORCS 1.3.7** con patch SCR (vedi sezione [Configurazione TORCS](#-configurazione-torcs-per-windows))
+
+### Setup Python per Rete Neurale MLP
+
+La funzionalità di guida autonoma MLP (Multi-Layer Perceptron) richiede Python. L'ambiente virtuale e le dipendenze sono già forniti nel repository.
+
+#### 1. Installare l'Ultima Versione di Python
+- Scarica l'ultima versione di Python da [python.org](https://www.python.org/downloads/)
+- **Importante:** Durante l'installazione, spunta "Add Python to PATH"
+- Verifica installazione: `python --version`
+
+#### 2. Ambiente Virtuale (Già Fornito)
+Il repository include un ambiente virtuale pre-configurato (cartella `.venv`) con tutte le dipendenze necessarie già installate. Non è richiesta alcuna configurazione aggiuntiva.
+
+**Librerie Pre-installate nell'Ambiente Virtuale:**
+- `pandas` - Manipolazione e analisi dati
+- `numpy` - Calcolo numerico
+- `scikit-learn` - Algoritmi di machine learning (MLPRegressor)
+- `joblib` - Serializzazione modelli
+- `jupyter` - Per eseguire notebook di training (opzionale)
 
 ### Build
 
 #### Metodo 1: NetBeans 26 (Raccomandato)
-**Ambiente di sviluppo:** NetBeans 26 + JDK 21+
+**Ambiente di sviluppo:** NetBeans 26 + JDK 24+
 
 **Procedura semplificata:**
 1. **Apri il progetto in NetBeans 26**
@@ -46,8 +71,7 @@ Questo progetto implementa un sistema avanzato per TORCS che:
    - NetBeans riconoscerà automaticamente il progetto Ant
 
 2. **Build con un click**
-   - **Pulsante verde "Run Project"** (▶️) nella toolbar
-   - **Oppure:** Right-click sul progetto → Clean and Build
+   - Right-click sul progetto → Clean and Build
 
 3. **Verifica build**
    - Il JAR verrà generato in: `JavaClientTorcs/dist/JavaClientTorcs.jar`
@@ -61,6 +85,8 @@ cd JavaClientTorcs
 ant clean
 ant jar
 ```
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 🎮 Come Usare il Sistema
 
@@ -80,34 +106,35 @@ torcs_menu.bat
 
 **📊 Gestione Dataset:**
 - Opzione 2: Visualizza statistiche dataset
-- Opzione 3: Converti dataset per modelli ML
+- Opzione 3: Converti dataset completo in dataset sensori ML
+- Opzione 4: Strumenti di Analisi Dataset (Google Colab)
 
-**🤖 Intelligenza Artificiale:**
-- Opzione 6: **Test sistema KNN**
-- Opzione 7: **Guida autonoma con KNN**
-- Opzione 8: **Confronto configurazioni KNN**
+**🤖 Guida Autonoma e Intelligenza Artificiale:**
+- Opzione 5: **SimpleDriver** (guida automatica tradizionale)
+- Opzione 6: **Guida KNN** (Valori Continui)
+- Opzione 7: **KNN Classifier** (Azioni Discrete)
+- Opzione 8: **Guida MLP** (Rete Neurale)
 
-**🚗 Guida Autonoma Classica:**
-- Opzione 9: SimpleDriver (guida automatica base)
-
-**🔧 Utilità:**
-- Opzione 10: Pulisci file temporanei
-- Opzione 11: Informazioni sul progetto
+**📖 Documentazione:**
+- Opzione 9: Apri guida completa
 
 ### Metodo 2: Script Individuali
 
 #### Raccolta Dati Manuali
 - `JavaClientTorcs/scripts/run_manual_driving.bat`
 
-#### Guida KNN
-- **Dataset umano**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
+#### Guida Autonoma Tradizionale
+- **SimpleDriver**: `JavaClientTorcs/scripts/run_simpledriver.bat`
 
-#### Driver Semplice
-- `JavaClientTorcs/scripts/run_simpledriver.bat`
+#### Guida Autonoma con Machine Learning
+- **KNN Standard**: `JavaClientTorcs/scripts/run_knn_driving.bat`
+- **KNN Dataset umano**: `JavaClientTorcs/scripts/run_knn_driving_human.bat`
+- **KNN Classifier**: `JavaClientTorcs/scripts/run_knn_classifier.bat`
+- **MLP Rete Neurale**: `JavaClientTorcs/scripts/run_mlp_driving_human.bat`
 
-#### Gestione Dataset
-- **Combinare dataset**: `JavaClientTorcs/scripts/combine_datasets.bat`
-- **Test KNN**: `JavaClientTorcs/scripts/test_knn.bat`
+
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 📁 Struttura del Progetto
 
@@ -115,56 +142,63 @@ torcs_menu.bat
 Progetto/
 ├── README.md               # Questa documentazione
 ├── torcs_menu.bat          # Menu Windows
-└── JavaClientTorcs/
-    ├── build.xml           # Configurazione Ant
-    ├── manifest.mf         # Manifest JAR
-    ├── nbproject/          # Configurazione NetBeans Ant
-    │   ├── build-impl.xml
-    │   ├── project.properties
-    │   └── project.xml
-    ├── src/
-    │   └── it/unisa/javaclienttorcs/
-    │       ├── Action.java                 # Azioni di controllo
-    │       ├── DataCollector.java          # Raccolta dati
-    │       ├── Client.java                 # Client principale
-    │       ├── Controller.java             # Interfaccia controller
-    │       ├── DataCollector.java          # Raccolta dati
-    │       ├── DeadSimpleSoloController.java # Controller base
-    │       ├── HumanController.java        # Controller manuale
-    │       ├── MessageBasedSensorModel.java # Modello sensori
-    │       ├── MessageParser.java          # Parser messaggi
-    │       ├── SensorModel.java            # Interfaccia sensori
-    │       ├── SimpleDriver.java           # Driver automatico
-    │       └── SocketHandler.java        # Gestione socket
-    ├── lib/
-    │   ├── Jamepad.jar
-    │   └── sdl2gdx-1.0.5.jar
-    ├── build/              # Output build temporaneo
-    ├── dist/
-    │   ├── JavaClientTorcs.jar
-    │   └── lib/            # Librerie copiate
-    └── scripts/
-        ├── run_manual_driving.bat    # Guida manuale
-        ├── run_knn_driving_human.bat # KNN con dati umani
-        ├── run_knn_driving_auto.bat  # KNN con dati automatici
-        ├── run_simpledriver.bat      # Driver semplice
-        ├── combine_datasets.bat      # Combina dataset
-        ├── test_knn.bat              # Test KNN
-        ├── combine_datasets.bat      # Combina dataset Windows
-        └── combine_datasets.sh       # Combina dataset Linux/Mac
+├── JavaClientTorcs/
+│   ├── build.xml           # Configurazione Ant
+│   ├── manifest.mf         # Manifest JAR
+│   ├── nbproject/          # Configurazione NetBeans Ant
+│   │   ├── build-impl.xml
+│   │   ├── project.properties
+│   │   └── project.xml
+│   ├── src/
+│   │   └── it/unisa/javaclienttorcs/
+│   │       ├── Action.java                 # Azioni di controllo
+│   │       ├── Client.java                 # Client principale
+│   │       ├── Controller.java             # Interfaccia controller
+│   │       ├── HumanController.java        # Controller manuale con gamepad
+│   │       ├── SimpleDriver.java           # Driver automatico tradizionale
+│   │       ├── KNNDriver.java              # Driver KNN con KD-Tree
+│   │       ├── MLPDriver.java              # Driver rete neurale MLP
+│   │       ├── KNNClassifierDriver.java    # Driver KNN con azioni discrete
+│   │       ├── DataPoint.java              # Struttura dati per ML
+│   │       ├── KDTree.java                 # Implementazione KD-Tree
+│   │       ├── EnhancedDataCollectionManager.java # Gestione dati avanzata
+│   │       ├── MessageBasedSensorModel.java # Modello sensori
+│   │       ├── MessageParser.java          # Parser messaggi
+│   │       ├── SensorModel.java            # Interfaccia sensori
+│   │       └── SocketHandler.java          # Gestione socket
+│   ├── lib/
+│   │   ├── Jamepad.jar
+│   │   └── sdl2gdx-1.0.5.jar
+│   ├── build/              # Output build temporaneo
+│   ├── dist/
+│   │   ├── JavaClientTorcs.jar
+│   │   └── lib/            # Librerie copiate
+│   └── scripts/                      # Script di esecuzione (vedi sezione Utilizzo)
+
+└── mlpDriver/
+    ├── mlpDrive.py               # Server UDP per rete neurale
+    ├── mlpFitting.ipynb          # Notebook training MLP
+    ├── best_mlp_model.pkl        # Modello MLP pre-addestrato
+    ├── data.csv                  # Dataset per training MLP
+    └── socketTest.py             # Test comunicazione socket UDP
 ```
 
-
+[⬆️ Torna all'indice](#-indice)
 
 ## 🕹️ Controlli di Guida & Supporto Controller
 
 ### Controlli Tastiera
 Durante la guida manuale, usa:
-- **Freccette/WASD/IJKL/8426** - Controlli direzione
-- **C** - Toggle raccolta dati ON/OFF
-- **P** - Mostra statistiche
-- **R** - Reset posizione
-- **Q** - Esci
+- **Accelerazione/Frenata**: W/S | ↑↓ | 8/2 | I/K
+- **Sterzo Sinistra/Destra**: A/D | ←→ | 4/6 | J/L
+- **Cambio marcia manuale**: Q/E (solo se modalità manuale attiva)
+- **Toggle cambio automatico**: G
+- **Toggle ABS**: V
+- **Toggle assistenza sterzo**: B
+- **Toggle frizione automatica**: N
+- **Toggle raccolta dati**: C (ON/OFF)
+- **Reset controlli**: R
+- **Esci**: X
 
 ### Supporto Controller Gamepad
 Il sistema supporta **controller compatibili XInput** (controller Xbox e gamepad compatibili) tramite **libreria Jamepad**.
@@ -173,10 +207,13 @@ Il sistema supporta **controller compatibili XInput** (controller Xbox e gamepad
 - **Stick Sinistro** - Sterzo (sinistra/destra)
 - **Grilletto Destro** - Accelerazione
 - **Grilletto Sinistro** - Frenata
-- **Pulsante A** - Toggle raccolta dati ON/OFF
-- **Pulsante B** - Reset posizione
-- **Pulsante Y** - Mostra statistiche
-- **Start/Back** - Esci
+- **Bumper Sinistro (LB)** - Cambio marcia giù (solo modalità manuale)
+- **Bumper Destro (RB)** - Cambio marcia su (solo modalità manuale)
+- **Pulsante A** - Toggle frizione automatica
+- **Pulsante B** - Toggle ABS
+- **Pulsante Y** - Toggle assistenza sterzo
+- **Start** - Toggle raccolta dati ON/OFF
+- **Back** - Toggle cambio automatico
 
 #### Requisiti Setup Controller
 - **Libreria Jamepad** (inclusa in `lib/Jamepad.jar`)
@@ -199,51 +236,43 @@ Il sistema prioritizza automaticamente:
 - **Input del controller** fornisce sterzo più fluido per dati di training migliori
 - **Metodi di input misti** sono supportati durante la raccolta
 
+[⬆️ Torna all'indice](#-indice)
+
 ## 🤖 Sistema KNN (K-Nearest Neighbors)
 
-Il progetto implementa un algoritmo avanzato **K-Nearest Neighbors** per la guida autonoma utilizzando machine learning.
+Il progetto implementa un algoritmo avanzato **K-Nearest Neighbors** per la guida autonoma utilizzando machine learning, con due implementazioni distinte:
 
-### Caratteristiche KNN
+### 🚗 Guida KNN (Controllo Continuo)
+Implementazione KNN tradizionale per guida autonoma fluida con valori continui di sterzo, accelerazione e frenata.
 
-**Implementazione Algoritmo:**
-- **Struttura dati KD-Tree** per ricerca efficiente dei vicini più prossimi
-- **Distanza Euclidea** come metrica di distanza
-- **Normalizzazione dati** per maggiore accuratezza
-- **Sistema di voto pesato** per le predizioni
-- **Parametri configurabili** (valore K, normalizzazione, ecc.)
-
-**Configurazioni Disponibili:**
-- **Auto-Ottimizzata**: Addestrata su dati automatici esistenti (K=5, distanza Euclidea)
-- **Umana-Ottimizzata**: Addestrata su dati di guida umana (K=5, distanza Euclidea)
+### 🎯 KNN Classifier (Azioni Discrete)
+Implementazione KNN avanzata che utilizza la classificazione di azioni discrete per un comportamento di guida più preciso e prevedibile.
 
 ### Utilizzo KNN
 
-**Test del Sistema:**
+**Guida KNN (Controllo Continuo):**
 ```cmd
-# Usa l'opzione 6 del menu o esegui direttamente:
-JavaClientTorcs/scripts/test_knn.bat
-```
-
-**Guida Autonoma:**
-```cmd
-# Usa l'opzione 7 per dataset umano:
+# Usa l'opzione 6 del menu o direttamente:
 JavaClientTorcs/scripts/run_knn_driving_human.bat
-
-
 ```
 
-**Confronto Configurazioni:**
+**KNN Classifier (Azioni Discrete):**
 ```cmd
-# Usa l'opzione 8 del menu per confronto dettagliato
+# Usa l'opzione 7 del menu o direttamente:
+JavaClientTorcs/scripts/run_knn_classifier.bat
 ```
+
+
 
 ### Dettagli Tecnici KNN
 
 **Caratteristiche di Input:**
-- Sensori pista (19 sensori di distanza)
-- Velocità, RPM, informazioni marcia
-- Posizione e angolo in pista
-- Posizioni avversari (se disponibili)
+- Sensori pista (10 sensori di distanza selezionati)
+- Velocità (speedX)
+- Angolo rispetto alla pista (angleToTrackAxis)
+- Posizione in pista (trackPosition)
+- Distanza dalla linea di partenza (distanceFromStartLine)
+- **Totale: 14 features normalizzate**
 
 **Azioni di Output:**
 - Angolo sterzo (-1.0 a 1.0)
@@ -253,12 +282,123 @@ JavaClientTorcs/scripts/run_knn_driving_human.bat
 
 **Prestazioni:**
 - Predizione in tempo reale (< 10ms per decisione)
-- Apprendimento adattivo dai dati di training
-- Gestione robusta dei casi limite
+- **Voto pesato** basato sulla distanza euclidea inversa
+- **Normalizzazione automatica** dei dati per maggiore accuratezza
+- **Gestione specializzata** per situazioni fuori strada
+- **Modalità classificatore** con 15 vicini per maggiore stabilità
+
+[⬆️ Torna all'indice](#-indice)
+
+## 📊 Strumenti di Analisi Dataset (Google Colab)
+
+Il progetto include **integrazione con Google Colab** per analisi avanzate e visualizzazione dei dataset.
+
+### Caratteristiche Google Colab
+
+**Strumenti di Analisi:**
+- **Normalizzazione e bilanciamento dataset** per migliori prestazioni ML
+- **Analisi delle caratteristiche e visualizzazione** con grafici interattivi
+- **Valutazione qualità dati** e rilevamento outlier
+- **Insights statistici** e analisi delle correlazioni
+- **Preprocessing dati** per modelli di machine learning
+
+**Accesso:**
+- **Opzione Menu 4**: Apre automaticamente il notebook Google Colab
+- **Link Diretto**: [Notebook Analisi Dataset](https://colab.research.google.com/drive/1k-cV_NJBRxCdNuzrNbqFrxhazVwFKo3e?usp=sharing)
+- **Integrazione Browser**: Apertura automatica nel browser predefinito
+
+**Utilizzo:**
+1. Seleziona **Opzione 4** dal menu principale
+2. Carica i tuoi file dataset (vedi sezione [Dataset & Configurazione Auto](#-dataset--configurazione-auto) per dettagli sui file)
+3. Esegui le celle di analisi per generare insights
+4. Scarica i dataset processati per un training ML migliorato
+
+**Vantaggi:**
+- **Elaborazione cloud** - Nessun setup Python locale richiesto
+- **Visualizzazioni interattive** per esplorazione dati
+- **Strumenti professionali data science** (Pandas, NumPy, Matplotlib)
+- **Analisi collaborativa** - Condividi notebook con il team
+
+[⬆️ Torna all'indice](#-indice)
+
+## 🧠 Sistema MLP (Multi-Layer Perceptron) - Rete Neurale
+
+Il progetto include un'implementazione avanzata di **Rete Neurale** utilizzando **Multi-Layer Perceptron** per la guida autonoma con capacità di deep learning.
+
+### Caratteristiche MLP
+
+**Architettura Rete Neurale:**
+- **Multi-Layer Perceptron** con layer nascosti configurabili
+- **Implementazione Scikit-learn MLPRegressor**
+- **Preprocessing dati** con scaling e normalizzazione
+- **Ottimizzazione grid search** per hyperparameter tuning
+- **Predizione in tempo reale** tramite comunicazione UDP
+
+**Processo di Training:**
+- **Ambiente Jupyter Notebook** per training (`mlpFitting.ipynb`)
+- **Cross-validation** per valutazione modello
+- **Architettura pipeline** con preprocessing e modello
+- **Serializzazione modello** usando joblib
+- **Metriche prestazioni** (MSE, R²)
+
+### Utilizzo MLP
+
+**Guida Autonoma:**
+```cmd
+# Usa l'opzione 7 del menu - avvia automaticamente il server Python:
+torcs_menu.bat
+# Seleziona opzione 7: Guida MLP (Rete Neurale)
+```
+
+**Avvio Manuale Server:**
+```cmd
+# Avvia server MLP Python manualmente:
+python mlpDriver\mlpDrive.py
+
+# Poi esegui client Java:
+JavaClientTorcs\scripts\run_mlp_driving_human.bat
+```
+
+**Training Nuovi Modelli:**
+```cmd
+# Apri notebook Jupyter per training:
+jupyter notebook mlpDriver\mlpFitting.ipynb
+```
+
+### Dettagli Tecnici MLP
+
+**Architettura:**
+- **Layer Input**: 14 caratteristiche (sensori pista + stato veicolo)
+- **Layer Nascosti**: Configurabili (default: 2 layer, 100 neuroni ciascuno)
+- **Layer Output**: 3 azioni (sterzo, accelerazione, freno)
+- **Attivazione**: ReLU per layer nascosti, lineare per output
+
+**Caratteristiche Input:**
+- Sensori pista: `track0, track2, track4, track6, track8, track10, track12, track14, track16, track18`
+- Stato veicolo: `speedX, angleToTrackAxis, trackPosition, distanceFromStartLine`
+
+**Azioni Output:**
+- Angolo sterzo (-1.0 a 1.0)
+- Accelerazione (0.0 a 1.0)
+- Freno (0.0 a 1.0)
+
+**Comunicazione:**
+- **Server UDP**: Server Python su `localhost:35567`
+- **Client Java**: Invia dati sensori, riceve predizioni
+- **Protocollo**: Valori separati da virgola
+- **Shutdown graceful**: Gestisce comandi di terminazione
+
+**Dipendenze:**
+- `pandas` - Manipolazione dati
+- `numpy` - Operazioni numeriche
+- `scikit-learn` - Implementazione rete neurale
+- `joblib` - Serializzazione modelli
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 📊 Dataset & Configurazione Auto
 
-**Configurazione Auto**: Tutti i dataset e le configurazioni del progetto sono specificamente ottimizzati per la **Ferrari F2001** (car1-ow1). L'elenco completo delle auto disponibili in TORCS può essere trovato su: https://www.igcd.net/vehicle.php?id=15647
+**Configurazione Auto**: Il progetto è configurato per funzionare con l'auto standard **car1-trb1 2001 Ferrari 360 GT**. L'elenco completo delle auto disponibili in TORCS può essere trovato su: https://www.igcd.net/vehicle.php?id=15647
 
 **Cambiare l'Auto**: Per utilizzare un'auto diversa, modificare il campo `car name` nel file di configurazione scr_server:
 - **Windows**: `C:\Program Files (x86)\torcs\drivers\scr_server\scr_server.xml`
@@ -266,7 +406,7 @@ JavaClientTorcs/scripts/run_knn_driving_human.bat
 
 Esempio di configurazione:
 ```xml
-<attstr name="car name" val="car1-ow1"></attstr>
+<attstr name="car name" val="car1-trb1"></attstr>
 ```
 
 **Impostazioni Aggiuntive Specifiche dell'Auto**: Potrebbe essere necessario regolare i parametri del cambio marcia in base alle specifiche dell'auto selezionata.
@@ -275,52 +415,70 @@ Esempio di configurazione:
 
 **Per SimpleDriver (guida AI)**:
 - **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/SimpleDriver.java`
-- **Linee 30-35**: Modifica le costanti del cambio marcia
+- **Linee 20-22**: Modifica le costanti del cambio marcia
   ```java
-  /* === COSTANTI PER IL CAMBIO MARCIA === */
-  // RPM minimi per salire di marcia [per marcia 1-6]
-  final int[] gearUp = { 19000, 19000, 19000, 19000, 19000, 0 };
-  // RPM massimi per scalare di marcia [per marcia 1-6]
-  final int[] gearDown = { 0, 7000, 7000, 7000, 7000, 7000 };
+  // RPM per salire di marcia [per marcia 1-6]
+  final int[] gearUp = { 4500, 5500, 6500, 6500, 7000, 0 };
+  // RPM per scalare di marcia [per marcia 1-6]
+  final int[] gearDown = { 0, 2500, 3500, 4000, 4500, 5000 };
   ```
 
 **Per HumanController (guida manuale)**:
 - **File**: `JavaClientTorcs/src/it/unisa/javaclienttorcs/HumanController.java`
-- **Linee 197-244**: Modifica la logica del cambio marcia nel metodo `getGear()`
-  - **Linea 220**: `if (currentGear > 0 && currentGear < 6 && rpm >= 19000)` - Cambia `19000` per RPM di upshift
-  - **Linea 224**: `else if (currentGear > 1 && rpm <= 7000)` - Cambia `7000` per RPM di downshift
+- **Linee 37-39**: Modifica le costanti del cambio marcia
+  ```java
+  // RPM per salire di marcia [per marcia 1-6]
+  private static final int[] gearUp = { 5000, 6000, 6000, 6500, 7000, 0 };
+  // RPM per scalare di marcia [per marcia 1-6]
+  private static final int[] gearDown = { 0, 2500, 3000, 3000, 3500, 3500 };
+  ```
 
 **Regola questi valori in base alle specifiche della tua auto**:
 - Riduci i valori `gearUp` per auto con RPM massimi più bassi
 - Regola i valori `gearDown` per prestazioni ottimali del motore
 - Modifica la logica del cambio se la tua auto ha un numero diverso di marce
 
-I dataset vengono creati automaticamente nella directory principale:
-- `auto_dataset.csv` - Dati automatici precedentemente raccolti (se disponibili) - Contiene sensori essenziali per analisi
-- `human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per analisi
-- `enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
+I dataset vengono creati automaticamente nelle rispettive directory:
+- `JavaClientTorcs/human_dataset.csv` - Dati raccolti manualmente (HumanController) - Contiene sensori essenziali per analisi
+- `JavaClientTorcs/enhanced_dataset.csv` - Dataset completo con quasi tutti i sensori disponibili di TORCS - Ideale per implementazioni future e analisi dati
+- `mlpDriver/data.csv` - Dataset utilizzato per l'addestramento della rete neurale MLP
+
+**Conversione Dataset (Opzione 3)**: L'opzione 3 del menu converte il dataset completo `enhanced_dataset.csv` (che contiene tutti i sensori TORCS) in un dataset ottimizzato `human_dataset.csv` contenente solo i sensori specifici utilizzati dai modelli di machine learning (10 sensori di pista alternati, velocità, posizione, azioni di controllo).
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 🔧 Tecnologia e Architettura
 
 ### Stack Tecnologico
-- **Linguaggio**: Java 21+
+- **Linguaggio Principale**: Java 24+
+- **Linguaggio ML**: Python 3.13+ (per MLP)
 - **IDE**: NetBeans 26 (progetto nativo)
 - **Build Tool**: Apache Ant
 - **Formato Dati**: CSV
-- **Comunicazione**: Socket UDP con TORCS (porta 3001)
-- **Machine Learning**: K-Nearest Neighbors con KD-Tree
-- **Librerie**: Jamepad (gamepad), SDL2 (input)
+- **Comunicazione**: Socket UDP con TORCS (porta 3001) e Python (porta 35567)
+- **Machine Learning**: 
+  - K-Nearest Neighbors con KD-Tree ottimizzato
+  - Multi-Layer Perceptron (scikit-learn)
+  - Algoritmi tradizionali basati su regole
+- **Librerie**: Jamepad (gamepad), SDL2 (input), pandas, numpy, scikit-learn
 
 ### Compatibilità NetBeans
-- **Testato con**: NetBeans 26 + JDK 21/24 ✅
-- **Compatibile con**: NetBeans 25+ e JDK 21+
+- **Testato con**: NetBeans 26 + JDK 24 ✅
 - **Progetto nativo**: Apri direttamente la cartella `JavaClientTorcs` come progetto Ant
 
 ### Architettura del Sistema
-- **Controller modulari**: HumanController, KNNDriver, SimpleDriver
-- **Raccolta dati intelligente**: DataCollector, EnhancedDataCollectionManager
-- **Comunicazione TORCS**: SocketHandler, MessageParser
+- **Controller modulari**: 
+  - HumanController (guida manuale con gamepad)
+  - SimpleDriver (algoritmi tradizionali)
+  - KNNDriver (machine learning KNN)
+  - MLPDriver (rete neurale)
+  - KNNClassifierDriver (azioni discrete)
+- **Raccolta dati intelligente**: EnhancedDataCollectionManager, DataPoint
+- **Algoritmi ML**: KDTree, KNNConfig, ActionDiscretizer
+- **Comunicazione**: SocketHandler, MessageParser, UDP Python-Java
 - **Modello sensoriale**: SensorModel, MessageBasedSensorModel
+
+[⬆️ Torna all'indice](#-indice)
 
 ## ⚡ Guida Rapida
 
@@ -328,8 +486,13 @@ I dataset vengono creati automaticamente nella directory principale:
 2. **Build**: `ant clean && ant jar` (da JavaClientTorcs/)
 3. **Avvia**: `torcs_menu.bat` per il menu interattivo
 4. **Raccogli dati**: Opzione 1 per guida manuale
-5. **Testa KNN**: Opzione 6 per test del sistema
-6. **Guida autonoma**: Opzione 7 per KNN con dati umani
+5. **Testa sistemi autonomi**:
+   - Opzione 5: SimpleDriver (tradizionale)
+   - Opzione 6: KNN con dataset umano
+   - Opzione 7: KNN Classifier (azioni discrete)
+   - Opzione 8: MLP Rete Neurale
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 📋 Note Importanti
 
@@ -337,7 +500,9 @@ I dataset vengono creati automaticamente nella directory principale:
 - **📊 Dataset**: Salvati nella directory di esecuzione degli script
 - **🎯 Dati ottimali**: Raccogli almeno 1000-5000 esempi per pista
 - **🪟 Sistema**: Progettato specificamente per Windows
-- **🚗 Auto**: Ottimizzato per Ferrari F2001 (car1-ow1)
+- **🚗 Auto**: Configurato per car1-trb1 2001 Ferrari 360 GT
+
+[⬆️ Torna all'indice](#-indice)
 
 ## 🪟 Configurazione TORCS per Windows
 
@@ -407,24 +572,32 @@ Dopo la configurazione:
 4. **Testa il sistema KNN** (Opzione 6)
 5. **Prova la guida autonoma** (Opzione 7)
 
+[⬆️ Torna all'indice](#-indice)
+
 ---
 
 ## 🎉 Conclusione
 
-Questo progetto rappresenta un sistema completo per l'integrazione di machine learning con TORCS, offrendo:
+Questo progetto rappresenta un sistema completo per l'integrazione di multiple tecnologie di intelligenza artificiale con TORCS, offrendo:
 
 - **🎮 Interfaccia utente intuitiva** con menu interattivo
-- **🤖 Algoritmi di guida autonoma avanzati** tramite KNN
+- **🤖 Algoritmi di guida autonoma diversificati**:
+  - Algoritmi tradizionali (SimpleDriver)
+  - Machine Learning KNN con KD-Tree
+  - Reti Neurali MLP con Python
+  - Classificazione azioni discrete
 - **📊 Raccolta dati professionale** per ricerca e sviluppo
 - **🔧 Architettura modulare** facilmente estendibile
 - **🪟 Compatibilità Windows** completa
 
 ### 🚀 Sviluppi Futuri
 
-- Implementazione di algoritmi ML aggiuntivi (Neural Networks, Reinforcement Learning)
+- Implementazione di algoritmi ML aggiuntivi (Reinforcement Learning, Deep Learning)
 - Supporto per piste multiple e configurazioni avanzate
 - Interfaccia grafica per visualizzazione dati in tempo reale
 - Ottimizzazioni per competizioni multi-agente
+- Integrazione di sensori aggiuntivi e fusione sensoriale
+- Ottimizzazione hyperparameter automatica per MLP
 
 ### 📞 Supporto
 
@@ -438,3 +611,5 @@ Per problemi o domande:
 **Progetto MIVIA 2025 - Sistema di Raccolta Dati e Guida Autonoma per TORCS**
 
 *Sviluppato per ricerca e applicazioni educative in Machine Learning e Guida Autonoma*
+
+[⬆️ Torna all'indice](#-indice)
