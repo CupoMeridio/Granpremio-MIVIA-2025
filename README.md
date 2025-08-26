@@ -43,22 +43,36 @@ This advanced system for TORCS offers:
 
 ### Python Setup for MLP Neural Network
 
-The MLP (Multi-Layer Perceptron) autonomous driving feature requires Python. The virtual environment and dependencies are already provided in the repository.
+The MLP (Multi-Layer Perceptron) autonomous driving feature requires Python and a properly configured virtual environment.
 
 #### 1. Install Latest Python Version
 - Download the latest Python version from [python.org](https://www.python.org/downloads/)
 - **Important:** During installation, check "Add Python to PATH"
 - Verify installation: `python --version`
 
-#### 2. Virtual Environment (Already Provided)
-The repository includes a pre-configured virtual environment (`.venv` folder) with all necessary dependencies already installed. No additional setup is required.
+#### 2. Virtual Environment Setup (Required)
+The repository includes an empty `.venv` folder that needs to be configured with the required dependencies.
 
-**Pre-installed Libraries in Virtual Environment:**
+**Setup Instructions:**
+```cmd
+# Navigate to project directory
+cd "c:\Users\cupom\OneDrive\Desktop\Cartella Vittorio\I.A\Granpremio-MIVIA-2025"
+
+# Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate
+
+# Install required dependencies
+pip install pandas numpy scikit-learn joblib jupyter matplotlib
+```
+
+**Required Libraries:**
 - `pandas` - Data manipulation and analysis
 - `numpy` - Numerical computing
 - `scikit-learn` - Machine learning algorithms (MLPRegressor)
 - `joblib` - Model serialization
 - `jupyter` - For running training notebooks (optional)
+- `matplotlib` - For data visualization
 
 ### Build
 

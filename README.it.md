@@ -9,6 +9,7 @@ Un sistema completo per TORCS (The Open Racing Car Simulator) che combina raccol
 - [🎯 Panoramica del Progetto](#-panoramica-del-progetto)
 - [🚀 Installazione e Setup](#-installazione-e-setup)
 - [🎮 Come Usare il Sistema](#-come-usare-il-sistema)
+- [📄 Relazione Tecnica del Progetto](#-relazione-tecnica-del-progetto)
 - [📁 Struttura del Progetto](#-struttura-del-progetto)
 - [🕹️ Controlli di Guida & Supporto Controller](#️-controlli-di-guida--supporto-controller)
 - [🤖 Sistema KNN (K-Nearest Neighbors)](#-sistema-knn-k-nearest-neighbors)
@@ -42,22 +43,36 @@ Questo progetto implementa un sistema avanzato per TORCS che offre:
 
 ### Setup Python per Rete Neurale MLP
 
-La funzionalità di guida autonoma MLP (Multi-Layer Perceptron) richiede Python. L'ambiente virtuale e le dipendenze sono già forniti nel repository.
+La funzionalità di guida autonoma MLP (Multi-Layer Perceptron) richiede Python e un ambiente virtuale configurato correttamente.
 
 #### 1. Installare l'Ultima Versione di Python
 - Scarica l'ultima versione di Python da [python.org](https://www.python.org/downloads/)
 - **Importante:** Durante l'installazione, spunta "Add Python to PATH"
 - Verifica installazione: `python --version`
 
-#### 2. Ambiente Virtuale (Già Fornito)
-Il repository include un ambiente virtuale pre-configurato (cartella `.venv`) con tutte le dipendenze necessarie già installate. Non è richiesta alcuna configurazione aggiuntiva.
+#### 2. Configurazione Ambiente Virtuale (Richiesta)
+Il repository include una cartella `.venv` vuota che deve essere configurata con le dipendenze necessarie.
 
-**Librerie Pre-installate nell'Ambiente Virtuale:**
+**Istruzioni di Setup:**
+```cmd
+# Naviga nella directory del progetto
+cd "c:\Users\cupom\OneDrive\Desktop\Cartella Vittorio\I.A\Granpremio-MIVIA-2025"
+
+# Crea e attiva l'ambiente virtuale
+python -m venv .venv
+.venv\Scripts\activate
+
+# Installa le dipendenze richieste
+pip install pandas numpy scikit-learn joblib jupyter matplotlib
+```
+
+**Librerie Richieste:**
 - `pandas` - Manipolazione e analisi dati
 - `numpy` - Calcolo numerico
 - `scikit-learn` - Algoritmi di machine learning (MLPRegressor)
 - `joblib` - Serializzazione modelli
 - `jupyter` - Per eseguire notebook di training (opzionale)
+- `matplotlib` - Per visualizzazione dati
 
 ### Build
 
@@ -117,6 +132,23 @@ torcs_menu.bat
 
 **📖 Documentazione:**
 - Opzione 9: Apri guida completa
+
+## 📄 Relazione Tecnica del Progetto
+
+### Approfondimento Tecnico Completo
+Per chi vuole entrare a fondo nel progetto e comprendere tutti gli aspetti tecnici, implementativi e sperimentali, consulta:
+
+**📋 [Relazione Progetto ITA.pdf](./Relazione%20progetto%20ITA.pdf)**
+
+La relazione tecnica contiene:
+- Analisi dettagliata dell'architettura del sistema
+- Metodologie di machine learning implementate
+- Risultati sperimentali e valutazioni delle prestazioni
+- Confronto tra diversi approcci di guida autonoma
+- Considerazioni tecniche e sviluppi futuri
+- Approfondimenti teorici e implementativi
+
+[⬆️ Torna all'indice](#-indice)
 
 ### Metodo 2: Script Individuali
 
