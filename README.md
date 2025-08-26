@@ -9,6 +9,7 @@ A comprehensive system for TORCS (The Open Racing Car Simulator) that combines i
 - [🎯 Project Overview](#-project-overview)
 - [🚀 Installation and Setup](#-installation-and-setup)
 - [🎮 How to Use the System](#-how-to-use-the-system)
+- [📄 Technical Report](#-technical-report)
 - [📁 Project Structure](#-project-structure)
 - [🕹️ Driving Controls & Controller Support](#️-driving-controls--controller-support)
 - [🤖 KNN System](#-knn-system)
@@ -151,6 +152,25 @@ torcs_menu.bat
 - **MLP Neural Network**: `JavaClientTorcs/scripts/run_mlp_driving_human.bat`
 
 
+
+[⬆️ Back to Table of Contents](#-table-of-contents)
+
+## 📄 Technical Report
+
+### Complete Technical Documentation
+For those who want to dive deep into the project and understand all technical, implementation, and experimental aspects, please refer to:
+
+**📋 [Relazione Progetto ITA.pdf](./Relazione%20progetto%20ITA.pdf)** *(Available in Italian only)*
+
+The technical report contains:
+- Detailed system architecture analysis
+- Implemented machine learning methodologies
+- Experimental results and performance evaluations
+- Comparison between different autonomous driving approaches
+- Technical considerations and future developments
+- Theoretical and implementation insights
+
+*Note: This comprehensive technical documentation is currently available only in Italian.*
 
 [⬆️ Back to Table of Contents](#-table-of-contents)
 
