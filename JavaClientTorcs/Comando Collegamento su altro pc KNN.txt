@@ -1,0 +1,1 @@
+java -cp "dist\JavaClientTorcs.jar;lib\*" it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.KNNDriver host:IP_DEL_SERVER port:3001 verbose:on

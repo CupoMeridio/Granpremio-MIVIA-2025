@@ -1,6 +1,6 @@
 @echo off
 REM Script per eseguire la guida autonoma MLP con dataset umano
-REM Questo script avvia TORCS e il driver MLP con distanza euclidea
+REM Questo script avvia TORCS e il driver MLP
 
 echo ========================================
 echo    MLP Driving - Dataset Umano
@@ -18,8 +18,7 @@ echo.
 echo Premi un tasto per avviare il driver MLP...
 pause >nul
 echo.
-echo [INFO] Avvio del driver MLP con dataset umano...
-echo [INFO] Configurazione: Distanza Euclidea, Dataset Umano
+echo [INFO] Avvio del driver MLP...
 echo [INFO] Il driver si connettera automaticamente a TORCS
 echo [INFO] Premi Ctrl+C per interrompere
 echo.
@@ -29,6 +28,6 @@ java -cp "dist\JavaClientTorcs.jar;lib\*" it.unisa.javaclienttorcs.Client it.uni
 
 echo.
 echo ========================================
-echo      Sessione KNN Terminata
+echo      Sessione MLP Terminata
 echo ========================================
 echo.

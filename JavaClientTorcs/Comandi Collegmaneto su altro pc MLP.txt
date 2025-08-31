@@ -1,0 +1,8 @@
+Far partire l'env da IDE 
+.venv\Scripts\Activate.ps1
+
+Far partire il server python
+python mlpDriver\mlpDrive.py
+
+Far partire il client Java
+java -cp "dist\JavaClientTorcs.jar;lib\*" it.unisa.javaclienttorcs.Client it.unisa.javaclienttorcs.MLPDriver host:IP_DEL_SERVER port:3001 verbose:on
